@@ -15,6 +15,7 @@ import type {
   SessionLog,
   PlayerCharacter,
   BuilderMessage,
+  CustomSpell,
 } from '@/types';
 
 export const campaignStore = createSupabaseStore<Campaign>('campaigns');
@@ -32,3 +33,4 @@ export const statBlockStore = createSupabaseStore<StatBlock>('stat_blocks');
 export const sessionLogStore = createSupabaseStore<SessionLog>('session_logs');
 export const playerCharacterStore = createSupabaseStore<PlayerCharacter>('player_characters');
 export const builderMessageStore = createSupabaseStore<BuilderMessage>('builder_messages');
+export const customSpellStore = createSupabaseStore<CustomSpell>('custom_spells');

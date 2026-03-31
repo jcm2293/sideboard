@@ -14,9 +14,11 @@ const sections = [
   { label: 'Locations', href: '/locations', icon: '\uD83C\uDFF0' },
   { label: 'Factions', href: '/factions', icon: '\u2691' },
   { label: 'Items', href: '/items', icon: '\uD83D\uDDE1' },
+  { label: 'Spells', href: '/spells', icon: '\uD83D\uDD2E' },
   { label: 'Sessions', href: '/sessions', icon: '\uD83D\uDCC5' },
   { label: 'Bestiary', href: '/bestiary', icon: '\uD83D\uDC09' },
   { label: 'Players', href: '/players', icon: '\uD83C\uDFAD' },
+  { label: 'Quick Ref', href: '/reference', icon: '\uD83D\uDCD6' },
 ];
 
 export default function Sidebar({ campaignId }: { campaignId: string }) {

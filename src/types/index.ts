@@ -192,6 +192,44 @@ export interface PlayerCharacter {
   updated_at: string;
 }
 
+export interface CustomSpell {
+  id: string;
+  campaign_id: string;
+  name: string;
+  level: number;
+  school: string;
+  casting_time: string;
+  range: string;
+  components_v: boolean;
+  components_s: boolean;
+  components_m: boolean;
+  material_description: string;
+  duration: string;
+  concentration: boolean;
+  ritual: boolean;
+  description: string;
+  higher_levels: string;
+  classes: string[];
+  created_at: string;
+}
+
+export interface SrdSpell {
+  index: string;
+  name: string;
+  desc: string[];
+  higher_level: string[];
+  range: string;
+  components: string[];
+  material: string;
+  ritual: boolean;
+  duration: string;
+  concentration: boolean;
+  casting_time: string;
+  level: number;
+  school: string;
+  classes: string[];
+}
+
 export type BuilderMessageRole = 'user' | 'assistant';
 
 export type ProposalType = 'location' | 'npc' | 'faction' | 'lore' | 'plot_arc' | 'world_meta';
