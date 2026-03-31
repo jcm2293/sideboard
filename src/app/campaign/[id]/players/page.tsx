@@ -16,6 +16,7 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const reuploadInputRef = useRef<HTMLInputElement>(null);
@@ -32,15 +33,28 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (data.character) {
-      sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
-      router.push(`/campaign/${id}/players/new?parsed=true`);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error || `Parse failed (${res.status})`);
+        return;
+      }
+      if (data.character) {
+        sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
+        router.push(`/campaign/${id}/players/new?parsed=true`);
+      } else {
+        setError('No character data returned from parser');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload PDF');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-    setUploading(false);
   }
 
   async function handleReupload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -48,16 +62,29 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     const pcId = reuploadPcIdRef.current;
     if (!file || !pcId) return;
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (data.character) {
-      sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
-      router.push(`/campaign/${id}/players/${pcId}?parsed=true`);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error || `Parse failed (${res.status})`);
+        return;
+      }
+      if (data.character) {
+        sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
+        router.push(`/campaign/${id}/players/${pcId}?parsed=true`);
+      } else {
+        setError('No character data returned from parser');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload PDF');
+    } finally {
+      setUploading(false);
+      reuploadPcIdRef.current = null;
+      if (reuploadInputRef.current) reuploadInputRef.current.value = '';
     }
-    setUploading(false);
-    reuploadPcIdRef.current = null;
   }
 
   async function handleExport(pc: PlayerCharacter) {
@@ -138,6 +165,16 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
           </button>
         </div>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-900/20 border border-red-900/40 rounded text-sm text-red-300">
+          <div className="flex justify-between items-start">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200 ml-2">✕</button>
+          </div>
+        </div>
+      )}
 
       {/* Hidden file inputs */}
       <input
