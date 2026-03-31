@@ -1,26 +1,403 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Parchment & Earth Tones */
+  --background: #F4E4C1;
+  --foreground: #1A1210;
+  --muted: #6B5B4E;
+  --accent: #58180D;
+  --accent-light: #7B2D26;
+  --gold: #D4A849;
+  --gold-light: #E0C068;
+  --surface: #F8F0DC;
+  --surface-light: #EDE0C8;
+  --border: #B8A88A;
+  --danger: #8B0000;
+  --success: #2E7D32;
+  --warning: #B8860B;
+
+  /* Sidebar — dark leather/wood */
+  --sidebar-bg: #1A1210;
+  --sidebar-bg-light: #2C1810;
+  --sidebar-text: #C8B07A;
+  --sidebar-border: #3D2B1F;
+
+  /* Stat block (classic 5e) */
+  --stat-block-bg: #FDF1DC;
+  --stat-block-header: #58180D;
+  --stat-block-rule: #9B1C2C;
+  --stat-block-bar-start: #58180D;
+  --stat-block-bar-end: #C9AD6A;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-surface: var(--surface);
+  --color-surface-light: var(--surface-light);
+  --color-border: var(--border);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-bg-light: var(--sidebar-bg-light);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-stat-block-bg: var(--stat-block-bg);
+  --color-stat-block-header: var(--stat-block-header);
+  --color-stat-block-rule: var(--stat-block-rule);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-logo);
+  --font-heading: var(--font-heading);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-data: system-ui, -apple-system, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), 'Crimson Text', Georgia, 'Times New Roman', serif;
+}
+
+/* ─── Font utilities ─── */
+
+/* Logo only — Cinzel Decorative */
+.font-logo {
+  font-family: var(--font-display), 'Cinzel Decorative', Georgia, serif;
+}
+
+/* Headings, nav, buttons — IM Fell English SC */
+.font-heading {
+  font-family: var(--font-heading), 'IM Fell English SC', Georgia, serif;
+}
+
+/* Backward compat: .font-display now maps to heading */
+.font-display {
+  font-family: var(--font-heading), 'IM Fell English SC', Georgia, serif;
+}
+
+/* Numbers, inputs, stat values — clean sans */
+.font-data {
+  font-family: var(--font-data);
+}
+
+/* ═══════════════════════════════════════════
+   PARCHMENT TEXTURE — CSS-only paper grain
+   ═══════════════════════════════════════════ */
+
+.parchment-bg {
+  background:
+    /* Layer 1: subtle noise — tiny semi-transparent dots for paper grain */
+    radial-gradient(ellipse at 23% 17%, rgba(139,90,43,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 78% 35%, rgba(139,90,43,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 45% 80%, rgba(101,67,33,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 12% 60%, rgba(139,90,43,0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 75%, rgba(101,67,33,0.03) 0%, transparent 40%),
+    /* Micro-grain pattern using repeating gradients */
+    repeating-radial-gradient(circle at 50% 50%, transparent 0, rgba(139,90,43,0.015) 1px, transparent 2px),
+    /* Base parchment */
+    var(--background);
+  /* Vignette — darker edges for aged look */
+  box-shadow:
+    inset 0 0 120px rgba(139,69,19,0.07),
+    inset 0 0 60px rgba(101,67,33,0.05);
+}
+
+/* Page-on-desk effect — subtle drop shadow on both sides */
+.page-shadow {
+  box-shadow:
+    -4px 0 16px -4px rgba(26,18,16,0.1),
+    4px 0 16px -4px rgba(26,18,16,0.1),
+    inset 0 0 120px rgba(139,69,19,0.07),
+    inset 0 0 60px rgba(101,67,33,0.05);
+}
+
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-light);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+
+/* ═══════════════════════════════════════════
+   FORM ELEMENTS
+   ═══════════════════════════════════════════ */
+
+select {
+  color: var(--foreground);
+  background-color: var(--surface-light);
+}
+select option {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.65;
+}
+
+
+/* ═══════════════════════════════════════════
+   ORNAMENTAL DIVIDER
+   ═══════════════════════════════════════════ */
+
+.divider-ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--warning);
+  margin: 1.5rem 0;
+  font-size: 0.75rem;
+}
+.divider-ornament::before,
+.divider-ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+
+
+/* ═══════════════════════════════════════════
+   CARD — PARCHMENT FEEL
+   ═══════════════════════════════════════════ */
+
+.card-parchment {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 0 30px rgba(181, 160, 120, 0.12),
+    0 1px 4px rgba(26, 18, 16, 0.08),
+    0 2px 8px rgba(139, 69, 19, 0.04);
+}
+
+
+/* ═══════════════════════════════════════════
+   SHELF CARDS — pinned note rotation
+   ═══════════════════════════════════════════ */
+
+.shelf-card:nth-child(odd) {
+  transform: rotate(0.3deg);
+}
+.shelf-card:nth-child(even) {
+  transform: rotate(-0.4deg);
+}
+.shelf-card:hover {
+  transform: rotate(0deg) translateY(-1px);
+}
+
+
+/* ═══════════════════════════════════════════
+   BUTTONS — embossed/raised crimson
+   ═══════════════════════════════════════════ */
+
+.btn-primary {
+  background: linear-gradient(to bottom, #6E1E14, #58180D);
+  border: 1px solid #3E0F08;
+  border-top-color: #7B2D26;
+  color: #FDF1DC;
+  font-family: var(--font-heading), 'IM Fell English SC', Georgia, serif;
+  transition: all 0.15s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(to bottom, #7B2D26, #6E1E14);
+  box-shadow: 0 0 10px rgba(212, 168, 73, 0.3);
+}
+.btn-primary:active {
+  background: linear-gradient(to bottom, #4E1209, #58180D);
+  box-shadow: none;
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  transition: all 0.15s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--foreground);
+  box-shadow: 0 0 6px rgba(212, 168, 73, 0.15);
+}
+
+
+/* ═══════════════════════════════════════════
+   STAT BLOCK — classic 5e styling
+   ═══════════════════════════════════════════
+
+   The gradient bars at top/bottom use the
+   classic DMG red-to-gold gradient. Inner
+   padding keeps content clear of the bars.
+   ═══════════════════════════════════════════ */
+
+.stat-block {
+  background: var(--stat-block-bg);
+  padding: 0.75rem 0.875rem;
+  position: relative;
+  /* room for the gradient bars */
+  padding-top: calc(0.75rem + 5px);
+  padding-bottom: calc(0.75rem + 5px);
+  box-shadow:
+    0 0 6px rgba(0,0,0,0.1);
+  column-rule: 1px solid var(--stat-block-rule);
+}
+
+/* Top gradient bar */
+.stat-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    var(--stat-block-bar-start),
+    var(--stat-block-bar-end),
+    var(--stat-block-bar-start)
+  );
+}
+
+/* Bottom gradient bar */
+.stat-block::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    var(--stat-block-bar-start),
+    var(--stat-block-bar-end),
+    var(--stat-block-bar-start)
+  );
+}
+
+.stat-block h3 {
+  color: var(--stat-block-header);
+  font-family: var(--font-heading), 'IM Fell English SC', Georgia, serif;
+}
+
+/* Thin maroon rule inside stat blocks */
+.stat-block-rule {
+  border: none;
+  height: 2px;
+  margin: 0.375rem 0;
+  background: linear-gradient(
+    to right,
+    var(--stat-block-bar-start),
+    var(--stat-block-bar-end),
+    var(--stat-block-bar-start)
+  );
+  opacity: 0.7;
+}
+
+/* Section heading inside stat blocks (Actions, Reactions, etc.) */
+.stat-block-section-heading {
+  color: var(--stat-block-header);
+  font-family: var(--font-heading), 'IM Fell English SC', Georgia, serif;
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--stat-block-rule);
+}
+
+
+/* ═══════════════════════════════════════════
+   SIDEBAR — wood grain texture
+   ═══════════════════════════════════════════ */
+
+.sidebar-wood {
+  background:
+    /* Subtle wood grain: layered linear-gradients at slight angles */
+    repeating-linear-gradient(
+      87deg,
+      transparent,
+      transparent 3px,
+      rgba(60, 35, 20, 0.08) 3px,
+      rgba(60, 35, 20, 0.08) 4px
+    ),
+    repeating-linear-gradient(
+      91deg,
+      transparent,
+      transparent 7px,
+      rgba(80, 50, 30, 0.05) 7px,
+      rgba(80, 50, 30, 0.05) 8px
+    ),
+    repeating-linear-gradient(
+      85deg,
+      transparent,
+      transparent 11px,
+      rgba(44, 24, 16, 0.06) 11px,
+      rgba(44, 24, 16, 0.06) 12px
+    ),
+    linear-gradient(
+      180deg,
+      #1A1210 0%,
+      #1E1512 50%,
+      #1A1210 100%
+    );
+}
+
+/* Sidebar scrollbar override */
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: var(--sidebar-border);
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--sidebar-text);
+}
+
+/* Active nav glow */
+.sidebar-nav-active {
+  background: rgba(212, 168, 73, 0.08);
+  border-left: 3px solid var(--gold);
+  box-shadow: inset 3px 0 8px -3px rgba(212, 168, 73, 0.15);
+}
+
+
+/* ═══════════════════════════════════════════
+   BUILDER CHAT — markdown prose
+   ═══════════════════════════════════════════ */
+
+.prose-sm strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.prose-sm em {
+  color: var(--muted);
+}
+
+.prose-sm li {
+  margin-bottom: 0.25rem;
+}
+
+.prose-sm h2,
+.prose-sm h3,
+.prose-sm h4 {
+  color: var(--accent);
 }
