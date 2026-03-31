@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -15,9 +16,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 parchment-bg">
-      <h1 className="font-logo text-4xl mb-2 text-accent">Sideboard</h1>
-      <p className="text-muted mb-2 italic">Campaign Manager for Dungeon Masters</p>
-      <div className="divider-ornament text-sm mb-8 w-48">◆</div>
+      <Image
+        src="/logo.png"
+        alt="Sideboard — Campaign Manager for Dungeon Masters"
+        width={1314}
+        height={318}
+        className="w-full max-w-[450px] h-auto mb-8"
+        priority
+      />
       <button
         onClick={handleGoogleLogin}
         className="btn-primary px-6 py-3 rounded text-sm flex items-center gap-2"

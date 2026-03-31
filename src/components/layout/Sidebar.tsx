@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -31,13 +32,21 @@ export default function Sidebar({ campaignId }: { campaignId: string }) {
     >
       <div className="flex items-center justify-between p-3 border-b border-sidebar-border">
         {!collapsed && (
-          <Link href="/" className="font-logo text-[1.25rem] text-gold truncate leading-tight">
-            Sideboard
+          <Link href="/" className="block flex-1 min-w-0">
+            <div className="bg-amber-50/90 rounded-md px-2 py-1.5">
+              <Image
+                src="/logo.png"
+                alt="Sideboard"
+                width={1314}
+                height={318}
+                className="w-full h-auto"
+              />
+            </div>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="text-sidebar-text hover:text-gold text-lg"
+          className={`text-sidebar-text hover:text-gold text-lg ${collapsed ? '' : 'ml-2'} shrink-0`}
           title={collapsed ? 'Expand' : 'Collapse'}
         >
           {collapsed ? '»' : '«'}
