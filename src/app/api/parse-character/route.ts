@@ -234,23 +234,31 @@ function parseProficiencies(fields: FormFields): {
   let tools = '';
 
   if (raw) {
-    const sections = raw.split('===').filter(Boolean);
-    for (const section of sections) {
-      const lines = section.trim();
-      if (lines.startsWith('ARMOR')) {
-        const content = lines.replace('ARMOR', '').trim().toLowerCase();
+    // Split by "=== HEADER ===" pattern, keeping the header name
+    const sectionRegex = /===\s*(\w+)\s*===/g;
+    const headers: { name: string; start: number }[] = [];
+    let match;
+    while ((match = sectionRegex.exec(raw)) !== null) {
+      headers.push({ name: match[1].toUpperCase(), start: match.index + match[0].length });
+    }
+
+    for (let i = 0; i < headers.length; i++) {
+      const end = i + 1 < headers.length ? raw.indexOf('===', headers[i].start) : raw.length;
+      const content = raw.substring(headers[i].start, end).trim().toLowerCase();
+      const name = headers[i].name;
+
+      if (name === 'ARMOR') {
         if (content.includes('light')) armor.light = true;
         if (content.includes('medium')) armor.medium = true;
         if (content.includes('heavy')) armor.heavy = true;
         if (content.includes('shield')) armor.shields = true;
-      } else if (lines.startsWith('WEAPONS')) {
-        const content = lines.replace('WEAPONS', '').trim().toLowerCase();
+      } else if (name === 'WEAPONS') {
         if (content.includes('simple')) weapons.simple = true;
         if (content.includes('martial')) weapons.martial = true;
-      } else if (lines.startsWith('LANGUAGES')) {
-        languages = lines.replace('LANGUAGES', '').trim().replace(/\n/g, ' ');
-      } else if (lines.startsWith('TOOLS')) {
-        tools = lines.replace('TOOLS', '').trim().replace(/\n/g, ', ');
+      } else if (name === 'LANGUAGES') {
+        languages = raw.substring(headers[i].start, end).trim().replace(/\n/g, ' ');
+      } else if (name === 'TOOLS') {
+        tools = raw.substring(headers[i].start, end).trim().replace(/\n/g, ', ');
       }
     }
   }
