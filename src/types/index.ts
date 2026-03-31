@@ -176,18 +176,119 @@ export interface SessionLog {
   created_at: string;
 }
 
+export interface AttackEntry {
+  name: string;
+  atk_bonus: string;
+  damage: string;
+  damage_type: string;
+  range?: string;
+  notes?: string;
+}
+
+export interface ClassResource {
+  name: string;
+  uses: number;
+  die?: string;
+  recovery: string;
+}
+
+export interface FeatureEntry {
+  name: string;
+  summary: string;
+}
+
+export interface EquipmentEntry {
+  name: string;
+  qty: number;
+  weight?: string;
+  notes?: string;
+}
+
 export interface PlayerCharacter {
   id: string;
   campaign_id: string;
+
+  // Identity
   name: string;
   player_name: string;
-  race: string;
   class_name: string;
+  subclass: string;
   level: number;
+
+  // Combat stats
   armor_class: number;
-  hit_points: number;
-  backstory: string;
-  notes: string;
+  ac_source: string;
+  initiative_modifier: number;
+  speeds: Record<string, string>;
+  hp_max: number;
+  hit_dice_total: string;
+  proficiency_bonus: number;
+
+  // Passives & senses
+  passive_perception: number;
+  passive_insight: number | null;
+  passive_investigation: number | null;
+  senses: string;
+
+  // Ability scores
+  str_score: number;
+  dex_score: number;
+  con_score: number;
+  int_score: number;
+  wis_score: number;
+  cha_score: number;
+
+  // Pre-calculated modifiers
+  skill_modifiers: Record<string, number>;
+  save_modifiers: Record<string, number>;
+
+  // Attacks
+  attacks: AttackEntry[];
+
+  // Defenses
+  damage_resistances: string;
+  damage_immunities: string;
+  condition_immunities: string;
+
+  // Proficiencies
+  armor_proficiencies: Record<string, boolean>;
+  weapon_proficiencies: Record<string, boolean>;
+  languages: string;
+  tool_proficiencies: string;
+
+  // Spellcasting
+  is_spellcaster: boolean;
+  spell_attack_bonus: number | null;
+  spell_save_dc: number | null;
+  spellcasting_ability: string | null;
+  spell_slots: Record<string, number> | null;
+  pact_slot_level: number | null;
+  pact_slot_count: number | null;
+  spells: Record<string, string[]> | null;
+  is_prepared_caster: boolean;
+  prepared_spells: string[] | null;
+
+  // Class resources
+  class_resources: ClassResource[] | null;
+
+  // Features
+  class_features: FeatureEntry[];
+  racial_traits: FeatureEntry[] | null;
+  feats: FeatureEntry[] | null;
+
+  // Inventory
+  equipment: EquipmentEntry[];
+
+  // Currency
+  cp: number;
+  sp: number;
+  ep: number;
+  gp: number;
+  pp: number;
+
+  // Source
+  pdf_url: string | null;
+
   created_at: string;
   updated_at: string;
 }

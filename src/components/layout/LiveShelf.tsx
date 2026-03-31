@@ -26,6 +26,49 @@ function SpellDetail({ data }: { data: Record<string, unknown> }) {
   );
 }
 
+function PCDetail({ data }: { data: Record<string, unknown> }) {
+  const saves = (data.save_modifiers || {}) as Record<string, number>;
+  const modStr = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
+
+  return (
+    <div className="text-xs space-y-1.5 mt-1">
+      <div className="text-muted">
+        {String(data.class_name || '')}
+        {data.subclass ? ` — ${data.subclass}` : ''}
+        {' \u2022 '}Level {String(data.level || '')}
+      </div>
+      <div className="flex gap-3">
+        <span>AC {String(data.armor_class || '')}{data.ac_source ? ` (${data.ac_source})` : ''}</span>
+        <span>HP {String(data.hp_max || '')}</span>
+        <span>PP {String(data.passive_perception || '')}</span>
+      </div>
+      {Object.keys(saves).length > 0 && (
+        <div className="text-muted">
+          <span className="block mb-0.5">Saves:</span>
+          <span>
+            STR {modStr(saves.str || 0)} {' \u2022 '}
+            DEX {modStr(saves.dex || 0)} {' \u2022 '}
+            CON {modStr(saves.con || 0)} {' \u2022 '}
+            INT {modStr(saves.int || 0)} {' \u2022 '}
+            WIS {modStr(saves.wis || 0)} {' \u2022 '}
+            CHA {modStr(saves.cha || 0)}
+          </span>
+        </div>
+      )}
+      {data.senses ? (
+        <div className="text-muted">{String(data.senses)}</div>
+      ) : null}
+      {(data.damage_resistances || data.damage_immunities || data.condition_immunities) ? (
+        <div className="text-muted">
+          {data.damage_resistances ? <div>Resist: {String(data.damage_resistances)}</div> : null}
+          {data.damage_immunities ? <div>Immune: {String(data.damage_immunities)}</div> : null}
+          {data.condition_immunities ? <div>Cond. Immune: {String(data.condition_immunities)}</div> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function LiveShelf() {
   const { isOpen, items, toggle, removeItem } = useShelfStore();
 
@@ -51,7 +94,7 @@ export default function LiveShelf() {
           <div className="divider-ornament text-xs">◆</div>
           {items.length === 0 ? (
             <p className="text-sm text-muted italic">
-              Pin NPCs, locations, spells, or notes here for quick reference during a session.
+              Pin NPCs, locations, spells, or characters here for quick reference during a session.
             </p>
           ) : (
             items.map((item) => (
@@ -62,6 +105,7 @@ export default function LiveShelf() {
                 onRemove={() => removeItem(item.id)}
               >
                 {item.type === 'Spell' && <SpellDetail data={item.data} />}
+                {item.type === 'Player Character' && <PCDetail data={item.data} />}
               </ShelfCard>
             ))
           )}
