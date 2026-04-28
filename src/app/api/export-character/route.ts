@@ -1,52 +1,72 @@
+// PDF character sheet export.
+//
+// Three pages:
+//   1. Combat reference  — header, quick stats, ability/skill grid, attacks,
+//                          senses/defenses, class resources, proficiencies, features
+//   2. Inventory         — table + currency block + notes (only if items exist)
+//   3. Spells            — stats bar, slot boxes, full spell cards w/ SRD descriptions
+//
+// jsPDF's built-in fonts (helvetica, times, courier) don't carry full Unicode,
+// so we draw bubbles/circles with doc.circle() instead of using ●/○ glyphs.
+// "times" is the closest serif fallback to Cinzel/Crimson per the spec.
+
 import { jsPDF } from 'jspdf';
 import { NextRequest } from 'next/server';
-import type { PlayerCharacter } from '@/types';
+import type { PlayerCharacter, SrdSpell, CustomSpell } from '@/types';
+import srdSpellsData from '@/data/spells.json';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function abilityMod(score: number): number {
-  return Math.floor((score - 10) / 2);
+const SRD_SPELLS: SrdSpell[] = srdSpellsData as SrdSpell[];
+const SRD_BY_NAME = new Map<string, SrdSpell>();
+for (const s of SRD_SPELLS) {
+  SRD_BY_NAME.set(s.name.toLowerCase().trim(), s);
 }
 
-function modStr(mod: number): string {
-  return mod >= 0 ? `+${mod}` : `${mod}`;
+// Bridge custom spells onto the SrdSpell shape so the renderer doesn't care which library a spell came from.
+function customToSrdShape(c: CustomSpell): SrdSpell {
+  const components: string[] = [];
+  if (c.components_v) components.push('V');
+  if (c.components_s) components.push('S');
+  if (c.components_m) components.push('M');
+  return {
+    index: c.id,
+    name: c.name,
+    desc: c.description ? [c.description] : [],
+    higher_level: c.higher_levels ? [c.higher_levels] : [],
+    range: c.range,
+    components,
+    material: c.material_description,
+    ritual: c.ritual,
+    duration: c.duration,
+    concentration: c.concentration,
+    casting_time: c.casting_time,
+    level: c.level,
+    school: c.school,
+    classes: c.classes || [],
+  };
 }
 
-// Ability → skill mapping (5e SRD)
-const ABILITY_SKILLS: Record<string, string[]> = {
-  STR: ['Athletics'],
-  DEX: ['Acrobatics', 'Sleight of Hand', 'Stealth'],
-  CON: [],
-  INT: ['Arcana', 'History', 'Investigation', 'Nature', 'Religion'],
-  WIS: ['Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival'],
-  CHA: ['Deception', 'Intimidation', 'Performance', 'Persuasion'],
-};
+// ──────────────────────────────────────────────────────────────────────────
+// Style tokens
+// ──────────────────────────────────────────────────────────────────────────
 
-const ABILITY_KEYS: { key: string; score: keyof PlayerCharacter }[] = [
-  { key: 'STR', score: 'str_score' },
-  { key: 'DEX', score: 'dex_score' },
-  { key: 'CON', score: 'con_score' },
-  { key: 'INT', score: 'int_score' },
-  { key: 'WIS', score: 'wis_score' },
-  { key: 'CHA', score: 'cha_score' },
-];
-
-// Colors
 const PARCHMENT = '#F4E4C1';
+const PARCHMENT_ALT = '#EDD6A8';
 const MAROON = '#58180D';
-const BODY = '#1a1a1a';
+const GOLD = '#B8860B';
+const BODY = '#1A1210';
 const MUTED = '#6b6b6b';
+const CREAM = '#FDF1DC';
 
-// Page dimensions (US Letter mm)
+// US Letter, mm
 const PW = 215.9;
 const PH = 279.4;
-const MARGIN = 10;
+const MARGIN = 12.7; // 0.5 inch
 
-// ---------------------------------------------------------------------------
-// Utility drawing helpers
-// ---------------------------------------------------------------------------
+const SERIF = 'times';
+
+// ──────────────────────────────────────────────────────────────────────────
+// Drawing helpers
+// ──────────────────────────────────────────────────────────────────────────
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '');
@@ -56,34 +76,70 @@ function hexToRgb(hex: string): [number, number, number] {
     parseInt(h.substring(4, 6), 16),
   ];
 }
-
 function setFill(doc: jsPDF, hex: string) {
   const [r, g, b] = hexToRgb(hex);
   doc.setFillColor(r, g, b);
 }
-
-function setTextCol(doc: jsPDF, hex: string) {
+function setText(doc: jsPDF, hex: string) {
   const [r, g, b] = hexToRgb(hex);
   doc.setTextColor(r, g, b);
 }
-
-function setDrawCol(doc: jsPDF, hex: string) {
+function setDraw(doc: jsPDF, hex: string) {
   const [r, g, b] = hexToRgb(hex);
   doc.setDrawColor(r, g, b);
 }
-
-/** Draw a filled circle (for proficiency dots). */
-function filledCircle(doc: jsPDF, x: number, y: number, r: number) {
-  doc.circle(x, y, r, 'F');
+function abilityMod(score: number): number {
+  return Math.floor((score - 10) / 2);
+}
+function modStr(mod: number | null | undefined): string {
+  if (mod == null) return '—';
+  return mod >= 0 ? `+${mod}` : `${mod}`;
 }
 
-/** Draw a stroked circle. */
-function emptyCircle(doc: jsPDF, x: number, y: number, r: number) {
-  doc.circle(x, y, r, 'S');
+function drawParchmentBg(doc: jsPDF) {
+  setFill(doc, PARCHMENT);
+  doc.rect(0, 0, PW, PH, 'F');
 }
 
-/** Wrap text to fit a width and draw it, returning the new Y. */
-function drawWrappedText(
+/** Filled circle for proficiency dots — draws a real circle, no Unicode glyph dependency. */
+function dot(doc: jsPDF, x: number, y: number, r: number, filled: boolean) {
+  setDraw(doc, MAROON);
+  setFill(doc, MAROON);
+  doc.circle(x, y, r, filled ? 'F' : 'S');
+}
+
+/** Diamond ornament drawn as 4-point path. */
+function drawDiamond(doc: jsPDF, cx: number, cy: number, half: number, color: string) {
+  setFill(doc, color);
+  setDraw(doc, color);
+  // jsPDF lines() takes an array of [dx, dy] vertices relative to start
+  doc.lines(
+    [
+      [half, -half],
+      [half, half],
+      [-half, half],
+      [-half, -half],
+    ],
+    cx - half,
+    cy,
+    [1, 1],
+    'F',
+    true,
+  );
+}
+
+/** Decorative section divider: thin rule with centered diamond. */
+function ornamentDivider(doc: jsPDF, x1: number, x2: number, y: number) {
+  setDraw(doc, GOLD);
+  doc.setLineWidth(0.2);
+  const cx = (x1 + x2) / 2;
+  doc.line(x1, y, cx - 3, y);
+  doc.line(cx + 3, y, x2, y);
+  drawDiamond(doc, cx, y, 1.2, GOLD);
+}
+
+/** Wrap and draw multi-line text; returns updated y. */
+function drawWrapped(
   doc: jsPDF,
   text: string,
   x: number,
@@ -91,6 +147,7 @@ function drawWrappedText(
   maxWidth: number,
   lineHeight: number,
 ): number {
+  if (!text) return y;
   const lines = doc.splitTextToSize(text, maxWidth) as string[];
   for (const line of lines) {
     doc.text(line, x, y);
@@ -99,636 +156,981 @@ function drawWrappedText(
   return y;
 }
 
-// ---------------------------------------------------------------------------
-// Page backgrounds
-// ---------------------------------------------------------------------------
+/** Header for any page: maroon top band + character name + class line. */
+function drawPageHeader(doc: jsPDF, c: PlayerCharacter, subtitle?: string) {
+  // Thin top accent
+  setFill(doc, MAROON);
+  doc.rect(0, 0, PW, 1.5, 'F');
 
-function drawParchmentBg(doc: jsPDF) {
-  setFill(doc, PARCHMENT);
-  doc.rect(0, 0, PW, PH, 'F');
+  // Main band
+  setFill(doc, MAROON);
+  doc.rect(0, 1.5, PW, 24, 'F');
+
+  // Character name
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(20);
+  setText(doc, '#FFFFFF');
+  doc.text(c.name || 'Unnamed', MARGIN, 14);
+
+  // Player name (italic, smaller)
+  if (c.player_name) {
+    doc.setFont(SERIF, 'italic');
+    doc.setFontSize(9);
+    setText(doc, '#E8D8B8');
+    doc.text(c.player_name, MARGIN, 21);
+  }
+
+  // Right side: class — subclass — level
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(12);
+  setText(doc, '#FFFFFF');
+  const classBits: string[] = [];
+  if (c.class_name) classBits.push(c.class_name);
+  if (c.subclass) classBits.push(c.subclass);
+  classBits.push(`Level ${c.level || 1}`);
+  doc.text(classBits.join(' — '), PW - MARGIN, 14, { align: 'right' });
+
+  if (subtitle) {
+    doc.setFont(SERIF, 'italic');
+    doc.setFontSize(11);
+    doc.text(subtitle, PW - MARGIN, 21, { align: 'right' });
+  }
+
+  // Bottom accent line
+  setFill(doc, MAROON);
+  doc.rect(0, 25.5, PW, 1, 'F');
 }
 
-// ---------------------------------------------------------------------------
+// ──────────────────────────────────────────────────────────────────────────
+// Page 1: Combat reference
+// ──────────────────────────────────────────────────────────────────────────
+
+interface QuickStat {
+  label: string;
+  value: string;
+}
+
+function drawQuickStatsBar(doc: jsPDF, stats: QuickStat[], y: number): number {
+  const x0 = MARGIN;
+  const totalW = PW - 2 * MARGIN;
+  const h = 14;
+  const colW = totalW / stats.length;
+
+  // Background
+  setFill(doc, CREAM);
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.rect(x0, y, totalW, h, 'FD');
+
+  // Vertical separators + labels + values
+  for (let i = 0; i < stats.length; i++) {
+    const cx = x0 + i * colW + colW / 2;
+
+    if (i > 0) {
+      setDraw(doc, MAROON);
+      doc.setLineWidth(0.15);
+      doc.line(x0 + i * colW, y + 2, x0 + i * colW, y + h - 2);
+    }
+
+    // Label
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'normal');
+    doc.setFontSize(6);
+    doc.text(stats[i].label.toUpperCase(), cx, y + 4.5, { align: 'center' });
+
+    // Value
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.setFontSize(11);
+    doc.text(stats[i].value, cx, y + 11, { align: 'center' });
+  }
+
+  return y + h + 3;
+}
+
+const ABILITIES: { key: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha'; label: string; full: string }[] = [
+  { key: 'str', label: 'STR', full: 'STRENGTH' },
+  { key: 'dex', label: 'DEX', full: 'DEXTERITY' },
+  { key: 'con', label: 'CON', full: 'CONSTITUTION' },
+  { key: 'int', label: 'INT', full: 'INTELLIGENCE' },
+  { key: 'wis', label: 'WIS', full: 'WISDOM' },
+  { key: 'cha', label: 'CHA', full: 'CHARISMA' },
+];
+
+const SKILLS_BY_ABILITY: Record<string, { key: string; label: string }[]> = {
+  str: [{ key: 'athletics', label: 'Athletics' }],
+  dex: [
+    { key: 'acrobatics', label: 'Acrobatics' },
+    { key: 'sleight_of_hand', label: 'Sleight of Hand' },
+    { key: 'stealth', label: 'Stealth' },
+  ],
+  con: [],
+  int: [
+    { key: 'arcana', label: 'Arcana' },
+    { key: 'history', label: 'History' },
+    { key: 'investigation', label: 'Investigation' },
+    { key: 'nature', label: 'Nature' },
+    { key: 'religion', label: 'Religion' },
+  ],
+  wis: [
+    { key: 'animal_handling', label: 'Animal Handling' },
+    { key: 'insight', label: 'Insight' },
+    { key: 'medicine', label: 'Medicine' },
+    { key: 'perception', label: 'Perception' },
+    { key: 'survival', label: 'Survival' },
+  ],
+  cha: [
+    { key: 'deception', label: 'Deception' },
+    { key: 'intimidation', label: 'Intimidation' },
+    { key: 'performance', label: 'Performance' },
+    { key: 'persuasion', label: 'Persuasion' },
+  ],
+};
+
+function abilityScoreOf(c: PlayerCharacter, key: typeof ABILITIES[number]['key']): number {
+  switch (key) {
+    case 'str': return c.str_score;
+    case 'dex': return c.dex_score;
+    case 'con': return c.con_score;
+    case 'int': return c.int_score;
+    case 'wis': return c.wis_score;
+    case 'cha': return c.cha_score;
+  }
+}
+
+/** One ability box with header + save + skills. Returns the computed height. */
+function drawAbilityBox(
+  doc: jsPDF,
+  c: PlayerCharacter,
+  ability: typeof ABILITIES[number],
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const score = abilityScoreOf(c, ability.key);
+  const mod = abilityMod(score);
+  const skills = SKILLS_BY_ABILITY[ability.key];
+  const saveMod = c.save_modifiers?.[ability.key] ?? mod;
+
+  // Container
+  setFill(doc, CREAM);
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.rect(x, y, w, h, 'FD');
+
+  // Header strip
+  setText(doc, MAROON);
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(8);
+  doc.text(ability.full, x + w / 2, y + 4.5, { align: 'center' });
+
+  // Big modifier
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(20);
+  setText(doc, BODY);
+  doc.text(modStr(mod), x + w / 2, y + 13, { align: 'center' });
+
+  // Score
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+  setText(doc, MUTED);
+  doc.text(String(score), x + w / 2, y + 17.5, { align: 'center' });
+
+  // Divider
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.2);
+  doc.line(x + 2, y + 20, x + w - 2, y + 20);
+
+  // Save row
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+  setText(doc, BODY);
+  doc.text('Save', x + 2, y + 24);
+  doc.setFont(SERIF, 'bold');
+  doc.text(modStr(saveMod), x + w - 2, y + 24, { align: 'right' });
+
+  // Skills
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(7.5);
+  let sy = y + 28;
+  for (const s of skills) {
+    if (sy > y + h - 1) break;
+    const sm = c.skill_modifiers?.[s.key] ?? mod;
+    setText(doc, BODY);
+    doc.text(s.label, x + 2, sy);
+    doc.setFont(SERIF, 'bold');
+    doc.text(modStr(sm), x + w - 2, sy, { align: 'right' });
+    doc.setFont(SERIF, 'normal');
+    sy += 3.5;
+  }
+}
+
+function drawAbilityGrid(doc: jsPDF, c: PlayerCharacter, x: number, y: number, w: number): number {
+  const colGap = 3;
+  const rowGap = 3;
+  const colW = (w - colGap) / 2;
+  // Tallest box must fit WIS (5 skills) or CHA (4 skills). 28mm header + 4mm/skill ≈ 48mm
+  const boxH = 50;
+
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 2; col++) {
+      const i = row * 2 + col;
+      const ab = ABILITIES[i];
+      const bx = x + col * (colW + colGap);
+      const by = y + row * (boxH + rowGap);
+      drawAbilityBox(doc, c, ab, bx, by, colW, boxH);
+    }
+  }
+  return y + 3 * (boxH + rowGap) - rowGap;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Right column blocks
+// ──────────────────────────────────────────────────────────────────────────
+
+function drawSectionHeader(doc: jsPDF, label: string, x: number, y: number, w: number): number {
+  setText(doc, MAROON);
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(10);
+  doc.text(label, x, y);
+  // Underline
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.4);
+  doc.line(x, y + 1, x + w, y + 1);
+  return y + 5;
+}
+
+function drawAttacksTable(
+  doc: jsPDF,
+  attacks: PlayerCharacter['attacks'],
+  x: number,
+  y: number,
+  w: number,
+): number {
+  if (!attacks || attacks.length === 0) return y;
+  y = drawSectionHeader(doc, 'ATTACKS', x, y, w);
+
+  // Column widths
+  const cols = [
+    { label: 'Name', w: 0.42 },
+    { label: 'Atk', w: 0.13 },
+    { label: 'Damage', w: 0.25 },
+    { label: 'Type', w: 0.20 },
+  ];
+
+  // Header row
+  const rowH = 5;
+  setFill(doc, MAROON);
+  doc.rect(x, y, w, rowH, 'F');
+  setText(doc, '#FFFFFF');
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(8);
+  let cx = x;
+  for (const col of cols) {
+    const colWidth = w * col.w;
+    doc.text(col.label, cx + 1, y + 3.5);
+    cx += colWidth;
+  }
+  y += rowH;
+
+  // Body rows
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+  for (let i = 0; i < attacks.length; i++) {
+    const atk = attacks[i];
+    if (i % 2 === 0) {
+      setFill(doc, PARCHMENT_ALT);
+      doc.rect(x, y, w, rowH, 'F');
+    }
+    setText(doc, BODY);
+    cx = x;
+    const cells = [atk.name, atk.atk_bonus, atk.damage, atk.damage_type];
+    for (let j = 0; j < cols.length; j++) {
+      const colWidth = w * cols[j].w;
+      const text = doc.splitTextToSize(cells[j] || '', colWidth - 2)[0] || '';
+      doc.text(text, cx + 1, y + 3.5);
+      cx += colWidth;
+    }
+    y += rowH;
+  }
+
+  // Bottom border
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.line(x, y, x + w, y);
+
+  return y + 3;
+}
+
+function drawSensesAndDefenses(
+  doc: jsPDF,
+  c: PlayerCharacter,
+  x: number,
+  y: number,
+  w: number,
+): number {
+  const lines: { label: string; value: string }[] = [];
+  if (c.senses) lines.push({ label: 'Senses', value: c.senses });
+  if (c.passive_perception != null) {
+    lines.push({ label: 'Passive Perc', value: String(c.passive_perception) });
+  }
+  if (c.damage_resistances) lines.push({ label: 'Resistances', value: c.damage_resistances });
+  if (c.damage_immunities) lines.push({ label: 'Damage Imm.', value: c.damage_immunities });
+  if (c.condition_immunities) lines.push({ label: 'Condition Imm.', value: c.condition_immunities });
+  if (lines.length === 0) return y;
+
+  y = drawSectionHeader(doc, 'SENSES & DEFENSES', x, y, w);
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+  for (const ln of lines) {
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.text(`${ln.label}:`, x, y);
+    const labelW = doc.getTextWidth(`${ln.label}: `);
+    doc.setFont(SERIF, 'normal');
+    setText(doc, BODY);
+    y = drawWrapped(doc, ln.value, x + labelW, y, w - labelW, 3.5);
+    y += 0.5;
+  }
+  return y + 2;
+}
+
+function drawClassResources(
+  doc: jsPDF,
+  resources: PlayerCharacter['class_resources'],
+  x: number,
+  y: number,
+  w: number,
+): number {
+  if (!resources || resources.length === 0) return y;
+  y = drawSectionHeader(doc, 'CLASS RESOURCES', x, y, w);
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+  for (const r of resources) {
+    const die = r.die ? ` (${r.die})` : '';
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.text(r.name, x, y);
+    setText(doc, BODY);
+    doc.setFont(SERIF, 'normal');
+    doc.text(`${r.uses} uses${die}`, x + w * 0.55, y);
+    setText(doc, MUTED);
+    doc.text(r.recovery, x + w, y, { align: 'right' });
+    y += 4;
+  }
+  return y + 2;
+}
+
+function drawProficiencies(
+  doc: jsPDF,
+  c: PlayerCharacter,
+  x: number,
+  y: number,
+  w: number,
+): number {
+  y = drawSectionHeader(doc, 'PROFICIENCIES', x, y, w);
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(8);
+
+  const armorTypes: { key: string; label: string }[] = [
+    { key: 'light', label: 'Light' },
+    { key: 'medium', label: 'Medium' },
+    { key: 'heavy', label: 'Heavy' },
+    { key: 'shields', label: 'Shields' },
+  ];
+  const weaponTypes: { key: string; label: string }[] = [
+    { key: 'simple', label: 'Simple' },
+    { key: 'martial', label: 'Martial' },
+  ];
+
+  // Armor row — drawn dots, not Unicode glyphs
+  setText(doc, BODY);
+  doc.setFont(SERIF, 'bold');
+  doc.text('Armor:', x, y);
+  let cx = x + 14;
+  doc.setFont(SERIF, 'normal');
+  for (const a of armorTypes) {
+    const has = c.armor_proficiencies?.[a.key] ?? false;
+    dot(doc, cx, y - 1, 1.1, has);
+    doc.text(a.label, cx + 2, y);
+    cx += doc.getTextWidth(a.label) + 7;
+  }
+  y += 4.5;
+
+  // Weapons row
+  doc.setFont(SERIF, 'bold');
+  doc.text('Weapons:', x, y);
+  cx = x + 17;
+  doc.setFont(SERIF, 'normal');
+  for (const wp of weaponTypes) {
+    const has = c.weapon_proficiencies?.[wp.key] ?? false;
+    dot(doc, cx, y - 1, 1.1, has);
+    doc.text(wp.label, cx + 2, y);
+    cx += doc.getTextWidth(wp.label) + 7;
+  }
+  y += 4.5;
+
+  if (c.languages) {
+    doc.setFont(SERIF, 'bold');
+    doc.text('Languages:', x, y);
+    doc.setFont(SERIF, 'normal');
+    y = drawWrapped(doc, c.languages, x + 20, y, w - 20, 3.5) + 0.5;
+  }
+  if (c.tool_proficiencies) {
+    doc.setFont(SERIF, 'bold');
+    doc.text('Tools:', x, y);
+    doc.setFont(SERIF, 'normal');
+    y = drawWrapped(doc, c.tool_proficiencies, x + 12, y, w - 12, 3.5) + 0.5;
+  }
+
+  return y + 2;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Bottom section: features in two columns
+// ──────────────────────────────────────────────────────────────────────────
+
+function drawFeatureList(
+  doc: jsPDF,
+  title: string,
+  features: { name: string; summary: string }[] | null,
+  x: number,
+  y: number,
+  w: number,
+): number {
+  if (!features || features.length === 0) return y;
+
+  y = drawSectionHeader(doc, title.toUpperCase(), x, y, w);
+  doc.setFontSize(7.5);
+
+  const colGap = 4;
+  const colW = (w - colGap) / 2;
+  const half = Math.ceil(features.length / 2);
+
+  let y1 = y;
+  let y2 = y;
+  for (let i = 0; i < features.length; i++) {
+    const f = features[i];
+    const isLeft = i < half;
+    const cx = isLeft ? x : x + colW + colGap;
+    const cy = isLeft ? y1 : y2;
+
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    const nameLabel = `${f.name}.`;
+    doc.text(nameLabel, cx, cy);
+    const nameW = doc.getTextWidth(nameLabel) + 1;
+
+    setText(doc, BODY);
+    doc.setFont(SERIF, 'normal');
+    const newY = drawWrapped(doc, f.summary || '', cx + nameW, cy, colW - nameW, 3.2);
+    const advance = Math.max(newY - cy, 3.5);
+
+    if (isLeft) y1 = cy + advance + 1;
+    else y2 = cy + advance + 1;
+  }
+
+  return Math.max(y1, y2) + 2;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // PAGE 1
-// ---------------------------------------------------------------------------
+// ──────────────────────────────────────────────────────────────────────────
 
 function drawPage1(doc: jsPDF, c: PlayerCharacter) {
   drawParchmentBg(doc);
+  drawPageHeader(doc, c);
 
-  // ---- TOP BAND ----
-  setFill(doc, MAROON);
-  doc.rect(0, 10, PW, 20, 'F');
+  // Quick stats
+  const speedStr = (() => {
+    if (typeof c.speeds === 'object' && c.speeds) {
+      const w = c.speeds.walking || c.speeds.walk;
+      if (w) return w;
+      const first = Object.values(c.speeds)[0];
+      return first || '30 ft.';
+    }
+    return '30 ft.';
+  })();
 
-  setTextCol(doc, '#FFFFFF');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text(c.name, MARGIN, 22);
-
-  doc.setFontSize(12);
-  const classLine = c.subclass
-    ? `${c.class_name} \u2014 ${c.subclass}`
-    : c.class_name;
-  doc.text(classLine, MARGIN, 28);
-
-  doc.setFontSize(16);
-  doc.text(`Level ${c.level}`, PW - MARGIN, 22, { align: 'right' });
-
-  // Below band — passives row
-  let y = 34;
-  doc.setFontSize(8);
-  setTextCol(doc, MUTED);
-  doc.setFont('helvetica', 'normal');
-
-  const passives: string[] = [
-    `Prof Bonus: ${modStr(c.proficiency_bonus)}`,
-    `Passive Perception: ${c.passive_perception}`,
+  const stats: QuickStat[] = [
+    { label: 'Prof', value: modStr(c.proficiency_bonus) },
+    { label: 'Pass. Perc', value: String(c.passive_perception ?? '—') },
+    { label: 'Pass. Insight', value: String(c.passive_insight ?? '—') },
+    { label: 'Pass. Inv', value: String(c.passive_investigation ?? '—') },
+    { label: 'Init', value: modStr(c.initiative_modifier) },
+    { label: 'AC', value: String(c.armor_class ?? '—') },
+    { label: 'HP', value: String(c.hp_max ?? '—') },
+    { label: 'Hit Dice', value: c.hit_dice_total || '—' },
+    { label: 'Speed', value: speedStr },
   ];
-  if (c.passive_insight != null) passives.push(`Insight: ${c.passive_insight}`);
-  if (c.passive_investigation != null) passives.push(`Investigation: ${c.passive_investigation}`);
-  if (c.senses) passives.push(`Senses: ${c.senses}`);
-
-  doc.text(passives.join('   |   '), MARGIN, y);
-  y += 4;
-
-  // Thin rule
-  setDrawCol(doc, MAROON);
-  doc.setLineWidth(0.3);
-  doc.line(MARGIN, y, PW - MARGIN, y);
-  y += 3;
-
-  // ---- LEFT COLUMN — Ability Scores ----
-  const leftX = MARGIN;
-  const leftW = 65;
-  let leftY = y;
-
-  for (const ab of ABILITY_KEYS) {
-    const score = c[ab.score] as number;
-    const mod = abilityMod(score);
-    const saveMod = c.save_modifiers?.[ab.key.toLowerCase()] ?? mod;
-
-    // Ability name (small caps style — just uppercase + small font)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    setTextCol(doc, MAROON);
-    doc.text(ab.key, leftX, leftY);
-
-    // Save on the right side of ability header
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    setTextCol(doc, BODY);
-    doc.text(`Save: ${modStr(saveMod)}`, leftX + leftW - 2, leftY, { align: 'right' });
-
-    leftY += 5;
-
-    // Large modifier
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    setTextCol(doc, BODY);
-    doc.text(modStr(mod), leftX + 2, leftY);
-
-    // Score (smaller, next to modifier)
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    setTextCol(doc, MUTED);
-    doc.text(`(${score})`, leftX + 16, leftY);
-
-    leftY += 5;
-
-    // Skills for this ability
-    const skills = ABILITY_SKILLS[ab.key] || [];
-    doc.setFontSize(8);
-    setTextCol(doc, BODY);
-    doc.setFont('helvetica', 'normal');
-    for (const skill of skills) {
-      const skillKey = skill.toLowerCase().replace(/ /g, '_');
-      const skillMod = c.skill_modifiers?.[skillKey] ?? mod;
-      doc.text(`${modStr(skillMod)} ${skill}`, leftX + 4, leftY);
-      leftY += 3.5;
-    }
-
-    leftY += 3;
-  }
-
-  // ---- CENTER-RIGHT AREA ----
-  const rightX = 80;
-  const rightW = PW - MARGIN - rightX;
-  let rightY = y;
-
-  // -- Combat Stats --
-  setTextCol(doc, MAROON);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text('COMBAT', rightX, rightY);
-  rightY += 5;
-
-  // Grid of combat stats (3 columns x 2 rows)
-  const colW = rightW / 3;
-  const statGrid = [
-    [`AC: ${c.armor_class}`, c.ac_source ? `(${c.ac_source})` : ''],
-    [`Init: ${modStr(c.initiative_modifier)}`, ''],
-    [`HP: ${c.hp_max}`, ''],
-    [`Hit Dice: ${c.hit_dice_total}`, ''],
-    [
-      `Speed: ${
-        typeof c.speeds === 'object'
-          ? Object.entries(c.speeds)
-              .map(([k, v]) => (k === 'walk' ? v : `${k} ${v}`))
-              .join(', ')
-          : String(c.speeds)
-      }`,
-      '',
-    ],
-  ];
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  setTextCol(doc, BODY);
-  let gridX = rightX;
-  let gridY = rightY;
-  let colIdx = 0;
-  for (const [main, sub] of statGrid) {
-    doc.setFont('helvetica', 'bold');
-    doc.text(main, gridX, gridY);
-    if (sub) {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      setTextCol(doc, MUTED);
-      doc.text(sub, gridX, gridY + 3.5);
-      setTextCol(doc, BODY);
-      doc.setFontSize(9);
-    }
-    colIdx++;
-    if (colIdx % 3 === 0) {
-      gridX = rightX;
-      gridY += 9;
-    } else {
-      gridX += colW;
-    }
-  }
-  rightY = gridY + 9;
-
-  // Thin rule
-  setDrawCol(doc, MAROON);
-  doc.line(rightX, rightY, PW - MARGIN, rightY);
-  rightY += 4;
-
-  // -- Attacks Table --
-  if (c.attacks && c.attacks.length > 0) {
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('ATTACKS', rightX, rightY);
-    rightY += 5;
-
-    // Header
-    doc.setFontSize(7);
-    setTextCol(doc, MUTED);
-    const atkCols = [rightX, rightX + 45, rightX + 62, rightX + 90];
-    doc.text('Name', atkCols[0], rightY);
-    doc.text('Atk', atkCols[1], rightY);
-    doc.text('Damage', atkCols[2], rightY);
-    doc.text('Type', atkCols[3], rightY);
-    rightY += 4;
-
-    doc.setFont('helvetica', 'normal');
-    setTextCol(doc, BODY);
-    doc.setFontSize(8);
-
-    for (let i = 0; i < c.attacks.length; i++) {
-      const atk = c.attacks[i];
-      // alternating shading
-      if (i % 2 === 0) {
-        setFill(doc, '#EAD8A8');
-        doc.rect(rightX - 1, rightY - 3, rightW + 2, 4.5, 'F');
-      }
-      setTextCol(doc, BODY);
-      doc.text(atk.name, atkCols[0], rightY);
-      doc.text(atk.atk_bonus, atkCols[1], rightY);
-      doc.text(atk.damage, atkCols[2], rightY);
-      doc.text(atk.damage_type, atkCols[3], rightY);
-      rightY += 4.5;
-    }
-    rightY += 3;
-  }
-
-  // -- Class Resources --
-  if (c.class_resources && c.class_resources.length > 0) {
-    setDrawCol(doc, MAROON);
-    doc.line(rightX, rightY, PW - MARGIN, rightY);
-    rightY += 4;
-
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('CLASS RESOURCES', rightX, rightY);
-    rightY += 5;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    setTextCol(doc, BODY);
-
-    for (const res of c.class_resources) {
-      const diePart = res.die ? ` (${res.die})` : '';
-      doc.text(
-        `${res.name}: ${res.uses} uses${diePart} \u2014 ${res.recovery}`,
-        rightX,
-        rightY,
-      );
-      rightY += 4;
-    }
-    rightY += 3;
-  }
-
-  // -- Proficiencies --
-  setDrawCol(doc, MAROON);
-  doc.line(rightX, rightY, PW - MARGIN, rightY);
-  rightY += 4;
-
-  setTextCol(doc, MAROON);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text('PROFICIENCIES', rightX, rightY);
-  rightY += 5;
-
-  doc.setFontSize(8);
-  setTextCol(doc, BODY);
-  doc.setFont('helvetica', 'normal');
-
-  // Armor proficiencies
-  const armorTypes = ['Light', 'Medium', 'Heavy', 'Shields'];
-  let profLine = 'Armor: ';
-  for (const at of armorTypes) {
-    const key = at.toLowerCase();
-    const has = c.armor_proficiencies?.[key] ?? false;
-    profLine += `${at} ${has ? '\u25CF' : '\u25CB'} `;
-  }
-  doc.text(profLine.trim(), rightX, rightY);
-  rightY += 4;
-
-  // Weapon proficiencies
-  const weaponTypes = ['Simple', 'Martial'];
-  let weapLine = 'Weapons: ';
-  for (const wt of weaponTypes) {
-    const key = wt.toLowerCase();
-    const has = c.weapon_proficiencies?.[key] ?? false;
-    weapLine += `${wt} ${has ? '\u25CF' : '\u25CB'} `;
-  }
-  doc.text(weapLine.trim(), rightX, rightY);
-  rightY += 4;
-
-  if (c.languages) {
-    doc.text(`Languages: ${c.languages}`, rightX, rightY);
-    rightY += 4;
-  }
-  if (c.tool_proficiencies) {
-    doc.text(`Tools: ${c.tool_proficiencies}`, rightX, rightY);
-    rightY += 4;
-  }
-  rightY += 2;
-
-  // -- Defenses --
-  const defenses: string[] = [];
-  if (c.damage_resistances) defenses.push(`Resistances: ${c.damage_resistances}`);
-  if (c.damage_immunities) defenses.push(`Immunities: ${c.damage_immunities}`);
-  if (c.condition_immunities) defenses.push(`Condition Imm: ${c.condition_immunities}`);
-
-  if (defenses.length > 0) {
-    setDrawCol(doc, MAROON);
-    doc.line(rightX, rightY, PW - MARGIN, rightY);
-    rightY += 4;
-
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('DEFENSES', rightX, rightY);
-    rightY += 5;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    setTextCol(doc, BODY);
-    for (const d of defenses) {
-      doc.text(d, rightX, rightY);
-      rightY += 4;
-    }
-    rightY += 2;
-  }
-
-  // ---- BOTTOM SECTION ----
-  // Start below whichever column is taller
-  let bottomY = Math.max(leftY, rightY) + 4;
-
-  // Guard against page overflow — if we're already past ~250, skip or truncate
-  if (bottomY > 260) bottomY = 260;
-
-  setDrawCol(doc, MAROON);
-  doc.line(MARGIN, bottomY, PW - MARGIN, bottomY);
-  bottomY += 4;
-
-  // -- Class Features (two columns) --
-  if (c.class_features && c.class_features.length > 0) {
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('CLASS FEATURES', MARGIN, bottomY);
-    bottomY += 4;
-
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    setTextCol(doc, BODY);
-
-    const col1X = MARGIN;
-    const col2X = MARGIN + (PW - 2 * MARGIN) / 2 + 2;
-    const featureColW = (PW - 2 * MARGIN) / 2 - 4;
-    const half = Math.ceil(c.class_features.length / 2);
-    let fy1 = bottomY;
-    let fy2 = bottomY;
-
-    for (let i = 0; i < c.class_features.length; i++) {
-      const f = c.class_features[i];
-      const x = i < half ? col1X : col2X;
-      const fy = i < half ? fy1 : fy2;
-
-      doc.setFont('helvetica', 'bold');
-      const featureText = `${f.name}. `;
-      doc.text(featureText, x, fy);
-      const nameW = doc.getTextWidth(featureText);
-      doc.setFont('helvetica', 'normal');
-
-      const newY = drawWrappedText(doc, f.summary, x + nameW, fy, featureColW - nameW, 3);
-      // If the summary wrapped, move past it
-      const advanceY = Math.max(newY - fy, 3.5);
-
-      if (i < half) {
-        fy1 = fy + advanceY + 0.5;
-      } else {
-        fy2 = fy + advanceY + 0.5;
-      }
-    }
-    bottomY = Math.max(fy1, fy2) + 2;
-  }
-
-  // -- Racial Traits --
-  if (c.racial_traits && c.racial_traits.length > 0 && bottomY < PH - 20) {
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text('RACIAL TRAITS', MARGIN, bottomY);
-    bottomY += 4;
-
-    doc.setFontSize(7);
-    setTextCol(doc, BODY);
-    for (const t of c.racial_traits) {
-      if (bottomY > PH - 10) break;
-      doc.setFont('helvetica', 'bold');
-      const label = `${t.name}. `;
-      doc.text(label, MARGIN, bottomY);
-      doc.setFont('helvetica', 'normal');
-      doc.text(t.summary, MARGIN + doc.getTextWidth(label), bottomY);
-      bottomY += 3.5;
-    }
-    bottomY += 2;
-  }
-
-  // -- Feats --
-  if (c.feats && c.feats.length > 0 && bottomY < PH - 20) {
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text('FEATS', MARGIN, bottomY);
-    bottomY += 4;
-
-    doc.setFontSize(7);
-    setTextCol(doc, BODY);
-    for (const f of c.feats) {
-      if (bottomY > PH - 10) break;
-      doc.setFont('helvetica', 'bold');
-      const label = `${f.name}. `;
-      doc.text(label, MARGIN, bottomY);
-      doc.setFont('helvetica', 'normal');
-      doc.text(f.summary, MARGIN + doc.getTextWidth(label), bottomY);
-      bottomY += 3.5;
-    }
-    bottomY += 2;
-  }
-
-  // -- Inventory --
-  if ((c.equipment && c.equipment.length > 0) && bottomY < PH - 15) {
-    setDrawCol(doc, MAROON);
-    doc.line(MARGIN, bottomY, PW - MARGIN, bottomY);
-    bottomY += 4;
-
-    setTextCol(doc, MAROON);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text('INVENTORY', MARGIN, bottomY);
-    bottomY += 4;
-
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    setTextCol(doc, BODY);
-
-    const invCol1X = MARGIN;
-    const invCol2X = MARGIN + (PW - 2 * MARGIN) / 2 + 2;
-    const invHalf = Math.ceil(c.equipment.length / 2);
-    let iy1 = bottomY;
-    let iy2 = bottomY;
-
-    for (let i = 0; i < c.equipment.length; i++) {
-      const eq = c.equipment[i];
-      const x = i < invHalf ? invCol1X : invCol2X;
-      const iy = i < invHalf ? iy1 : iy2;
-      if (iy > PH - 10) break;
-
-      const weightPart = eq.weight ? ` (${eq.weight})` : '';
-      doc.text(`${eq.qty}\u00D7 ${eq.name}${weightPart}`, x, iy);
-
-      if (i < invHalf) iy1 += 3.5;
-      else iy2 += 3.5;
-    }
-    bottomY = Math.max(iy1, iy2) + 2;
-  }
-
-  // Currency line
-  if (bottomY < PH - 8) {
-    doc.setFontSize(7);
-    setTextCol(doc, MUTED);
-    doc.text(
-      `CP: ${c.cp}  |  SP: ${c.sp}  |  EP: ${c.ep}  |  GP: ${c.gp}  |  PP: ${c.pp}`,
-      MARGIN,
-      Math.min(bottomY, PH - 8),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// PAGE 2 — SPELLS
-// ---------------------------------------------------------------------------
-
-function drawPage2(doc: jsPDF, c: PlayerCharacter) {
-  doc.addPage();
-  drawParchmentBg(doc);
-
-  // Header band
-  setFill(doc, MAROON);
-  doc.rect(0, 10, PW, 16, 'F');
-
-  setTextCol(doc, '#FFFFFF');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text(`${c.name} \u2014 ${c.class_name} Spells`, MARGIN, 21);
 
   let y = 30;
+  y = drawQuickStatsBar(doc, stats, y);
 
-  // Spellcasting stats
-  doc.setFontSize(11);
-  setTextCol(doc, MAROON);
-  doc.setFont('helvetica', 'bold');
+  // Two-column layout: ability grid (left ~46%) + stacked blocks (right ~54%)
+  const leftX = MARGIN;
+  const leftW = (PW - 2 * MARGIN) * 0.45;
+  const rightX = leftX + leftW + 5;
+  const rightW = PW - MARGIN - rightX;
 
-  const scStats: string[] = [];
-  if (c.spell_attack_bonus != null) scStats.push(`Spell Attack: ${modStr(c.spell_attack_bonus)}`);
-  if (c.spell_save_dc != null) scStats.push(`Spell Save DC: ${c.spell_save_dc}`);
-  if (c.spellcasting_ability) scStats.push(`Ability: ${c.spellcasting_ability}`);
+  const gridBottomY = drawAbilityGrid(doc, c, leftX, y, leftW);
 
-  doc.text(scStats.join('     '), MARGIN, y);
-  y += 7;
+  // Right column
+  let ry = y;
+  ry = drawAttacksTable(doc, c.attacks, rightX, ry, rightW);
+  ry = drawSensesAndDefenses(doc, c, rightX, ry, rightW);
+  ry = drawClassResources(doc, c.class_resources, rightX, ry, rightW);
+  ry = drawProficiencies(doc, c, rightX, ry, rightW);
 
-  // Spell Slots
-  setTextCol(doc, BODY);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('SPELL SLOTS', MARGIN, y);
-  y += 5;
+  // Bottom: features
+  let by = Math.max(gridBottomY, ry) + 4;
+  ornamentDivider(doc, MARGIN, PW - MARGIN, by);
+  by += 4;
 
-  doc.setFont('helvetica', 'normal');
+  if (by < PH - 30) {
+    by = drawFeatureList(doc, 'Class Features', c.class_features, MARGIN, by, PW - 2 * MARGIN);
+  }
+  if (by < PH - 25 && c.racial_traits && c.racial_traits.length > 0) {
+    by += 1;
+    by = drawFeatureList(doc, 'Racial / Species Traits', c.racial_traits, MARGIN, by, PW - 2 * MARGIN);
+  }
+  if (by < PH - 20 && c.feats && c.feats.length > 0) {
+    by += 1;
+    by = drawFeatureList(doc, 'Feats', c.feats, MARGIN, by, PW - 2 * MARGIN);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// PAGE 2: Inventory
+// ──────────────────────────────────────────────────────────────────────────
+
+function drawInventoryPage(doc: jsPDF, c: PlayerCharacter) {
+  doc.addPage();
+  drawParchmentBg(doc);
+  drawPageHeader(doc, c, 'Inventory');
+
+  let y = 32;
+
+  // Two-column layout
+  const leftX = MARGIN;
+  const leftW = (PW - 2 * MARGIN) * 0.62;
+  const rightX = leftX + leftW + 5;
+  const rightW = PW - MARGIN - rightX;
+
+  // INVENTORY TABLE
+  const ly0 = drawSectionHeader(doc, 'INVENTORY', leftX, y, leftW);
+
+  const cols = [
+    { label: 'Item', w: 0.50 },
+    { label: 'Qty', w: 0.10 },
+    { label: 'Weight', w: 0.18 },
+    { label: 'Notes', w: 0.22 },
+  ];
+  const rowH = 5;
+
+  // Header
+  setFill(doc, MAROON);
+  doc.rect(leftX, ly0, leftW, rowH, 'F');
+  setText(doc, '#FFFFFF');
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(8);
+  let cx = leftX;
+  for (const col of cols) {
+    doc.text(col.label, cx + 1.5, ly0 + 3.5);
+    cx += leftW * col.w;
+  }
+  let ly = ly0 + rowH;
+
+  doc.setFont(SERIF, 'normal');
   doc.setFontSize(8);
 
-  if (c.spell_slots) {
-    const slotBoxSize = 14;
-    let sx = MARGIN;
-    for (let lvl = 1; lvl <= 9; lvl++) {
-      const key = String(lvl);
-      const count = c.spell_slots[key] ?? 0;
-      if (count === 0 && lvl > 5) continue; // skip empty high-level slots
-
-      setFill(doc, '#FFFFFF');
-      setDrawCol(doc, MAROON);
-      doc.rect(sx, y, slotBoxSize, slotBoxSize, 'FD');
-
-      setTextCol(doc, MUTED);
-      doc.setFontSize(6);
-      const ordinals = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
-      doc.text(ordinals[lvl], sx + slotBoxSize / 2, y + 4, { align: 'center' });
-
-      setTextCol(doc, BODY);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text(String(count), sx + slotBoxSize / 2, y + 11, { align: 'center' });
-      doc.setFont('helvetica', 'normal');
-
-      sx += slotBoxSize + 3;
+  const equipment = c.equipment || [];
+  for (let i = 0; i < equipment.length; i++) {
+    if (ly > PH - MARGIN - 15) break;
+    const item = equipment[i];
+    if (i % 2 === 0) {
+      setFill(doc, PARCHMENT_ALT);
+      doc.rect(leftX, ly, leftW, rowH, 'F');
     }
-    y += slotBoxSize + 4;
+    setText(doc, BODY);
+    cx = leftX;
+    const cells = [item.name, String(item.qty), item.weight || '', item.notes || ''];
+    for (let j = 0; j < cols.length; j++) {
+      const colWidth = leftW * cols[j].w;
+      const text = doc.splitTextToSize(cells[j] || '', colWidth - 2)[0] || '';
+      doc.text(text, cx + 1.5, ly + 3.5);
+      cx += colWidth;
+    }
+    ly += rowH;
+  }
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.line(leftX, ly, leftX + leftW, ly);
+
+  // CURRENCY block (right)
+  let ry = drawSectionHeader(doc, 'CURRENCY', rightX, y, rightW);
+  const coins: { label: string; key: 'cp' | 'sp' | 'ep' | 'gp' | 'pp' }[] = [
+    { label: 'CP', key: 'cp' },
+    { label: 'SP', key: 'sp' },
+    { label: 'EP', key: 'ep' },
+    { label: 'GP', key: 'gp' },
+    { label: 'PP', key: 'pp' },
+  ];
+  doc.setFont(SERIF, 'normal');
+  doc.setFontSize(9);
+  for (const coin of coins) {
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.text(coin.label, rightX, ry);
+    setText(doc, BODY);
+    doc.setFont(SERIF, 'normal');
+    doc.text(String(c[coin.key] ?? 0), rightX + rightW, ry, { align: 'right' });
+    ry += 5;
   }
 
-  // Pact slots (warlock)
-  if (c.pact_slot_count != null && c.pact_slot_level != null) {
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    setTextCol(doc, MAROON);
-    const ordinals = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
-    doc.text(
-      `Pact Slots: ${c.pact_slot_count} \u00D7 ${ordinals[c.pact_slot_level] ?? c.pact_slot_level + 'th'} level`,
-      MARGIN,
-      y,
-    );
-    y += 6;
+  // Total wealth in GP equivalent: 1gp = 100cp = 10sp = 2ep = 0.1pp
+  const totalGp =
+    (c.cp ?? 0) / 100 +
+    (c.sp ?? 0) / 10 +
+    (c.ep ?? 0) / 2 +
+    (c.gp ?? 0) +
+    (c.pp ?? 0) * 10;
+  ry += 1;
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.line(rightX, ry, rightX + rightW, ry);
+  ry += 3.5;
+  setText(doc, MAROON);
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(9);
+  doc.text('Total (GP)', rightX, ry);
+  setText(doc, BODY);
+  doc.text(totalGp.toFixed(1), rightX + rightW, ry, { align: 'right' });
+  ry += 8;
+
+  // NOTES block — empty space the player CAN write in
+  ry = drawSectionHeader(doc, 'NOTES', rightX, ry, rightW);
+  setDraw(doc, MUTED);
+  doc.setLineWidth(0.15);
+  while (ry < PH - MARGIN - 5) {
+    doc.line(rightX, ry, rightX + rightW, ry);
+    ry += 5;
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// PAGE 3: Spells
+// ──────────────────────────────────────────────────────────────────────────
+
+function levelLabel(level: string): string {
+  if (level === '0') return 'Cantrips';
+  const n = parseInt(level, 10);
+  const suffix: Record<number, string> = { 1: 'st', 2: 'nd', 3: 'rd' };
+  return `${n}${suffix[n] || 'th'} Level`;
+}
+
+/** Look up a spell by name across SRD library + per-character custom spells. */
+function findSpell(name: string, customByName: Map<string, SrdSpell>): SrdSpell | null {
+  if (!name) return null;
+  const lower = name.toLowerCase().trim();
+  const directCustom = customByName.get(lower);
+  if (directCustom) return directCustom;
+  const direct = SRD_BY_NAME.get(lower);
+  if (direct) return direct;
+  // Fuzzy fallback: strip apostrophes/hyphens, compare
+  const norm = lower.replace(/['-]/g, '').replace(/\s+/g, ' ');
+  for (const [k, v] of customByName) {
+    if (k.replace(/['-]/g, '').replace(/\s+/g, ' ') === norm) return v;
+  }
+  for (const [k, v] of SRD_BY_NAME) {
+    if (k.replace(/['-]/g, '').replace(/\s+/g, ' ') === norm) return v;
+  }
+  return null;
+}
+
+function drawSpellSlots(doc: jsPDF, c: PlayerCharacter, x: number, y: number, w: number): number {
+  const isWarlock = c.pact_slot_count != null && c.pact_slot_level != null;
+
+  if (isWarlock) {
+    y = drawSectionHeader(doc, 'PACT SLOTS', x, y, w);
+    const boxSize = 18;
+    setFill(doc, CREAM);
+    setDraw(doc, MAROON);
+    doc.setLineWidth(0.3);
+    doc.rect(x, y, boxSize, boxSize, 'FD');
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'normal');
+    doc.setFontSize(7);
+    const ord = ['', '1st', '2nd', '3rd', '4th', '5th'][c.pact_slot_level!] || `${c.pact_slot_level}th`;
+    doc.text(ord, x + boxSize / 2, y + 5, { align: 'center' });
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.setFontSize(16);
+    doc.text(String(c.pact_slot_count), x + boxSize / 2, y + 13, { align: 'center' });
+    return y + boxSize + 5;
   }
 
-  // Spell list by level
-  if (c.spells) {
-    const levelNames: Record<string, string> = {
-      '0': 'CANTRIPS',
-      '1': '1ST LEVEL',
-      '2': '2ND LEVEL',
-      '3': '3RD LEVEL',
-      '4': '4TH LEVEL',
-      '5': '5TH LEVEL',
-      '6': '6TH LEVEL',
-      '7': '7TH LEVEL',
-      '8': '8TH LEVEL',
-      '9': '9TH LEVEL',
-    };
+  if (!c.spell_slots) return y;
 
-    const sortedLevels = Object.keys(c.spells).sort(
-      (a, b) => parseInt(a) - parseInt(b),
-    );
+  y = drawSectionHeader(doc, 'SPELL SLOTS', x, y, w);
 
-    // Use two columns for spell list
-    const spellCol1X = MARGIN;
-    const spellCol2X = MARGIN + (PW - 2 * MARGIN) / 2 + 2;
-    const spellColW = (PW - 2 * MARGIN) / 2 - 4;
-    let col = 0;
-    let sy1 = y;
-    let sy2 = y;
+  const ordinals = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+  const boxSize = 16;
+  const gap = 2;
+  let bx = x;
 
-    for (const lvlKey of sortedLevels) {
-      const spellNames = c.spells[lvlKey];
-      if (!spellNames || spellNames.length === 0) continue;
+  for (let lvl = 1; lvl <= 9; lvl++) {
+    const count = c.spell_slots[String(lvl)] ?? 0;
+    setFill(doc, count > 0 ? CREAM : '#E8DCB8');
+    setDraw(doc, MAROON);
+    doc.setLineWidth(0.25);
+    doc.rect(bx, y, boxSize, boxSize, 'FD');
 
-      // Decide which column to use — pick the shorter one
-      const useCol2 = sy1 > sy2 + 5;
-      const sx = useCol2 ? spellCol2X : spellCol1X;
-      let sy = useCol2 ? sy2 : sy1;
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'normal');
+    doc.setFontSize(6.5);
+    doc.text(ordinals[lvl], bx + boxSize / 2, y + 4, { align: 'center' });
 
-      // Check for page overflow
-      if (sy > PH - 20) {
+    setText(doc, count > 0 ? MAROON : MUTED);
+    doc.setFont(SERIF, 'bold');
+    doc.setFontSize(13);
+    doc.text(String(count), bx + boxSize / 2, y + 11.5, { align: 'center' });
+
+    bx += boxSize + gap;
+  }
+  return y + boxSize + 5;
+}
+
+interface SpellCardLayout {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+function measureSpellCard(doc: jsPDF, name: string, srd: SrdSpell | null, width: number): number {
+  // No-description case: just name + light padding (a row in the level group).
+  if (!srd) return 11;
+
+  let h = 5; // top padding + name
+  h += 4; // school/level line
+  h += 4; // casting time / range
+  h += 4; // components / duration
+  h += 1; // gap
+  const desc = srd.desc.join(' ');
+  const lines = doc.splitTextToSize(desc, width - 6).length;
+  h += lines * 3.2;
+  if (srd.higher_level && srd.higher_level.length > 0) {
+    h += 2.5;
+    const upLines = doc.splitTextToSize(srd.higher_level.join(' '), width - 6).length;
+    h += upLines * 3.2;
+  }
+  return h + 4;
+}
+
+function drawSpellCard(
+  doc: jsPDF,
+  spellName: string,
+  srd: SrdSpell | null,
+  isPrepared: boolean,
+  showPreparedDot: boolean,
+  layout: SpellCardLayout,
+) {
+  const { x, y, width, height } = layout;
+
+  // Card background
+  setFill(doc, CREAM);
+  setDraw(doc, MAROON);
+  doc.setLineWidth(0.3);
+  doc.rect(x, y, width, height, 'FD');
+
+  let cy = y + 5;
+
+  // Spell name
+  setText(doc, MAROON);
+  doc.setFont(SERIF, 'bold');
+  doc.setFontSize(11);
+  doc.text(spellName.toUpperCase(), x + 3, cy);
+
+  // Prepared indicator (right side, drawn dot)
+  if (showPreparedDot) {
+    dot(doc, x + width - 8, cy - 1.5, 1.4, isPrepared);
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'italic');
+    doc.setFontSize(7);
+    doc.text(isPrepared ? 'Prepared' : 'Known', x + width - 5, cy, { align: 'left' });
+  }
+  cy += 4;
+
+  if (srd) {
+    // School/level italic line
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'italic');
+    doc.setFontSize(8);
+    const schoolLine = srd.level === 0
+      ? `${srd.school} cantrip`
+      : `${srd.level}${({1:'st',2:'nd',3:'rd'} as Record<number,string>)[srd.level] || 'th'}-level ${srd.school.toLowerCase()}${srd.ritual ? ' (ritual)' : ''}`;
+    doc.text(schoolLine, x + 3, cy);
+    cy += 4;
+
+    // Two-column row: Casting Time | Range
+    setText(doc, BODY);
+    doc.setFont(SERIF, 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Casting Time:', x + 3, cy);
+    doc.text('Range:', x + width / 2 + 1, cy);
+    doc.setFont(SERIF, 'normal');
+    doc.text(srd.casting_time, x + 3 + 22, cy);
+    doc.text(srd.range, x + width / 2 + 1 + 12, cy);
+    cy += 4;
+
+    // Components | Duration
+    doc.setFont(SERIF, 'bold');
+    doc.text('Components:', x + 3, cy);
+    doc.text('Duration:', x + width / 2 + 1, cy);
+    doc.setFont(SERIF, 'normal');
+    const compStr = (srd.components || []).join(', ') + (srd.material ? ' (M)' : '');
+    doc.text(compStr, x + 3 + 22, cy);
+    const durStr = (srd.concentration ? 'C, ' : '') + srd.duration;
+    doc.text(durStr, x + width / 2 + 1 + 16, cy);
+    cy += 4.5;
+
+    // Description
+    doc.setFont(SERIF, 'normal');
+    doc.setFontSize(7.5);
+    setText(doc, BODY);
+    cy = drawWrapped(doc, srd.desc.join(' '), x + 3, cy, width - 6, 3.2);
+
+    // At higher levels
+    if (srd.higher_level && srd.higher_level.length > 0) {
+      cy += 1.5;
+      doc.setFont(SERIF, 'bolditalic');
+      setText(doc, MAROON);
+      doc.text('At Higher Levels: ', x + 3, cy);
+      const labelW = doc.getTextWidth('At Higher Levels: ');
+      doc.setFont(SERIF, 'normal');
+      setText(doc, BODY);
+      cy = drawWrapped(doc, srd.higher_level.join(' '), x + 3 + labelW, cy, width - 6 - labelW, 3.2);
+    }
+  }
+  // No-description case: card stays minimal — name + "Known/Prepared" indicator only.
+  // Cleaner than a "not in SRD library" footnote on a finished sheet.
+}
+
+function drawSpellsPage(doc: jsPDF, c: PlayerCharacter, customByName: Map<string, SrdSpell>) {
+  if (!c.is_spellcaster) return;
+
+  doc.addPage();
+  drawParchmentBg(doc);
+  drawPageHeader(doc, c, 'Spells');
+
+  let y = 32;
+
+  // Spell stats bar
+  const stats: QuickStat[] = [
+    { label: 'Spell Atk', value: modStr(c.spell_attack_bonus) },
+    { label: 'Spell DC', value: String(c.spell_save_dc ?? '—') },
+    { label: 'Ability', value: c.spellcasting_ability || '—' },
+  ];
+  y = drawQuickStatsBar(doc, stats, y);
+
+  y = drawSpellSlots(doc, c, MARGIN, y, PW - 2 * MARGIN);
+
+  // Spell cards by level
+  if (!c.spells) return;
+
+  const cardWidth = (PW - 2 * MARGIN - 4) / 2;
+  const colGap = 4;
+  const rowGap = 3;
+
+  let leftY = y;
+  let rightY = y;
+
+  const sortedLevels = Object.keys(c.spells).sort((a, b) => parseInt(a) - parseInt(b));
+
+  for (const lvlKey of sortedLevels) {
+    const names = c.spells[lvlKey] || [];
+    if (names.length === 0) continue;
+
+    // Level header (full width)
+    const headerY = Math.max(leftY, rightY) + 2;
+    if (headerY > PH - MARGIN - 30) {
+      doc.addPage();
+      drawParchmentBg(doc);
+      drawPageHeader(doc, c, 'Spells (cont.)');
+      leftY = 32;
+      rightY = 32;
+    }
+
+    const useY = Math.max(leftY, rightY) + 2;
+    leftY = rightY = useY;
+
+    // Level header banner
+    setText(doc, MAROON);
+    doc.setFont(SERIF, 'bold');
+    doc.setFontSize(11);
+    const headerLabel = levelLabel(lvlKey).toUpperCase();
+    const labelW = doc.getTextWidth(headerLabel);
+    const cx = PW / 2;
+    setDraw(doc, MAROON);
+    doc.setLineWidth(0.3);
+    doc.line(MARGIN, leftY + 1, cx - labelW / 2 - 3, leftY + 1);
+    doc.line(cx + labelW / 2 + 3, leftY + 1, PW - MARGIN, leftY + 1);
+    doc.text(headerLabel, cx, leftY + 2.5, { align: 'center' });
+    leftY += 8;
+    rightY = leftY;
+
+    // Cards in two columns
+    for (const name of names) {
+      const srd = findSpell(name, customByName);
+      const isPrepared = c.is_prepared_caster && (c.prepared_spells?.includes(name) ?? false);
+      const showDot = !!c.is_prepared_caster && lvlKey !== '0';
+
+      // Choose shorter column
+      const useLeft = leftY <= rightY;
+      const cx = useLeft ? MARGIN : MARGIN + cardWidth + colGap;
+      let cy = useLeft ? leftY : rightY;
+
+      const cardH = measureSpellCard(doc, name, srd, cardWidth);
+
+      // Page break check
+      if (cy + cardH > PH - MARGIN - 5) {
         doc.addPage();
         drawParchmentBg(doc);
-        sy = MARGIN;
-        sy1 = MARGIN;
-        sy2 = MARGIN;
+        drawPageHeader(doc, c, 'Spells (cont.)');
+        leftY = 32;
+        rightY = 32;
+        cy = useLeft ? leftY : rightY;
       }
 
-      // Level header
-      setTextCol(doc, MAROON);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text(levelNames[lvlKey] ?? `LEVEL ${lvlKey}`, sx, sy);
-      sy += 4;
+      drawSpellCard(doc, name, srd, isPrepared, showDot, {
+        x: cx, y: cy, width: cardWidth, height: cardH,
+      });
 
-      // Spell names
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      setTextCol(doc, BODY);
-
-      for (const spell of spellNames) {
-        if (sy > PH - 10) break;
-        const isPrepared =
-          c.is_prepared_caster && c.prepared_spells?.includes(spell);
-        const prefix = c.is_prepared_caster
-          ? isPrepared
-            ? '\u25CF '
-            : '\u25CB '
-          : '';
-        doc.text(`${prefix}${spell}`, sx + 2, sy);
-        sy += 3.5;
-      }
-      sy += 2;
-
-      if (useCol2) sy2 = sy;
-      else sy1 = sy;
-      col++;
+      if (useLeft) leftY = cy + cardH + rowGap;
+      else rightY = cy + cardH + rowGap;
     }
   }
 }
 
-// ---------------------------------------------------------------------------
+// ──────────────────────────────────────────────────────────────────────────
 // Route handler
-// ---------------------------------------------------------------------------
+// ──────────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
-    const character = (await req.json()) as PlayerCharacter;
+    // Accept either a bare PlayerCharacter or { character, customSpells }.
+    // The wrapper form lets the client pass campaign-scoped custom spells so the
+    // PDF can render their full descriptions.
+    const body = await req.json();
+    const character = (body.character ?? body) as PlayerCharacter;
+    const rawCustom = (body.customSpells ?? []) as CustomSpell[];
+
+    const customByName = new Map<string, SrdSpell>();
+    for (const c of rawCustom) {
+      customByName.set(c.name.toLowerCase().trim(), customToSrdShape(c));
+    }
 
     const doc = new jsPDF({
       orientation: 'portrait',
@@ -738,8 +1140,12 @@ export async function POST(req: NextRequest) {
 
     drawPage1(doc, character);
 
+    if (character.equipment && character.equipment.length > 0) {
+      drawInventoryPage(doc, character);
+    }
+
     if (character.is_spellcaster) {
-      drawPage2(doc, character);
+      drawSpellsPage(doc, character, customByName);
     }
 
     const pdfOutput = doc.output('arraybuffer');

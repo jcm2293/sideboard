@@ -1,5 +1,7 @@
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import path from 'path';
+import { getSpellProgression, parseClassLine } from '@/data/spell-progression';
+import type { ProficiencyLevel } from '@/types';
 
 // Point worker to actual file for server-side usage
 GlobalWorkerOptions.workerSrc = path.join(process.cwd(), 'node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs');
@@ -75,6 +77,7 @@ interface ParsedCharacter {
   class_name: string;
   subclass: string;
   level: number;
+  is_multiclass: boolean;
   armor_class: number;
   ac_source: string;
   initiative_modifier: number;
@@ -94,6 +97,8 @@ interface ParsedCharacter {
   cha_score: number;
   skill_modifiers: Record<string, number>;
   save_modifiers: Record<string, number>;
+  skill_proficiencies: Record<string, ProficiencyLevel>;
+  save_proficiencies: Record<string, ProficiencyLevel>;
   attacks: { name: string; atk_bonus: string; damage: string; damage_type: string; range: string; notes: string }[];
   damage_resistances: string;
   damage_immunities: string;
@@ -124,13 +129,19 @@ interface ParsedCharacter {
   pp: number;
 }
 
-function parseClassLevel(raw: string): { class_name: string; level: number; subclass: string } {
-  // "Warlock 7" or "Fighter 5 / Warlock 2"
-  const match = raw.match(/^(.+?)\s+(\d+)/);
-  if (match) {
-    return { class_name: match[1].trim(), level: parseInt(match[2], 10), subclass: '' };
-  }
-  return { class_name: raw, level: 1, subclass: '' };
+function parseClassLevel(raw: string): {
+  class_name: string;
+  level: number;
+  subclass: string;
+  isMulticlass: boolean;
+} {
+  const parsed = parseClassLine(raw);
+  return {
+    class_name: parsed.primaryClass,
+    level: parsed.primaryLevel,
+    subclass: parsed.subclass,
+    isMulticlass: parsed.isMulticlass,
+  };
 }
 
 function parseSkills(fields: FormFields): Record<string, number> {
@@ -164,6 +175,78 @@ function parseSkills(fields: FormFields): Record<string, number> {
     }
   }
   return result;
+}
+
+// Skill → ability mapping (5e SRD). Used for proficiency inference.
+const SKILL_ABILITY: Record<string, 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha'> = {
+  athletics: 'str',
+  acrobatics: 'dex',
+  sleight_of_hand: 'dex',
+  stealth: 'dex',
+  arcana: 'int',
+  history: 'int',
+  investigation: 'int',
+  nature: 'int',
+  religion: 'int',
+  animal_handling: 'wis',
+  insight: 'wis',
+  medicine: 'wis',
+  perception: 'wis',
+  survival: 'wis',
+  deception: 'cha',
+  intimidation: 'cha',
+  performance: 'cha',
+  persuasion: 'cha',
+};
+
+function inferProficiency(
+  totalMod: number,
+  abilityMod: number,
+  profBonus: number,
+): ProficiencyLevel {
+  const delta = totalMod - abilityMod;
+  // Use thresholds at midpoints to absorb small bonuses (e.g. +1 from feats).
+  // expertise = +2*prof; proficient = +1*prof; half = +floor(prof/2)
+  if (delta >= profBonus * 2 - Math.floor(profBonus / 2)) return 'expertise';
+  if (delta >= profBonus - Math.floor(profBonus / 2)) return 'proficient';
+  if (delta >= 1 && profBonus >= 2) return 'half';
+  return 'none';
+}
+
+function inferSkillProficiencies(
+  skillMods: Record<string, number>,
+  abilityMods: Record<string, number>,
+  profBonus: number,
+): Record<string, ProficiencyLevel> {
+  const out: Record<string, ProficiencyLevel> = {};
+  for (const skill of Object.keys(SKILL_ABILITY)) {
+    const ability = SKILL_ABILITY[skill];
+    const mod = skillMods[skill];
+    if (mod == null) {
+      out[skill] = 'none';
+      continue;
+    }
+    out[skill] = inferProficiency(mod, abilityMods[ability] ?? 0, profBonus);
+  }
+  return out;
+}
+
+function inferSaveProficiencies(
+  saveMods: Record<string, number>,
+  abilityMods: Record<string, number>,
+  profBonus: number,
+): Record<string, ProficiencyLevel> {
+  const out: Record<string, ProficiencyLevel> = {};
+  for (const ab of ['str', 'dex', 'con', 'int', 'wis', 'cha'] as const) {
+    const mod = saveMods[ab];
+    if (mod == null) {
+      out[ab] = 'none';
+      continue;
+    }
+    // Saves only have none/proficient in 5e (no half, no expertise).
+    out[ab] = mod - (abilityMods[ab] ?? 0) >= profBonus - 1 ? 'proficient' : 'none';
+  }
+  return out;
 }
 
 function parseSaves(fields: FormFields): Record<string, number> {
@@ -294,6 +377,87 @@ function parseDefenses(fields: FormFields): { resistances: string; immunities: s
   return { resistances, immunities, conditionImmunities };
 }
 
+// Feature classification: decides how much description to keep.
+// "Mechanical" = something the player references mid-turn (preserve full text).
+// "Passive" = bookkeeping / always-on senses (one sentence).
+// "Excluded" = noise that shouldn't appear on the sheet at all.
+
+const EXCLUDED_NAME_PATTERNS: RegExp[] = [
+  /^ability\s+score\s+improvement/i,
+  /^proficiency\s+bonus$/i,
+  /^proficiencies$/i,
+  /^core\s+\w+\s+traits?$/i, // e.g. "Core Warlock Traits"
+  /^starting\s+equipment/i,
+  /^hit\s+points?$/i,
+  /^equipment$/i,
+  /^class\s+features?$/i,
+  /^species\s+traits?$/i,
+  /^age$/i,
+  /^size$/i,
+  /^creature\s+type$/i,
+];
+
+// Any one of these markers in the description means the feature is mid-turn-relevant.
+const MECHANICAL_PATTERNS: RegExp[] = [
+  /\d+\s*\/\s*(?:long|short)\s*rest/i,            // 3/Long Rest
+  /\bper\s+(?:long|short)\s+rest/i,                // "3 luck points per long rest"
+  /\b(?:1|one|two|three|\d+)\s+actions?\b/i,       // 1 Action, two actions
+  /\bbonus\s+actions?\b/i,
+  /\breactions?\b/i,
+  /\bonce\s+per\s+(?:turn|round)\b/i,
+  /\bd\d+\b/i,                                     // d20, d6, d4 — die without leading digit
+  /\d+d\d+/,                                       // 1d6, 4d8
+  /\bDC\s*\d+/i,
+  /\b(?:saving|ability)\s+throws?\b/i,
+  /\b(?:advantage|disadvantage)\s+(?:on|against)\b/i,
+  /\b(?:resistance|immunity|immune)\s+to\b/i,
+  /\b(?:flying|swimming|climbing|burrow)\s+speed\b/i,
+  /\b\d+\s*(?:ft|feet|foot)\b.*\b(?:range|radius|cone|line|cube|sphere)\b/i,
+  /\bregain\s+(?:hit\s+points|.*spell\s+slots?|.*pact)/i,
+  /\bspell\s+slots?\b/i,
+  /\b(?:add|adds|extra|bonus)\b[\s\S]{0,40}\bdamage\b/i,   // "Add CHA mod to ... damage", "extra 3 fire damage"
+  /\bspend(?:ing)?\s+\d+/i,                                // "spend 1 luck point"
+  /\bregain\s+\d+/i,
+];
+
+type FeatureKind = 'mechanical' | 'passive' | 'excluded';
+
+function classifyFeature(name: string, description: string): FeatureKind {
+  for (const pat of EXCLUDED_NAME_PATTERNS) {
+    if (pat.test(name)) return 'excluded';
+  }
+  // Header-only entries with no description aren't useful on the sheet.
+  if (!description.trim()) return 'excluded';
+  for (const pat of MECHANICAL_PATTERNS) {
+    if (pat.test(description) || pat.test(name)) return 'mechanical';
+  }
+  return 'passive';
+}
+
+function buildSummary(kind: FeatureKind, description: string): string {
+  if (kind === 'excluded') return '';
+  const clean = description.replace(/\s+/g, ' ').trim();
+  if (kind === 'passive') {
+    const firstSentence = clean.match(/^[^.!?]+[.!?]/);
+    return (firstSentence ? firstSentence[0] : clean.substring(0, 120)).trim();
+  }
+  // Mechanical: keep up to ~3 sentences or 320 chars.
+  const sentences: string[] = [];
+  const sentenceRegex = /[^.!?]+[.!?]+\s*/g;
+  let match;
+  let charCount = 0;
+  while ((match = sentenceRegex.exec(clean)) !== null && sentences.length < 3) {
+    const s = match[0].trim();
+    if (charCount + s.length > 320 && sentences.length > 0) break;
+    sentences.push(s);
+    charCount += s.length + 1;
+  }
+  if (sentences.length === 0) {
+    return clean.substring(0, 320).trim();
+  }
+  return sentences.join(' ').trim();
+}
+
 function parseFeatures(fields: FormFields): {
   classFeatures: { name: string; summary: string }[];
   racialTraits: { name: string; summary: string }[];
@@ -330,29 +494,36 @@ function parseFeatures(fields: FormFields): {
       continue;
     }
 
-    // Parse features from the content block
+    // Parse features from the content block.
+    // Bullets can be "*", "•", or "-" depending on the PDF source.
     const content = sections[i];
-    const featureBlocks = content.split(/\n\s*\*\s+/).filter(Boolean);
+    const featureBlocks = content.split(/\n\s*[*•\-]\s+/).filter(Boolean);
 
     for (const block of featureBlocks) {
       const lines = block.trim().split('\n');
       const firstLine = lines[0]?.trim() || '';
 
-      // Extract feature name (before • or end of line)
-      const nameMatch = firstLine.match(/^([^•]+)/);
-      if (!nameMatch) continue;
-      const name = nameMatch[1].trim().replace(/^\|\s*/, '');
+      // The first line often has format: "Feature Name • metadata" or "Feature Name | metadata".
+      // Name is before the bullet/pipe; the after-bullet portion ("1/Long Rest" etc.) is mechanical metadata
+      // that should be preserved at the start of the description.
+      const splitMatch = firstLine.match(/^([^•|]+?)\s*[•|]\s*(.+)$/);
+      let name: string;
+      let titleMeta = '';
+      if (splitMatch) {
+        name = splitMatch[1].trim().replace(/^\|\s*/, '');
+        titleMeta = splitMatch[2].trim();
+      } else {
+        name = firstLine.replace(/^\|\s*/, '').trim();
+      }
       if (!name || name.length < 2) continue;
 
-      // Extract summary: first sentence of description
-      const descLines = lines.slice(1).map(l => l.trim()).filter(Boolean);
-      let summary = '';
-      if (descLines.length > 0) {
-        const fullDesc = descLines.join(' ');
-        const firstSentence = fullDesc.match(/^[^.!]+[.!]/);
-        summary = firstSentence ? firstSentence[0].trim() : fullDesc.substring(0, 120);
-      }
+      const descLines = lines.slice(1).map((l) => l.trim()).filter(Boolean);
+      const fullDesc = (titleMeta ? `(${titleMeta}) ` : '') + descLines.join(' ');
 
+      const kind = classifyFeature(name, fullDesc);
+      if (kind === 'excluded') continue;
+
+      const summary = buildSummary(kind, fullDesc);
       currentTarget.push({ name, summary });
     }
   }
@@ -673,15 +844,12 @@ function parseSpells(fields: FormFields): {
   };
 }
 
-function parseSpellsFromAnnotations(spellOrder: SpellAnnotation[], fields: FormFields): {
-  spells: Record<string, string[]>;
-  pactSlotLevel: number | null;
-  pactSlotCount: number | null;
-} {
+function parseSpellsFromAnnotations(spellOrder: SpellAnnotation[]): { spells: Record<string, string[]> } {
   const spells: Record<string, string[]> = {};
   let currentLevel = '0';
 
-  // Walk through annotations in PDF order — headers mark level transitions
+  // Walk through annotations in PDF order — headers mark level transitions.
+  // Slot counts (regular and pact) come from the spell-progression lookup, not the PDF.
   for (const entry of spellOrder) {
     if (entry.type === 'header' && entry.level != null) {
       currentLevel = entry.level;
@@ -691,23 +859,7 @@ function parseSpellsFromAnnotations(spellOrder: SpellAnnotation[], fields: FormF
     }
   }
 
-  // Detect warlock pact slots
-  let pactSlotLevel: number | null = null;
-  let pactSlotCount: number | null = null;
-  const castingClass = getField(fields, 'spellCastingClass0').toLowerCase();
-  if (castingClass.includes('warlock')) {
-    const level = parseInt2(getField(fields, 'CLASS  LEVEL').match(/\d+/)?.[0] || '1');
-    if (level >= 9) { pactSlotLevel = 5; pactSlotCount = 2; }
-    else if (level >= 7) { pactSlotLevel = 4; pactSlotCount = 2; }
-    else if (level >= 5) { pactSlotLevel = 3; pactSlotCount = 2; }
-    else if (level >= 3) { pactSlotLevel = 2; pactSlotCount = 2; }
-    else if (level >= 2) { pactSlotLevel = 1; pactSlotCount = 2; }
-    else { pactSlotLevel = 1; pactSlotCount = 1; }
-    if (level >= 17) pactSlotCount = 4;
-    else if (level >= 11) pactSlotCount = 3;
-  }
-
-  return { spells, pactSlotLevel, pactSlotCount };
+  return { spells };
 }
 
 function parseSpeed(raw: string): Record<string, string> {
@@ -796,9 +948,31 @@ export async function POST(request: Request) {
     const defenses = parseDefenses(fields);
     const features = parseFeatures(fields);
     const spellInfo = parseSpells(fields);
-    const spellsFromAnnotations = spellInfo.isSpellcaster ? parseSpellsFromAnnotations(spellOrder, fields) : null;
+
+    // Spell-slot lookup overrides anything the PDF says about slot counts.
+    // Multiclass: callers pick highest-level class for primary; user verifies in edit view.
+    const progression = getSpellProgression(classLevel.class_name, classLevel.level, classLevel.subclass);
+    const isCaster = spellInfo.isSpellcaster || progression.casterType !== 'none';
+    const spellList = isCaster ? parseSpellsFromAnnotations(spellOrder).spells : null;
+
     const classResources = parseClassResources(fields);
     const isPreparedCaster = /cleric|druid|wizard|paladin/i.test(classLevel.class_name);
+
+    // Proficiency level (none/half/proficient/expertise) inferred per skill/save
+    // by comparing the modifier delta against the proficiency bonus.
+    const profBonus = parseInt2(fields['ProfBonus'], 2);
+    const skillMods = parseSkills(fields);
+    const saveMods = parseSaves(fields);
+    const abilityMods: Record<string, number> = {
+      str: Math.floor((parseInt2(fields['STR'], 10) - 10) / 2),
+      dex: Math.floor((parseInt2(fields['DEX'], 10) - 10) / 2),
+      con: Math.floor((parseInt2(fields['CON'], 10) - 10) / 2),
+      int: Math.floor((parseInt2(fields['INT'], 10) - 10) / 2),
+      wis: Math.floor((parseInt2(fields['WIS'], 10) - 10) / 2),
+      cha: Math.floor((parseInt2(fields['CHA'], 10) - 10) / 2),
+    };
+    const skillProficiencies = inferSkillProficiencies(skillMods, abilityMods, profBonus);
+    const saveProficiencies = inferSaveProficiencies(saveMods, abilityMods, profBonus);
 
     const character: ParsedCharacter = {
       name: getField(fields, 'CharacterName', 'CharacterName2'),
@@ -806,6 +980,7 @@ export async function POST(request: Request) {
       class_name: classLevel.class_name,
       subclass: classLevel.subclass,
       level: classLevel.level,
+      is_multiclass: classLevel.isMulticlass,
 
       armor_class: parseInt2(fields['AC']),
       ac_source: '',
@@ -813,7 +988,7 @@ export async function POST(request: Request) {
       speeds: parseSpeed(getField(fields, 'Speed')),
       hp_max: parseInt2(fields['MaxHP']),
       hit_dice_total: getField(fields, 'Total'),
-      proficiency_bonus: parseInt2(fields['ProfBonus']),
+      proficiency_bonus: profBonus,
 
       passive_perception: parseInt2(fields['Passive1'], 10),
       passive_insight: fields['Passive2'] ? parseInt2(fields['Passive2']) : null,
@@ -827,8 +1002,10 @@ export async function POST(request: Request) {
       wis_score: parseInt2(fields['WIS'], 10),
       cha_score: parseInt2(fields['CHA'], 10),
 
-      skill_modifiers: parseSkills(fields),
-      save_modifiers: parseSaves(fields),
+      skill_modifiers: skillMods,
+      save_modifiers: saveMods,
+      skill_proficiencies: skillProficiencies,
+      save_proficiencies: saveProficiencies,
       attacks: parseAttacks(fields),
 
       damage_resistances: defenses.resistances,
@@ -840,14 +1017,14 @@ export async function POST(request: Request) {
       languages: proficiencies.languages,
       tool_proficiencies: proficiencies.tools,
 
-      is_spellcaster: spellInfo.isSpellcaster,
+      is_spellcaster: isCaster,
       spell_attack_bonus: spellInfo.spellAttackBonus,
       spell_save_dc: spellInfo.spellSaveDC,
       spellcasting_ability: spellInfo.spellcastingAbility,
-      spell_slots: null,
-      pact_slot_level: spellsFromAnnotations?.pactSlotLevel ?? null,
-      pact_slot_count: spellsFromAnnotations?.pactSlotCount ?? null,
-      spells: spellsFromAnnotations?.spells ?? null,
+      spell_slots: progression.spellSlots,
+      pact_slot_level: progression.pactSlotLevel,
+      pact_slot_count: progression.pactSlotCount,
+      spells: spellList,
       is_prepared_caster: isPreparedCaster,
       prepared_spells: null,
 

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const systemPrompt = getBuilderSystemPrompt(campaignContext);
 
   const stream = await client.messages.stream({
-    model: 'claude-opus-4-6',
+    model: 'claude-opus-4-7',
     max_tokens: 4096,
     system: systemPrompt,
     messages: messages.map((m: { role: string; content: string }) => ({

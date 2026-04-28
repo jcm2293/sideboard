@@ -176,6 +176,8 @@ export interface SessionLog {
   created_at: string;
 }
 
+export type ProficiencyLevel = 'none' | 'half' | 'proficient' | 'expertise';
+
 export interface AttackEntry {
   name: string;
   atk_bonus: string;
@@ -214,6 +216,7 @@ export interface PlayerCharacter {
   class_name: string;
   subclass: string;
   level: number;
+  is_multiclass: boolean;
 
   // Combat stats
   armor_class: number;
@@ -238,9 +241,14 @@ export interface PlayerCharacter {
   wis_score: number;
   cha_score: number;
 
-  // Pre-calculated modifiers
+  // Pre-calculated modifiers (final values, used in PDF export and shelf)
   skill_modifiers: Record<string, number>;
   save_modifiers: Record<string, number>;
+
+  // Proficiency metadata for the edit view (not used in calc — modifiers above are authoritative)
+  // Values: 'none' | 'half' | 'proficient' | 'expertise'. Saves only use 'none' | 'proficient'.
+  skill_proficiencies: Record<string, ProficiencyLevel>;
+  save_proficiencies: Record<string, ProficiencyLevel>;
 
   // Attacks
   attacks: AttackEntry[];
