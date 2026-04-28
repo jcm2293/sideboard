@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { playerCharacterStore } from '@/lib/data';
 import { useShelfStore } from '@/stores/shelf-store';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { ALL_HOMEBREW_CLASSES } from '@/data/homebrew-classes';
 import type { PlayerCharacter } from '@/types';
 
 export default function PlayersPage({ params }: { params: Promise<{ id: string }> }) {
@@ -17,6 +18,8 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
   const [uploading, setUploading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createTab, setCreateTab] = useState<'official' | 'homebrew'>('official');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const reuploadInputRef = useRef<HTMLInputElement>(null);
@@ -158,7 +161,7 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
             {uploading ? 'Parsing character sheet...' : 'Upload Character PDF'}
           </button>
           <button
-            onClick={() => router.push(`/campaign/${id}/players/new`)}
+            onClick={() => setCreateOpen(true)}
             className="btn-ghost px-4 py-2 rounded text-sm"
           >
             Create Manually
@@ -269,6 +272,82 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Create-character modal: choose Official (blank edit form) or Homebrew (wizard) */}
+      {createOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setCreateOpen(false)}>
+          <div
+            className="card-parchment rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-baseline justify-between mb-4">
+              <h3 className="font-display text-lg text-accent">Create Character</h3>
+              <button onClick={() => setCreateOpen(false)} className="text-muted hover:text-foreground">✕</button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-2 border-b border-border mb-4">
+              {(['official', 'homebrew'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setCreateTab(t)}
+                  className={`px-4 py-2 text-sm font-medium ${
+                    createTab === t
+                      ? 'text-accent border-b-2 border-accent -mb-px'
+                      : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  {t === 'official' ? 'Official Class' : 'Homebrew Class'}
+                </button>
+              ))}
+            </div>
+
+            {createTab === 'official' ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted">
+                  Standard manual entry. Opens an empty character sheet for any 5e class — fill in everything by hand.
+                </p>
+                <button
+                  onClick={() => {
+                    setCreateOpen(false);
+                    router.push(`/campaign/${id}/players/new`);
+                  }}
+                  className="btn-primary px-4 py-2 rounded text-sm"
+                >
+                  Create Blank Character →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {ALL_HOMEBREW_CLASSES.length === 0 ? (
+                  <p className="text-sm text-muted italic">
+                    No homebrew classes available. Drop a ClassDefinition into <code>/src/data/homebrew-classes/</code> to add one.
+                  </p>
+                ) : (
+                  ALL_HOMEBREW_CLASSES.map((cls) => (
+                    <div key={cls.id} className="border border-border rounded p-4 bg-surface-light/40">
+                      <div className="flex items-baseline justify-between mb-1">
+                        <h4 className="font-display text-base text-accent">{cls.name}</h4>
+                        <span className="text-xs text-muted">{cls.source}</span>
+                      </div>
+                      <p className="text-sm text-muted mb-3">{cls.description}</p>
+                      <button
+                        onClick={() => {
+                          setCreateOpen(false);
+                          router.push(`/campaign/${id}/players/new-homebrew?class=${cls.id}`);
+                        }}
+                        className="btn-primary px-3 py-1.5 rounded text-xs"
+                      >
+                        Select
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -146,6 +146,17 @@ function rowToSlotMap(row: number[]): Record<string, number> {
   return out;
 }
 
+/** Direct lookup when caster type is already known (homebrew classes pass it explicitly). */
+export function getProgressionByCasterType(
+  type: CasterType,
+  level: number,
+  cantripFn?: (lvl: number) => number,
+): SpellProgression {
+  const lvl = Math.max(1, Math.min(20, Math.floor(level || 1)));
+  const cantrips = cantripFn ? cantripFn(lvl) : 0;
+  return resolveProgression(type, lvl, cantrips);
+}
+
 export function getSpellProgression(
   className: string,
   level: number,
@@ -155,7 +166,10 @@ export function getSpellProgression(
   const type = classify(className, subclass);
   const c = className.trim().toLowerCase();
   const cantrips = CANTRIP_PROG[c] ? CANTRIP_PROG[c](lvl) : 0;
+  return resolveProgression(type, lvl, cantrips);
+}
 
+function resolveProgression(type: CasterType, lvl: number, cantrips: number): SpellProgression {
   switch (type) {
     case 'full': {
       const row = FULL_CASTER_SLOTS[lvl] ?? FULL_CASTER_SLOTS[1];
@@ -171,7 +185,7 @@ export function getSpellProgression(
       const row = priorRow(HALF_CASTER_SLOTS, lvl);
       return {
         casterType: 'half',
-        cantripsKnown: 0,
+        cantripsKnown: cantrips,
         spellSlots: row ? rowToSlotMap(row) : null,
         pactSlotLevel: null,
         pactSlotCount: null,
@@ -181,7 +195,7 @@ export function getSpellProgression(
       const row = priorRow(THIRD_CASTER_SLOTS, lvl);
       return {
         casterType: 'third',
-        cantripsKnown: 0,
+        cantripsKnown: cantrips,
         spellSlots: row ? rowToSlotMap(row) : null,
         pactSlotLevel: null,
         pactSlotCount: null,

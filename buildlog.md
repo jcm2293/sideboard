@@ -149,6 +149,35 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-04-28 — Homebrew class system + Magus
+
+**Architecture.** New data-driven system for homebrew classes. Each class is a TS data file in `src/data/homebrew-classes/` exporting a `ClassDefinition` (level progression, features w/ full mechanics, subclasses, spell list, fighting styles). The character creation flow reads the registry and walks the user through a wizard rather than dumping them in the empty edit form.
+
+- New types: `src/types/homebrew-class.ts` (`ClassDefinition`, `LevelEntry`, `FeatureDefinition`, `SubclassDefinition`)
+- Registry: `src/data/homebrew-classes/index.ts` exports `ALL_HOMEBREW_CLASSES` and `findHomebrewClass(id)`
+- Spell-progression: extracted `getProgressionByCasterType(type, level, cantripFn?)` from the existing class-name-based path so homebrew classes pass caster type explicitly. Half/third caster paths now thread the cantrip count through (vanilla still gets 0 because Paladin/Ranger don't have a cantrip function).
+- Assembly logic: `src/lib/homebrew/assemble-character.ts` — `assembleCharacterFromClass(inputs)` returns a `Partial<PlayerCharacter>` ready for the existing parsed-flow path (sessionStorage → /players/new?parsed=true). Computes PB, HP estimate, save+skill modifiers (with proficiency from class def + chosen skills), proficiency metadata jsonbs, spell slots via the progression helper, spell save DC + attack from PB + spellcasting ability, full class features expanded by character level (with `esoteric_order_feature` markers replaced by the chosen subclass's tier features), and bonus spells from the subclass folded into the right spell-level buckets.
+
+**The Magus (laserllama)** at `src/data/homebrew-classes/magus.ts`:
+- All 20 levels of progression
+- 17 base class features with full mechanical descriptions (Arcane Armory, Spellstrike, Spellsunder, Arcane Conservation, etc.)
+- All 12 subclasses (6 base + 6 expanded): Arcanists, Arcane Archers, Blades, Dragon Knights, Spellbreakers, Warders, Armorers, Conduits, Hexblades, Shades, Spellswords, Travelers — full feature text at 3rd/7th/15th/20th + bonus spells where applicable
+- 16 fighting styles (8 base + 8 expanded) as informational `FeatureDefinition[]`
+- Full Magus spell list (cantrips through 5th level, ~120 spell names; spells not in our SRD library route to the existing Add Description flow)
+- Magus-specific cantrip function exported separately and registered in the cantrip lookup
+
+**Character creation flow.**
+- Players page: "Create Manually" button now opens a tabbed modal — Tab 1 ("Official Class") still routes to `/players/new`; Tab 2 ("Homebrew Class") shows `ALL_HOMEBREW_CLASSES` as cards
+- New route: `/campaign/[id]/players/new-homebrew?class={id}` — three-step wizard:
+  1. Basics (name, player, level, subclass card-picker shown only when `level >= subclass_choice_level`)
+  2. Class Choices (skill multi-select with count cap, fighting style text + collapsible style list, cantrip multi-select, spells-known multi-select grouped by spell level)
+  3. Manual fields (race, background, ability scores, equipment textarea, currency)
+- On submit, assembled character lands in the standard edit view via the same sessionStorage path the PDF parser uses, so the user reviews/saves through the existing form
+
+**Verified for the user's test case** (Level 7 Magus / Order of Blades): half-caster slots 4/3/0/0/0; class features include Arcane Armory, Fighting Style (with user's text injected), Spellcasting, Spellstrike, Arcane Regeneration, Esoteric Order, Extra Attack, Spellsight, Ethereal Step, plus the Blades L3/L7 features (Art of the Dance, Blade Dance, Fluid Steps); bonus spells (compelled duel, zephyr strike at L3 → 1st-level bucket; blur, misty step at L5 → 2nd-level bucket); save proficiencies CON/INT; skill modifiers correct for chosen Arcana + Athletics with PB applied; spell save DC and attack bonus computed from PB + INT mod.
+
+**Bug fixed before commit:** the wizard's `StepBasics` / `StepChoices` / `StepManual` were defined as nested functions inside the parent component's body, giving them new identities every render and forcing React to remount the inputs each keystroke (focus loss). Inlined them as direct JSX gated by `step ===` checks. Also dropped the "The" prefix on the Magus class name so the page title reads "Create a Magus" instead of "Create a The Magus".
+
 ### 2026-04-28 — Character sheet refinements (4 issues)
 
 **Skill names visible on edit view.** The `numberInputClass` carries `w-full`, which Tailwind v4 generates after `w-14` in the stylesheet, so appending `w-14` had no effect — the inputs took 100% width and pushed the label out of frame. Added `compactInputClass` / `compactNumberClass` without `w-full` for inline ability-card rows. Layout now: `[Skill Name]  [mod input]  [proficiency dropdown]`.
