@@ -149,6 +149,22 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-04-29 — Spell stat calc + Heathbound class
+
+**Spell save DC and attack bonus are now calculated, not stored.** They derive deterministically from `proficiency_bonus + abilityModifier(score for spellcasting_ability)`, with optional override columns for the rare magic-item / feature case.
+
+- New `src/lib/character.ts` exposes `abilityModifier`, `abilityScoreFor`, `spellSaveDc`, `spellAttackBonus`, `modString` — single source of truth used by the edit page UI, PDF export, and any future surface that needs these numbers.
+- Migration `008_spell_stat_overrides.sql` renames `spell_attack_bonus → spell_attack_bonus_override` and `spell_save_dc → spell_save_dc_override` (preserves existing values; user can toggle them off post-migration to reveal the calculated values).
+- `PlayerCharacter` type updated to match. PDF parser stops writing these fields (sets overrides to null on import — calculation handles the standard case). Wizard's `assemble-character` likewise stops setting them.
+- Edit page Spellcasting section: Spell Attack and Spell DC are now read-only display tiles that recompute live when the ability dropdown, level, or relevant ability score changes. Below them, an "Override calculated values" toggle reveals two number inputs that write to the override columns; toggling off nulls them.
+- PDF export reads via the new helpers, so override wins when set, otherwise calculated.
+
+**The Heathbound (laserllama, witch-themed reskin)** at `src/data/homebrew-classes/heathbound.ts`:
+- Mechanically identical to the Magus, but spellcasting ability is **Wisdom** and saving throw proficiencies are **CON / WIS**. All `INT`/`Intelligence`/`Magus`/`Magus level` references in feature text rewritten to `WIS`/`Wisdom`/`Heathbound`/`Heathbound level`. Hexblade weapon's INT/WIS/CHA stat block stays as-is (those are creature ability scores, not the character's casting ability).
+- Order of Dragon Knights is replaced by **Ward of the Witch** — the character is the chosen of an ancient fey-touched witch of the deep forest, accompanied by a familiar she has sent. All draconic features renamed and reflavored: Draconic Companion → Witch's Familiar (Small Fey, Neutral; languages Sylvan), Wyrmsoul → Witch's Mark, Greater Companion → Awakened Familiar, Elemental Breath → Hexbreath, Mythic Companion → Mythic Familiar, Grand Dragon Knight → Witch's Chosen (Greater Witchblood stat block), Dragon Knight Spells → Witch-Touched Spells. Companion essence renamed to "The Witch's Element" with **fire as canonical**, other elements (acid, cold, lightning, poison) presented as variants. Familiar form is the player's choice (fox / raven / black cat / owl / hare / stoat) with size scaling at the 7th and 15th level milestones described in flavor text.
+- Bonus spells adjusted toward witch theme: 5th-level grant changed `dragon's breath` → `scorching ray`; 9th-level changed `elemental bane` → `fireball`; 17th-level changed `conjure dragon` → `fire storm`. The new bonus spells (command, warding bond, fear, dominate creature, fire storm) added to the Heathbound spell list at appropriate levels so the assembler buckets them correctly.
+- Registered in the homebrew classes index and shows up in the Players page Create Manually → Homebrew tab. Verified: Level 7 / Ward of the Witch produces WIS-based DC 14 / Atk +6 with WIS 16, CON+WIS save proficiencies, all 4 visible subclass features at this level, bonus spells folded into the right slot buckets.
+
 ### 2026-04-28 — Homebrew class system + Magus
 
 **Architecture.** New data-driven system for homebrew classes. Each class is a TS data file in `src/data/homebrew-classes/` exporting a `ClassDefinition` (level progression, features w/ full mechanics, subclasses, spell list, fighting styles). The character creation flow reads the registry and walks the user through a wizard rather than dumping them in the empty edit form.

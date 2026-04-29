@@ -1,19 +1,23 @@
-// The Magus — laserllama homebrew class.
-// Source: laserllama's Magus PDF (the version uploaded to docs/homebrew-references/magus.pdf).
+// The Heathbound — a witch-themed reskin of laserllama's Magus.
 //
-// Mechanically: Intelligence-based half-caster (slot table identical to Paladin/Ranger),
-// d10 hit die, gets cantrips (2/3/4 progression), with a signature mechanic called Spellstrike
-// that channels spells through melee weapons.
+// Mechanically identical to the Magus class but:
+// - Spellcasting ability is Wisdom (not Intelligence)
+// - Saving throw proficiencies are Constitution and Wisdom
+// - The "Order of Dragon Knights" subclass is replaced by "Ward of the Witch"
+//   with all draconic features renamed and reflavored toward fey witch-magic
+//   (the player is the witch's chosen, accompanied by a familiar she has sent
+//    to watch over them; fire is the canonical element)
 //
-// This file is data-only. Render via the homebrew creation wizard
-// (/campaign/[id]/players/new-homebrew?class=magus) and assembled into a PlayerCharacter via
-// /src/lib/homebrew/assemble-character.ts.
+// All other subclasses, base features, level progression, fighting styles, and
+// the full spell list are inherited from the Magus.
+//
+// Source: laserllama (derivative reskin for in-campaign use).
 
 import type { ClassDefinition, FeatureDefinition, SubclassDefinition } from '@/types/homebrew-class';
 import { ALL_FIGHTING_STYLE_IDS } from '@/data/fighting-styles';
 
 // ──────────────────────────────────────────────────────────────────────────
-// Base class features
+// Base class features (all "INT" / "Magus" references swapped for WIS / Heathbound)
 // ──────────────────────────────────────────────────────────────────────────
 
 const BASE_FEATURES: Record<string, FeatureDefinition> = {
@@ -22,21 +26,21 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
     name: 'Arcane Armory',
     description:
       "An extradimensional space accessible only by you. " +
-      "Enchanting Objects: 1-hour ritual on a single weapon, shield, set of armor, or Tiny Object — when complete it disappears into the Armory until summoned. Capacity: 1 + your Magus level (one must always be a melee weapon). " +
+      "Enchanting Objects: 1-hour ritual on a single weapon, shield, set of armor, or Tiny Object — when complete it disappears into the Armory until summoned. Capacity: 1 + your Heathbound level (one must always be a melee weapon). " +
       "Accessing: as a bonus action, summon any number of objects from the Armory (instantly equipping/donning) and/or shunt any number back into it. " +
-      "Benefits: Armory weapons, shields, and armor are magical while inside. When calculating AC in light or medium Armory armor, you may use INT in place of DEX.",
+      "Benefits: Armory weapons, shields, and armor are magical while inside. When calculating AC in light or medium Armory armor, you may use WIS in place of DEX.",
   },
   fighting_style: {
     id: 'fighting_style',
     name: 'Fighting Style',
     description:
-      'You learn one Fighting Style from the Magus list (e.g. Archery, Balanced Fighting, Classical Swordplay, Defensive, Dual Wielding, Hurler, Protection, Versatile Fighting; expanded options also available). When you gain a Magus level, you may replace your Fighting Style with another for which you meet the prerequisites.',
+      'You learn one Fighting Style from the Heathbound list (e.g. Archery, Balanced Fighting, Classical Swordplay, Defensive, Dual Wielding, Hurler, Protection, Versatile Fighting; expanded options also available). When you gain a Heathbound level, you may replace your Fighting Style with another for which you meet the prerequisites.',
   },
   spellcasting: {
     id: 'spellcasting',
     name: 'Spellcasting',
     description:
-      "At 2nd level, you cast arcane spells using INT. Spell save DC = 8 + your proficiency bonus + your INT modifier; spell attack modifier = your proficiency bonus + your INT modifier. " +
+      "At 2nd level, you cast wild arcane spells using WIS. Spell save DC = 8 + your proficiency bonus + your WIS modifier; spell attack modifier = your proficiency bonus + your WIS modifier. " +
       "You can use any weapon, shield, or arcane focus within your Arcane Armory as a Spellcasting Focus. Armory weapons and shields can also perform somatic components. " +
       "Spell slots: half-caster table starting at 2nd level. Cantrips known: 2 at L2, 3 at L4, 4 at L10.",
   },
@@ -44,7 +48,7 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
     id: 'spellstrike',
     name: 'Spellstrike',
     description:
-      "Once on your turn when you attack with a melee Arcane Armory weapon, you can simultaneously cast a Magus spell, expending a spell slot as normal. The spell must have casting time 1 action and either require one spell attack roll, force at least one save, or affect a number of HP worth of creatures (like sleep). " +
+      "Once on your turn when you attack with a melee Arcane Armory weapon, you can simultaneously cast a Heathbound spell, expending a spell slot as normal. The spell must have casting time 1 action and either require one spell attack roll, force at least one save, or affect a number of HP worth of creatures (like sleep). " +
       "The spell channels through your weapon: on a miss, the spell fails and has no effect; on hit, the spell takes effect instantly after your attack. " +
       "Area of Effect: spells targeting an area larger than a 5-foot cube either affect only your target or extend as a 15-foot cone outward. " +
       "Saving Throws: targets make their initial save with disadvantage; on a critical hit, they automatically fail. " +
@@ -56,7 +60,7 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
     id: 'arcane_regeneration',
     name: 'Arcane Regeneration',
     description:
-      'Starting at 3rd level, during a short rest you can recover expended spell slots of a combined level equal to your INT modifier (minimum a single 1st-level slot). Once used, you must finish a long rest before using this feature again.',
+      'Starting at 3rd level, during a short rest you can recover expended spell slots of a combined level equal to your WIS modifier (minimum a single 1st-level spell slot). Once used, you must finish a long rest before using this feature again.',
     is_resource: true,
     resource_uses: '1',
     resource_recovery: 'long',
@@ -65,7 +69,7 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
     id: 'esoteric_order',
     name: 'Esoteric Order',
     description:
-      'At 3rd level, you formally join one of the Esoteric Orders: Arcanists, Arcane Archers, Blades, Dragon Knights, Spellbreakers, or Warders (plus expanded options: Armorers, Conduits, Hexblades, Shades, Spellswords, Travelers). Your Order grants features at 3rd, 7th, 15th, and 20th level. Order spells use your Magus Spell save DC.',
+      'At 3rd level, you formally join one of the Esoteric Orders: Arcanists, Arcane Archers, Blades, Ward of the Witch, Spellbreakers, or Warders (plus expanded options: Armorers, Conduits, Hexblades, Shades, Spellswords, Travelers). Your Order grants features at 3rd, 7th, 15th, and 20th level. Order spells use your Heathbound Spell save DC.',
   },
   ability_score_improvement: {
     id: 'ability_score_improvement',
@@ -109,7 +113,7 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
     id: 'mystical_ward',
     name: 'Mystical Ward',
     description:
-      'Beginning at 10th level, you are immune to the effects of any Magus spell you cast, unless you wish to be affected.',
+      'Beginning at 10th level, you are immune to the effects of any Heathbound spell you cast, unless you wish to be affected.',
   },
   arcane_conservation: {
     id: 'arcane_conservation',
@@ -136,14 +140,11 @@ const BASE_FEATURES: Record<string, FeatureDefinition> = {
   },
 };
 
-// Esoteric Order Feature placeholder — replaced per-subclass at the assembly step.
-// We reference 'esoteric_order_feature' in the level table at L7/15/20 so the assembler
-// knows to inject the actual subclass features at those tiers.
 const ESOTERIC_ORDER_TIER: FeatureDefinition = {
   id: 'esoteric_order_feature',
   name: 'Esoteric Order Feature',
   description: 'Gain features from your chosen Esoteric Order at this level.',
-  hide_on_sheet: true, // assembler expands to the actual subclass features
+  hide_on_sheet: true,
 };
 
 const FEATURES: Record<string, FeatureDefinition> = {
@@ -152,11 +153,7 @@ const FEATURES: Record<string, FeatureDefinition> = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Fighting Styles are now bundled centrally in /src/data/fighting-styles.ts.
-// See `allowed_fighting_style_ids` on the class definition below.
-
-// ──────────────────────────────────────────────────────────────────────────
-// Level progression (1-20)
+// Level progression — identical to Magus
 // ──────────────────────────────────────────────────────────────────────────
 
 const LEVEL_PROGRESSION = [
@@ -183,13 +180,13 @@ const LEVEL_PROGRESSION = [
 ];
 
 // ──────────────────────────────────────────────────────────────────────────
-// Subclasses (Esoteric Orders)
+// Subclasses (Esoteric Orders) — same structure as Magus, with one swap
 // ──────────────────────────────────────────────────────────────────────────
 
 const ARCANISTS: SubclassDefinition = {
   id: 'arcanists',
   name: 'Order of Arcanists',
-  description: 'Magi who serve wizards and arcane scholars. Maintain a Spellbook for prepared casting and gather magical knowledge.',
+  description: 'Heathbound who serve wizards and arcane scholars. Maintain a Spellbook for prepared casting and gather magical knowledge.',
   features_by_level: {
     3: ['arcanists_arcane_spellbook', 'arcanists_arcane_library'],
     7: ['arcanists_esoteric_sight'],
@@ -201,18 +198,18 @@ const ARCANISTS: SubclassDefinition = {
       id: 'arcanists_arcane_spellbook',
       name: 'Arcane Spellbook',
       description:
-        "You maintain a Spellbook from which you prepare your Magus spells (replacing the Spells Known column). " +
-        "It starts with three 1st-level spells from the Magus or Wizard spell list. " +
-        "Preparing: during a long rest, spend 1 hour studying to prepare a number of spells equal to your INT mod + half your Magus level. " +
+        "You maintain a Spellbook from which you prepare your Heathbound spells (replacing the Spells Known column). " +
+        "It starts with three 1st-level spells from the Heathbound or Wizard spell list. " +
+        "Preparing: during a long rest, spend 1 hour studying to prepare a number of spells equal to your WIS mod + half your Heathbound level. " +
         "Ritual Casting: cast the Ritual version of any spell in your Spellbook, even if not prepared. " +
-        "Adding spells: each time you gain a Magus level, add one Magus or Wizard spell of a level for which you have spell slots.",
+        "Adding spells: each time you gain a Heathbound level, add one Heathbound or Wizard spell of a level for which you have spell slots.",
     },
     arcanists_arcane_library: {
       id: 'arcanists_arcane_library',
       name: 'Arcane Library',
       description:
-        "Knowledge stored in your Arcane Armory is at your fingertips. When making an INT check to recall information from a book, tome, or scroll stored within your Armory, treat any d20 roll lower than your Magus level as equal to it. " +
-        "Adding a Magus or Wizard Spell Scroll of a level you have slots for to your Armory lets you destroy it to add the spell to your Spellbook (or to a Spellbook each Armory ritual).",
+        "Knowledge stored in your Arcane Armory is at your fingertips. When making a WIS check to recall information from a book, tome, or scroll stored within your Armory, treat any d20 roll lower than your Heathbound level as equal to it. " +
+        "Adding a Heathbound or Wizard Spell Scroll of a level you have slots for to your Armory lets you destroy it to add the spell to your Spellbook (or to a Spellbook each Armory ritual).",
     },
     arcanists_esoteric_sight: {
       id: 'arcanists_esoteric_sight',
@@ -223,12 +220,12 @@ const ARCANISTS: SubclassDefinition = {
       id: 'arcanists_stored_spells',
       name: 'Stored Spells',
       description:
-        'During a long rest, perform a 1-hour ritual to fill vacant Armory slots with spells from your Spellbook. Each spell takes Armory slots equal to twice its level; total stored level cannot exceed your INT modifier (min 1). Cast each stored spell once at its normal casting time without expending a spell slot; once cast, it is lost.',
+        'During a long rest, perform a 1-hour ritual to fill vacant Armory slots with spells from your Spellbook. Each spell takes Armory slots equal to twice its level; total stored level cannot exceed your WIS modifier (min 1). Cast each stored spell once at its normal casting time without expending a spell slot; once cast, it is lost.',
     },
     arcanists_grand_arcanist: {
       id: 'arcanists_grand_arcanist',
       name: 'Grand Arcanist',
-      description: 'Add one 6th-level and one 7th-level Wizard spell of your choice to your Spellbook. You can cast each of them once per long rest without expending a spell slot. They count as Magus spells.',
+      description: 'Add one 6th-level and one 7th-level Wizard spell of your choice to your Spellbook. You can cast each of them once per long rest without expending a spell slot. They count as Heathbound spells.',
     },
   },
 };
@@ -253,7 +250,7 @@ const ARCANE_ARCHERS: SubclassDefinition = {
     archers_eagle_eyed: {
       id: 'archers_eagle_eyed',
       name: 'Eagle-Eyed',
-      description: 'Gain proficiency in Perception. Use INT in place of WIS for Perception checks.',
+      description: 'Gain proficiency in Perception. You may use WIS twice (Perception already uses WIS), so this is purely the proficiency grant.',
     },
     archers_enchanted_shot: {
       id: 'archers_enchanted_shot',
@@ -292,7 +289,7 @@ const ARCANE_ARCHERS: SubclassDefinition = {
 const BLADES: SubclassDefinition = {
   id: 'blades',
   name: 'Order of Blades',
-  description: 'Lifelong devotees of the Blade Dance — a mystical combat trance that turns the Magus into a whirlwind of magic and steel.',
+  description: 'Lifelong devotees of the Blade Dance — a mystical combat trance that turns the Heathbound into a whirlwind of magic and steel.',
   features_by_level: {
     3: ['blades_art_of_the_dance', 'blades_blade_dance'],
     7: ['blades_fluid_steps'],
@@ -303,14 +300,14 @@ const BLADES: SubclassDefinition = {
     blades_art_of_the_dance: {
       id: 'blades_art_of_the_dance',
       name: 'Art of the Dance',
-      description: 'Gain Performance proficiency. On Performance checks, use STR or DEX in place of CHA. While unarmored, your AC = 10 + DEX mod + INT mod.',
+      description: 'Gain Performance proficiency. On Performance checks, use STR or DEX in place of CHA. While unarmored, your AC = 10 + DEX mod + WIS mod.',
     },
     blades_blade_dance: {
       id: 'blades_blade_dance',
       name: 'Blade Dance',
       description:
         "As a bonus action (no heavy armor / no heavy weapon), enter the Blade Dance for 1 minute: " +
-        "+10 ft. walking speed; +1 AC; INT mod (min +1) added to Acrobatics, Athletics, and Performance checks; once per turn, when dealing damage with an Armory weapon, roll its damage dice twice (incl. Spellstrike dice) and use the higher result. " +
+        "+10 ft. walking speed; +1 AC; WIS mod (min +1) added to Acrobatics, Athletics, and Performance checks; once per turn, when dealing damage with an Armory weapon, roll its damage dice twice (incl. Spellstrike dice) and use the higher result. " +
         "Ends early if Incapacitated or bonus-actioned off. Once per short or long rest at no cost; thereafter, expend a spell slot.",
       is_resource: true,
       resource_uses: '1',
@@ -325,7 +322,7 @@ const BLADES: SubclassDefinition = {
       id: 'blades_deadly_dance',
       name: 'Deadly Dance',
       description:
-        'While in Blade Dance, gain: Evasion (DEX save for half → take none on success, half on fail); Spellsunder rolls add INT mod (min +1); Blade Dance AC bonus becomes +3.',
+        'While in Blade Dance, gain: Evasion (DEX save for half → take none on success, half on fail); Spellsunder rolls add WIS mod (min +1); Blade Dance AC bonus becomes +3.',
     },
     blades_master_of_blades: {
       id: 'blades_master_of_blades',
@@ -342,65 +339,90 @@ const BLADES: SubclassDefinition = {
   },
 };
 
-const DRAGON_KNIGHTS: SubclassDefinition = {
-  id: 'dragon_knights',
-  name: 'Order of Dragon Knights',
-  description: 'Magi whose souls are bound to a Draconic Companion. Riders, guardians, and bringers of elemental ruin.',
+// ── WARD OF THE WITCH ────────────────────────────────────────────────────
+// Replaces "Order of Dragon Knights" — flavor reskinned to match the witch
+// theme (the Heathbound is the witch's chosen, accompanied by a familiar she
+// has sent to walk beside them; fire is canonical, other elements available).
+
+const WARD_OF_THE_WITCH: SubclassDefinition = {
+  id: 'ward_of_the_witch',
+  name: 'Ward of the Witch',
+  description:
+    "Heathbound chosen by a witch of the deep forest are bound to her service, marked by her power, and accompanied by a familiar she has sent to walk beside them. Some are her lovers, some her sworn knights, some her wayward children — all carry a fragment of her ancient magic.",
   features_by_level: {
-    3: ['knights_draconic_companion', 'knights_wyrmsoul'],
-    7: ['knights_greater_companion'],
-    15: ['knights_elemental_breath', 'knights_mythic_companion'],
-    20: ['knights_grand_dragon_knight'],
+    3: ['witch_touched_spells', 'witchs_familiar', 'witchs_mark'],
+    7: ['awakened_familiar'],
+    15: ['hexbreath', 'mythic_familiar'],
+    20: ['witchs_chosen'],
   },
   features: {
-    knights_draconic_companion: {
-      id: 'knights_draconic_companion',
-      name: 'Draconic Companion',
+    witch_touched_spells: {
+      id: 'witch_touched_spells',
+      name: 'Witch-Touched Spells',
       description:
-        "Your soul is bound to a Draconic Companion. Choose its Essence (acid, cold, fire, lightning, or poison) — fixed once chosen. " +
-        "Stat block (Small Dragon, Lawful): AC 14 + PB; HP = 5 + (5 × Magus level); Speed 30 ft., fly 30 ft.; STR 16, DEX 12, CON 15, INT 8, WIS 10, CHA 14; Immunities Essence damage type; Senses Darkvision 60 ft.; Languages Draconic. Hit Dice = d8 × Magus level. Soul Bound: adds PB to forced ability checks/saves. " +
-        "Action — Claw: Melee Weapon Attack +3+PB to hit, reach 5 ft., one target. Hit: 1d4+PB slashing + 1d4 Essence damage. " +
-        "Combat: shares your initiative; on your bonus action you can order it to take an action from its stat block (or you forgo one Attack action attack to order it to attack). It moves and uses reactions on its own; without an order it Dodges. " +
-        "Stasis: optionally enchant the Companion as an Armory object. Death: makes Death Saves like a PC; if it dies, perform a 1-hour ritual (during a short or long rest) to revive it at 1 HP — you may spend its Hit Dice as a short rest as part of this.",
+        "You learn certain spells at the Heathbound levels noted below. These spells do not count against your total number of Spells Known and cannot be switched on level up. " +
+        "Level 3: absorb elements, command. Level 5: scorching ray, warding bond. Level 9: fireball, fear. Level 13: dominate creature, freedom of movement. Level 17: awaken, fire storm.",
     },
-    knights_wyrmsoul: {
-      id: 'knights_wyrmsoul',
-      name: 'Wyrmsoul',
-      description: 'Speak, read, and write Draconic. When you cast a spell that deals acid, cold, fire, lightning, or poison damage, you can change its damage type to your Companion\'s Essence type.',
-    },
-    knights_greater_companion: {
-      id: 'knights_greater_companion',
-      name: 'Greater Companion',
-      description: 'Your Companion becomes Medium and can bear you (or a Medium-or-smaller ally) as a rider; flying speed halves while ridden by anyone other than you. Its Claw attacks become magical and use d6 in place of d4.',
-    },
-    knights_elemental_breath: {
-      id: 'knights_elemental_breath',
-      name: 'Elemental Breath',
+    witchs_familiar: {
+      id: 'witchs_familiar',
+      name: "Witch's Familiar",
       description:
-        "As an action, your Companion exhales a 30-ft. cone forcing a DEX save: 10d6 Essence damage on fail, half on success. Uses = your INT modifier (min 1), recharging on long rest. With no uses left, expend a 3rd-level or higher spell slot.",
+        "Your soul is bound to a familiar the witch has sent to walk beside you. " +
+        "Choose the form your familiar takes — common choices include a fox, raven, black cat, owl, hare, or stoat, but any small natural creature touched by fey magic is appropriate. The familiar's appearance reflects both your bond and your witch's nature: a witch of autumn forests might send a fox with leaves caught in its fur; a witch of midwinter might send a snow-white hare with eyes like coals. " +
+        "The Witch's Element. Choose its elemental nature. Fire is the most common — the witch's domain is hearthfire, wildfire, and hexflame — but some witches grant familiars touched by other elements: acid, cold, lightning, or poison. Once chosen, the element cannot be changed except by the witch herself. This element determines the damage type of the familiar's natural attacks and breath. " +
+        "Stat block (Small Fey, Neutral): AC 14 + PB; HP = 5 + (5 × Heathbound level); Speed 30 ft., fly 30 ft.; STR 16, DEX 12, CON 15, INT 8, WIS 10, CHA 14; Immunities the chosen element's damage type; Senses Darkvision 60 ft.; Languages Sylvan, understands the languages of the Heathbound bound to it but cannot speak them. Hit Dice: d6 × Heathbound level. Witch-Bound: when the Familiar is forced to make an ability check or saving throw, it adds your PB to its roll — the witch's blessing protects her chosen's companion. " +
+        "Action — Claw (or fang/beak/talon, as fits your familiar's form): Melee Weapon Attack +3+PB to hit, reach 5 ft., one target. Hit: 1d4+PB slashing + 1d4 element damage. " +
+        "Statistics. The Witch's Familiar is Friendly to you and your allies and fervently loyal to you. " +
+        "Combat. In combat, your Familiar shares your initiative; on your bonus action you can order it to take an action from its stat block (or you forgo one Attack action attack to order it to attack). It moves and uses reactions on its own; without an order it Dodges. " +
+        "Witch's Hold. Should you choose to, you can hold your Familiar in stasis as you would an object in your Arcane Armory, giving you the ability to summon and shunt it as needed. " +
+        "Death. If your Familiar falls to 0 hit points, it makes Death Saves like a player character would. If your Familiar dies, you can perform a 1-hour ritual under the moonlight to call upon the witch's power and restore it to life with 1 hit point — you may spend its Hit Dice as a short rest as part of this.",
+    },
+    witchs_mark: {
+      id: 'witchs_mark',
+      name: "Witch's Mark",
+      description:
+        "The witch's mark is upon you. You learn to speak, read, and write Sylvan, the language of the deep wood. " +
+        "When you cast a spell that deals acid, cold, fire, lightning, or poison damage, you can change its damage type to your Familiar's element instead.",
+    },
+    awakened_familiar: {
+      id: 'awakened_familiar',
+      name: 'Awakened Familiar',
+      description:
+        "As the bond deepens, your Familiar takes on a more fearsome aspect — the fox grows wolf-sized with embers smoldering in its eyes; the raven becomes the size of a great eagle with feathers black as deep night. " +
+        "Your Familiar becomes Medium and can bear you (or a Medium-or-smaller ally) as a rider; flying speed halves while ridden by anyone other than you. Its Claw attacks become magical and use d6 in place of d4.",
+    },
+    hexbreath: {
+      id: 'hexbreath',
+      name: 'Hexbreath',
+      description:
+        "Your Familiar can channel its element into a breath of pure power. As an action, it exhales a 30-foot cone of its element, forcing all creatures in that area to make a Dexterity saving throw. They take 10d6 damage of the element's type on a failed save, and half as much on a success. If your Familiar's element is fire, this manifests as a roar of hexflame; if cold, a withering frost; if lightning, a crackling storm; and so on. " +
+        "Uses = your WIS modifier (min 1), recharging on long rest. With no uses left, expend a 3rd-level or higher spell slot.",
       is_resource: true,
-      resource_uses: 'INT modifier',
+      resource_uses: 'WIS modifier',
       resource_recovery: 'long',
     },
-    knights_mythic_companion: {
-      id: 'knights_mythic_companion',
-      name: 'Mythic Companion',
-      description: "As an action, the Companion changes size (Small/Medium/Large). At Large, no speed halving with you riding. Once per turn, when you order it to attack, it can make two Claw attacks instead of one.",
-    },
-    knights_grand_dragon_knight: {
-      id: 'knights_grand_dragon_knight',
-      name: 'Grand Dragon Knight',
+    mythic_familiar: {
+      id: 'mythic_familiar',
+      name: 'Mythic Familiar',
       description:
-        "Companion uses the Exalted Companion stat block: Large Dragon, Lawful; AC 20 (natural); HP 125; Speed 40, climb 40, fly 60; STR 20, DEX 12, CON 18, INT 14, WIS 10, CHA 18; Immunities Essence type; Senses Blindsight 30, Darkvision 60. " +
-        "Multiattack: two Claw attacks. Change Size: Small/Medium/Large until used again. Claw: +11 to hit, reach 5 ft., 2d6+5 slashing + 1d6 Essence. Essence Breath (recharge 5–6): 30-ft. cone DEX save, 12d6 Essence damage on fail, half on success.",
+        "At the apex of your bond, your Familiar reveals its true form — closer to what it was in the witch's grove before she sent it to you. The fox becomes a great fey hound the size of a horse; the raven, an enormous spirit-bird that can carry you on its back. It is no longer truly an animal — it is a creature of myth, of fey magic, of the deep wood. " +
+        "As an action, your Familiar changes size (Small/Medium/Large). At Large, no speed halving with you riding. Once per turn, when you order it to attack, it can make two Claw attacks instead of one.",
+    },
+    witchs_chosen: {
+      id: 'witchs_chosen',
+      name: "Witch's Chosen",
+      description:
+        "Your bond with the witch is complete; her power flows through you, and her chosen Familiar reveals its full might. Your Familiar uses the Greater Witchblood stat block: " +
+        "Greater Witchblood (Large Fey, Neutral): AC 20 (natural); HP 125; Speed 40, climb 40, fly 60; STR 20, DEX 12, CON 18, INT 14, WIS 10, CHA 18; Immunities the chosen element's damage type; Senses Blindsight 30, Darkvision 60; Languages Sylvan, understands the languages of the Heathbound bound to it but cannot speak them. " +
+        "Multiattack: two Claw attacks. Change Size: Small/Medium/Large until used again. Claw: +11 to hit, reach 5 ft., 2d6+5 slashing + 1d6 element damage. Hexbreath (recharge 5–6): 30-ft. cone DEX save, 12d6 element damage on fail, half on success. Witch-Bound: adds your PB to forced ability checks/saves.",
     },
   },
   bonus_spells: {
     3: ['absorb elements', 'command'],
-    5: ["dragon's breath", 'warding bond'],
-    9: ['elemental bane', 'fear'],
+    5: ['scorching ray', 'warding bond'],
+    9: ['fireball', 'fear'],
     13: ['dominate creature', 'freedom of movement'],
-    17: ['awaken', 'conjure dragon'],
+    17: ['awaken', 'fire storm'],
   },
 };
 
@@ -425,7 +447,7 @@ const SPELLBREAKERS: SubclassDefinition = {
     spellbreakers_mantle_of_defense: {
       id: 'spellbreakers_mantle_of_defense',
       name: 'Mantle of Defense',
-      description: 'Whenever your Mark forces you to make a saving throw to resist a spell or magical effect, gain a bonus to your roll = your INT modifier (min +1).',
+      description: 'Whenever your Mark forces you to make a saving throw to resist a spell or magical effect, gain a bonus to your roll = your WIS modifier (min +1).',
     },
     spellbreakers_crippling_mark: {
       id: 'spellbreakers_crippling_mark',
@@ -436,7 +458,7 @@ const SPELLBREAKERS: SubclassDefinition = {
     spellbreakers_reflective_spellsunder: {
       id: 'spellbreakers_reflective_spellsunder',
       name: 'Reflective Spellsunder',
-      description: 'When Spellsunder causes a hostile spell to fail, you can force the caster to become the new target of their own spell. Uses the caster\'s spell attack roll and Spell save DC; if it requires concentration, you must concentrate on it.',
+      description: "When Spellsunder causes a hostile spell to fail, you can force the caster to become the new target of their own spell. Uses the caster's spell attack roll and Spell save DC; if it requires concentration, you must concentrate on it.",
     },
     spellbreakers_master_spellbreaker: {
       id: 'spellbreakers_master_spellbreaker',
@@ -457,7 +479,7 @@ const SPELLBREAKERS: SubclassDefinition = {
 const WARDERS: SubclassDefinition = {
   id: 'warders',
   name: 'Order of Warders',
-  description: 'Defensive Magi who bond to a single ward and combine martial guardianship with arcane protection.',
+  description: 'Defensive Heathbound who bond to a single ward and combine martial guardianship with arcane protection.',
   features_by_level: {
     3: ['warders_bond'],
     7: ['warders_arcane_aegis'],
@@ -476,13 +498,13 @@ const WARDERS: SubclassDefinition = {
       id: 'warders_arcane_aegis',
       name: 'Arcane Aegis',
       description:
-        "When you use your Warder's Bond reaction and take damage, expend a spell slot as part of the same reaction to reduce that damage by 2d8 per slot level. Also, at the start of each of your turns, while your Ward is within 10 feet, grant yourself or your Ward temp HP equal to your INT mod (min 1).",
+        "When you use your Warder's Bond reaction and take damage, expend a spell slot as part of the same reaction to reduce that damage by 2d8 per slot level. Also, at the start of each of your turns, while your Ward is within 10 feet, grant yourself or your Ward temp HP equal to your WIS mod (min 1).",
     },
     warders_bond_perfected: {
       id: 'warders_bond_perfected',
       name: 'Bond Perfected',
       description:
-        'When you use Warder\'s Bond, you are considered resistant to any damage from the triggering attack. While within 10 feet of your Ward, both of you are immune to Charmed and Frightened, and the conditions are temporarily suppressed if either of you currently has them.',
+        "When you use Warder's Bond, you are considered resistant to any damage from the triggering attack. While within 10 feet of your Ward, both of you are immune to Charmed and Frightened, and the conditions are temporarily suppressed if either of you currently has them.",
     },
     warders_high_warder: {
       id: 'warders_high_warder',
@@ -501,13 +523,13 @@ const WARDERS: SubclassDefinition = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Expanded subclasses
+// Expanded subclasses — same as Magus, with Magus/INT swapped for Heathbound/WIS
 // ──────────────────────────────────────────────────────────────────────────
 
 const ARMORERS: SubclassDefinition = {
   id: 'armorers',
   name: 'Order of Armorers',
-  description: 'Disciples of the original Magus. Levitate Armory weapons around themselves to strike at range.',
+  description: 'Heathbound who unlock the true potential of their Arcane Armory, conjuring weapons within to levitate and strike at their foes.',
   features_by_level: {
     3: ['armorers_awakened_armory', 'armorers_mythic_swordsmith'],
     7: ['armorers_improved_focus'],
@@ -519,12 +541,12 @@ const ARMORERS: SubclassDefinition = {
       id: 'armorers_awakened_armory',
       name: 'Awakened Armory',
       description:
-        "Bonus action: expend a spell slot to awaken your Armory. A number of one-handed melee weapons from your Armory equal to 1 + the slot's level appear and levitate around you. Lasts 1 minute. While active: weapons gain Thrown (20/60), use INT for attack/damage; no Fighting Style benefit but they can Spellstrike; as an action, make one Thrown attack with each weapon levitating; as a bonus action, recall any thrown Armory weapons (they re-levitate); disadvantage on concentration saves.",
+        "Bonus action: expend a spell slot to awaken your Armory. A number of one-handed melee weapons from your Armory equal to 1 + the slot's level appear and levitate around you. Lasts 1 minute. While active: weapons gain Thrown (20/60), use WIS for attack/damage; no Fighting Style benefit but they can Spellstrike; as an action, make one Thrown attack with each weapon levitating; as a bonus action, recall any thrown Armory weapons (they re-levitate); disadvantage on concentration saves.",
     },
     armorers_mythic_swordsmith: {
       id: 'armorers_mythic_swordsmith',
       name: 'Mythic Swordsmith',
-      description: 'Gain proficiency in Arcana and smith\'s tools. On a smith\'s tools check, add INT mod (min +1). Time to craft any weapon is halved.',
+      description: "Gain proficiency in Arcana and smith's tools. On a smith's tools check, add WIS mod (min +1). Time to craft any weapon is halved.",
     },
     armorers_improved_focus: {
       id: 'armorers_improved_focus',
@@ -554,7 +576,7 @@ const ARMORERS: SubclassDefinition = {
 const CONDUITS: SubclassDefinition = {
   id: 'conduits',
   name: 'Order of Conduits',
-  description: 'Reclusive martial-arts Magi. They become living conduits of Magus magic, forgoing the Armory for inner power.',
+  description: 'Reclusive martial-arts Heathbound. They become living conduits of wild magic, forgoing the Armory for inner power.',
   features_by_level: {
     3: ['conduits_arcane_conduit', 'conduits_ascetic_resilience'],
     7: ['conduits_ethereal_arts'],
@@ -566,7 +588,7 @@ const CONDUITS: SubclassDefinition = {
       id: 'conduits_arcane_conduit',
       name: 'Arcane Conduit',
       description:
-        "When unarmored, no shield, no weapon: gain the Brawling Fighting Style (or Featherweight Fighting if you already have Brawling); use DEX in place of STR for unarmed strike attacks/damage; unarmed strikes count as magical and can Spellstrike (also fulfill material components for Conduit Spells); AC = 10 + DEX mod + INT mod.",
+        "When unarmored, no shield, no weapon: gain the Brawling Fighting Style (or Featherweight Fighting if you already have Brawling); use DEX in place of STR for unarmed strike attacks/damage; unarmed strikes count as magical and can Spellstrike (also fulfill material components for Conduit Spells); AC = 10 + DEX mod + WIS mod.",
     },
     conduits_ascetic_resilience: {
       id: 'conduits_ascetic_resilience',
@@ -591,7 +613,7 @@ const CONDUITS: SubclassDefinition = {
       id: 'conduits_ascended_conduit',
       name: 'Ascended Conduit',
       description:
-        "Bonus action: overcharge for 1 minute — Attack action with only unarmed strikes makes 4 attacks; flying speed = walking speed; when you teleport with a Magus feature/spell, you can touch a creature your size or smaller (including grappled) and bring them with you. Once per long rest at no cost; thereafter, expend a 5th-level slot.",
+        "Bonus action: overcharge for 1 minute — Attack action with only unarmed strikes makes 4 attacks; flying speed = walking speed; when you teleport with a Heathbound feature/spell, you can touch a creature your size or smaller (including grappled) and bring them with you. Once per long rest at no cost; thereafter, expend a 5th-level slot.",
       is_resource: true,
       resource_uses: '1',
       resource_recovery: 'long',
@@ -609,7 +631,7 @@ const CONDUITS: SubclassDefinition = {
 const HEXBLADES: SubclassDefinition = {
   id: 'hexblades',
   name: 'Order of Hexblades',
-  description: 'Magi infused with sinister Shadowfell magic. They forge sentient cursed weapons that drink the life of foes.',
+  description: 'Heathbound infused with sinister Shadowfell magic. They forge sentient cursed weapons that drink the life of foes.',
   features_by_level: {
     3: ['hexblades_hex_warrior'],
     7: ['hexblades_accursed_armory'],
@@ -622,7 +644,7 @@ const HEXBLADES: SubclassDefinition = {
       name: 'Hex Warrior',
       description:
         "During a long rest, perform a 1-hour ritual to transform one melee Armory weapon into your Hexblade until you ritual again. Benefits: " +
-        "Enchanted Armament — use INT in place of STR/DEX for attacks/damage and choose its damage to be necrotic. " +
+        "Enchanted Armament — use WIS in place of STR/DEX for attacks/damage and choose its damage to be necrotic. " +
         "Life Drain — when you deal necrotic damage to a Hostile, non-Construct, non-Undead creature, gain temp HP = half the damage. " +
         "Malevolent Curse — when attacking a creature affected by a Hexblade Spell with your Hexblade, you score a critical hit on a 19 or 20.",
     },
@@ -669,7 +691,7 @@ const SHADES: SubclassDefinition = {
       id: 'shades_shroud_of_darkness',
       name: 'Shroud of Darkness',
       description:
-        'As an action, envelop yourself in a Shroud of illusion magic for 1 hour. While active, use a bonus action to turn invisible if in dim light or darkness; invisibility lasts the Shroud\'s duration but ends if you attack, touch, or force a creature to make an ability check or save. Once per short or long rest at no cost; thereafter, expend a spell slot.',
+        "As an action, envelop yourself in a Shroud of illusion magic for 1 hour. While active, use a bonus action to turn invisible if in dim light or darkness; invisibility lasts the Shroud's duration but ends if you attack, touch, or force a creature to make an ability check or save. Once per short or long rest at no cost; thereafter, expend a spell slot.",
       is_resource: true,
       resource_uses: '1',
       resource_recovery: 'short',
@@ -693,9 +715,9 @@ const SHADES: SubclassDefinition = {
       id: 'shades_cloud_the_mind',
       name: 'Cloud the Mind',
       description:
-        "Action: one creature within 30 feet makes an INT save. Fail: cannot see, hear, smell, or sense you in any way for 1 minute (immune for 24 hours on success). Effect ends immediately if you attack, touch, or force them to make a check/save. Uses = your INT modifier (min 1), recharging on long rest. With no uses left, expend a spell slot.",
+        "Action: one creature within 30 feet makes a WIS save. Fail: cannot see, hear, smell, or sense you in any way for 1 minute (immune for 24 hours on success). Effect ends immediately if you attack, touch, or force them to make a check/save. Uses = your WIS modifier (min 1), recharging on long rest. With no uses left, expend a spell slot.",
       is_resource: true,
-      resource_uses: 'INT modifier',
+      resource_uses: 'WIS modifier',
       resource_recovery: 'long',
     },
     shades_one_with_the_darkness: {
@@ -716,7 +738,7 @@ const SHADES: SubclassDefinition = {
 const SPELLSWORDS: SubclassDefinition = {
   id: 'spellswords',
   name: 'Order of Spellswords',
-  description: 'Rare masters who pair their arcane magic with deep martial study, learning Exploits alongside their spells.',
+  description: 'Rare masters who pair their wild magic with deep martial study, learning Exploits alongside their spells.',
   features_by_level: {
     3: ['spellswords_martial_exploits', 'spellswords_swift_armory'],
     7: ['spellswords_mystic_precision'],
@@ -730,9 +752,9 @@ const SPELLSWORDS: SubclassDefinition = {
       description:
         "You learn Martial Exploits from the Alternate Fighter list. " +
         "Exploit Dice: see the Spellsword Exploits table for count and die size; expend an Exploit Die per use, regain on short or long rest. " +
-        "High Degree: your Magus level limits the technicality of Exploits you can learn (1st/2nd/3rd Degree). " +
+        "High Degree: your Heathbound level limits the technicality of Exploits you can learn (1st/2nd/3rd Degree). " +
         "Restrictions: only one Exploit per ability check, attack, or save. Cannot use an Exploit and Spellstrike at the same time. " +
-        "Saving Throws: if a Martial Exploit forces a save, it uses your Magus Spell save DC.",
+        "Saving Throws: if a Martial Exploit forces a save, it uses your Heathbound Spell save DC.",
       is_resource: true,
       resource_uses: 'see table',
       resource_recovery: 'short',
@@ -755,7 +777,7 @@ const SPELLSWORDS: SubclassDefinition = {
     spellswords_arcane_blademaster: {
       id: 'spellswords_arcane_blademaster',
       name: 'Arcane Blademaster',
-      description: 'Once on each of your turns, use a Martial Exploit you know without expending an Exploit Die or Spellstrike a 1st-level Magus spell you know without expending a spell slot.',
+      description: 'Once on each of your turns, use a Martial Exploit you know without expending an Exploit Die or Spellstrike a 1st-level Heathbound spell you know without expending a spell slot.',
     },
   },
 };
@@ -775,9 +797,9 @@ const TRAVELERS: SubclassDefinition = {
       id: 'travelers_temporal_shift',
       name: 'Temporal Shift',
       description:
-        "When you miss with an attack roll, or fail an ability check or save, use a reaction to reroll the d20; you must use the new result. Uses = your INT modifier (min 1), recharging on long rest. With no uses left, expend a spell slot to use this reaction again.",
+        "When you miss with an attack roll, or fail an ability check or save, use a reaction to reroll the d20; you must use the new result. Uses = your WIS modifier (min 1), recharging on long rest. With no uses left, expend a spell slot to use this reaction again.",
       is_resource: true,
-      resource_uses: 'INT modifier',
+      resource_uses: 'WIS modifier',
       resource_recovery: 'long',
     },
     travelers_visions_of_the_past: {
@@ -817,7 +839,12 @@ const TRAVELERS: SubclassDefinition = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-// Spell list
+// Spell list — same as Magus, with a few additions to support the Ward of the
+// Witch bonus spells (so they bucket correctly in the assembler):
+//   1st: + command
+//   2nd: + warding bond
+//   3rd: + fear
+//   5th: + dominate creature, fire storm
 // ──────────────────────────────────────────────────────────────────────────
 
 const SPELL_LIST: Record<string, string[]> = {
@@ -830,7 +857,7 @@ const SPELL_LIST: Record<string, string[]> = {
   ],
   '1': [
     'absorb elements', 'armor of agathys', 'burning hands', 'caustic brew',
-    'chromatic orb', 'color spray', 'detect magic', 'earth tremor',
+    'chromatic orb', 'color spray', 'command', 'detect magic', 'earth tremor',
     'expeditious retreat', 'faerie fire', 'feather fall', 'floating disk',
     'fog cloud', 'grease', 'ice knife', 'identify', 'jump', 'mage armor',
     'magic missile', 'ray of sickness', 'shield', 'sleep', 'thunderwave',
@@ -843,10 +870,11 @@ const SPELL_LIST: Record<string, string[]> = {
     'hold person', 'invisibility', 'levitate', 'lock/unlock', 'magic aura',
     'magic weapon', 'mirror image', 'misty step', 'ray of enfeeblement',
     'scorching ray', 'shatter', 'snowball swarm', 'spider climb',
+    'warding bond',
   ],
   '3': [
     'counterspell', 'dispel magic', 'elemental bane', 'elemental weapon',
-    'erupting earth', 'fireball', 'flame arrows', 'fly', 'haste',
+    'erupting earth', 'fear', 'fireball', 'flame arrows', 'fly', 'haste',
     'lightning bolt', 'magic circle', 'minute meteors',
     'protection from energy', 'sleet storm', 'slow', 'sonic wave',
     'tidal wave', 'thunder step', 'wall of sand', 'wall of water', 'wind wall',
@@ -860,10 +888,10 @@ const SPELL_LIST: Record<string, string[]> = {
   ],
   '5': [
     'cone of cold', 'contact other plane', 'contagion', 'dispel evil and good',
-    'far step', 'hold monster', 'immolation', 'passwall', 'scrying',
-    'skill empowerment', 'steel wind strike', 'telepathic bond',
-    'teleportation circle', 'vorpal blade', 'wall of force', 'wall of light',
-    'wall of stone',
+    'dominate creature', 'far step', 'fire storm', 'hold monster', 'immolation',
+    'passwall', 'scrying', 'skill empowerment', 'steel wind strike',
+    'telepathic bond', 'teleportation circle', 'vorpal blade', 'wall of force',
+    'wall of light', 'wall of stone',
   ],
 };
 
@@ -871,19 +899,19 @@ const SPELL_LIST: Record<string, string[]> = {
 // Final export
 // ──────────────────────────────────────────────────────────────────────────
 
-export const MAGUS: ClassDefinition = {
-  id: 'magus',
-  name: 'Magus',
+export const HEATHBOUND: ClassDefinition = {
+  id: 'heathbound',
+  name: 'Heathbound',
   source: 'laserllama',
   description:
-    'Master of spell and sword. INT-based half-caster (d10) with a signature Spellstrike mechanic that channels spells through melee weapons. Six base Esoteric Orders + six expanded.',
+    "The Heathbound are warriors bound to the wild magic of forgotten heaths and untamed lands, weaving primal sorcery through their blade work. Each is the chosen of a witch of the deep forest — fey-touched, ancient, neither wholly good nor evil — and carries a fragment of her magic into the world. WIS-based half-caster (d10) with the signature Spellstrike mechanic.",
 
   hit_die: 'd10',
-  primary_ability: ['INT', 'STR', 'DEX'],
-  saving_throws: ['CON', 'INT'],
+  primary_ability: ['WIS', 'STR', 'DEX'],
+  saving_throws: ['CON', 'WIS'],
 
   caster_type: 'half',
-  spellcasting_ability: 'INT',
+  spellcasting_ability: 'WIS',
 
   armor_proficiencies: { light: true, medium: true, heavy: false, shields: true },
   weapon_proficiencies: { simple: true, martial: true },
@@ -906,16 +934,16 @@ export const MAGUS: ClassDefinition = {
   subclass_label: 'Esoteric Order',
   subclass_choice_level: 3,
   subclasses: [
-    ARCANISTS, ARCANE_ARCHERS, BLADES, DRAGON_KNIGHTS, SPELLBREAKERS, WARDERS,
+    ARCANISTS, ARCANE_ARCHERS, BLADES, WARD_OF_THE_WITCH, SPELLBREAKERS, WARDERS,
     ARMORERS, CONDUITS, HEXBLADES, SHADES, SPELLSWORDS, TRAVELERS,
   ],
 
   spell_list: SPELL_LIST,
-  allowed_fighting_style_ids: ALL_FIGHTING_STYLE_IDS, // Magus can pick any of the 16 styles
+  allowed_fighting_style_ids: ALL_FIGHTING_STYLE_IDS,
 };
 
-/** Magus cantrip progression: 0 at L1, 2 at L2-3, 3 at L4-9, 4 at L10+. */
-export function magusCantripsKnown(level: number): number {
+/** Heathbound cantrip progression — same as Magus: 0 at L1, 2 at L2-3, 3 at L4-9, 4 at L10+. */
+export function heathboundCantripsKnown(level: number): number {
   if (level < 2) return 0;
   if (level < 4) return 2;
   if (level < 10) return 3;

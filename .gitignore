@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# reference PDFs (homebrew sources etc.) — kept local for re-extraction
+docs/homebrew-references/*.pdf
+
 # debug
 npm-debug.log*
 yarn-debug.log*

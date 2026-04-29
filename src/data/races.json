@@ -1,0 +1,982 @@
+{
+  "metadata": {
+    "edition": "D&D 5th Edition",
+    "extraction_date": "2026-04-28",
+    "source_site": "D&D Beyond",
+    "ruleset_notes": [
+      "Most races use the 2024 Player's Handbook rules. In the 2024 rules, ability score increases, languages, and age/lifespan are no longer race-defined: ability score increases come from the character's Background, all characters know Common plus 2 additional standard languages from their Background, and age is largely flavor.",
+      "Half-Elf is the 2014 legacy version (the 2024 PHB folded half-elves into the Elf species's lineage choices). It still uses 2014 mechanics: race-granted Ability Score Increase, Languages, Age, etc.",
+      "Warforged is sourced from 'Eberron: Forge of the Artificer' and uses 2024-style trait formatting.",
+      "Lifespan values are pulled from the lore/description text and provided for character creation flavor; they do not affect mechanics."
+    ],
+    "extraction_status": {
+      "complete": ["aasimar", "dragonborn", "dwarf", "elf", "gnome", "goliath", "half-elf", "halfling", "human", "orc", "tiefling", "warforged"]
+    },
+    "_resolved_notes": [
+      "Dragonborn re-extracted by user from D&D Beyond and updated; full Draconic Flight text and source page (PHB 2024 pg. 187) now included.",
+      "Orc verified by user: 2024 PHB Orc does NOT have Powerful Build (that trait belongs to Goliath). Orc has only three traits: Adrenaline Rush, Darkvision, Relentless Endurance."
+    ]
+  },
+  "races": {
+    "aasimar": {
+      "name": "Aasimar",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 186
+      },
+      "ruleset": "2024",
+      "pronunciation": "AH-sih-mar",
+      "description": "Aasimar are mortals who carry a spark of the Upper Planes within their souls. Whether descended from an angelic being or infused with celestial power, they can fan that spark to bring light, healing, and heavenly fury. Aasimar can arise among any population of mortals. They resemble their parents, but they live for up to 160 years and have features that hint at their celestial heritage, such as metallic freckles, luminous eyes, a halo, or the skin color of an angel (silver, opalescent green, or coppery red). These features start subtle and become obvious when the aasimar learns to reveal their full celestial nature.",
+      "lifespan_years": 160,
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium", "Small"],
+        "details": "Medium (about 4-7 feet tall) or Small (about 2-4 feet tall), chosen when you select this species",
+        "choose_at_creation": true
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Celestial Resistance",
+          "description": "You have Resistance to Necrotic damage and Radiant damage.",
+          "mechanics": {
+            "damage_resistances": ["Necrotic", "Radiant"]
+          }
+        },
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 60 feet.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Healing Hands",
+          "description": "As a Magic action, you touch a creature and roll a number of d4s equal to your Proficiency Bonus. The creature regains a number of Hit Points equal to the total rolled. Once you use this trait, you can't use it again until you finish a Long Rest.",
+          "mechanics": {
+            "action_type": "Magic",
+            "uses": "1 / Long Rest",
+            "dice": "(Proficiency Bonus)d4 healing"
+          }
+        },
+        {
+          "name": "Light Bearer",
+          "description": "You know the Light cantrip. Charisma is your spellcasting ability for it.",
+          "mechanics": {
+            "innate_spells": [
+              {"spell": "Light", "level": "cantrip", "spellcasting_ability": "Charisma"}
+            ]
+          }
+        },
+        {
+          "name": "Celestial Revelation",
+          "level_unlocked": 3,
+          "description": "When you reach character level 3, you can transform as a Bonus Action using one of the options below (choose the option each time you transform). The transformation lasts for 1 minute or until you end it (no action required). Once you transform, you can't do so again until you finish a Long Rest. Once on each of your turns before the transformation ends, you can deal extra damage to one target when you deal damage to it with an attack or a spell. The extra damage equals your Proficiency Bonus, and the extra damage's type is either Necrotic for Necrotic Shroud or Radiant for Heavenly Wings and Inner Radiance.",
+          "choices": {
+            "name": "Transformation Option",
+            "type": "choose_each_use",
+            "options": [
+              {
+                "name": "Heavenly Wings",
+                "description": "Two spectral wings sprout from your back temporarily. Until the transformation ends, you have a Fly Speed equal to your Speed.",
+                "extra_damage_type": "Radiant"
+              },
+              {
+                "name": "Inner Radiance",
+                "description": "Searing light temporarily radiates from your eyes and mouth. For the duration, you shed Bright Light in a 10-foot radius and Dim Light for an additional 10 feet, and at the end of each of your turns, each creature within 10 feet of you takes Radiant damage equal to your Proficiency Bonus.",
+                "extra_damage_type": "Radiant"
+              },
+              {
+                "name": "Necrotic Shroud",
+                "description": "Your eyes briefly become pools of darkness, and flightless wings sprout from your back temporarily. Creatures other than your allies within 10 feet of you must succeed on a Charisma saving throw (DC 8 plus your Charisma modifier and Proficiency Bonus) or have the Frightened condition until the end of your next turn.",
+                "extra_damage_type": "Necrotic",
+                "save_dc_formula": "8 + Charisma modifier + Proficiency Bonus"
+              }
+            ]
+          },
+          "mechanics": {
+            "action_type": "Bonus Action",
+            "duration": "1 minute or until ended",
+            "uses": "1 / Long Rest"
+          }
+        }
+      ]
+    },
+    "dragonborn": {
+      "name": "Dragonborn",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 187
+      },
+      "ruleset": "2024",
+      "description": "The ancestors of dragonborn hatched from the eggs of chromatic and metallic dragons. One story holds that these eggs were blessed by the dragon gods Bahamut and Tiamat, who wanted to populate the multiverse with people created in their image. Another story claims that dragons created the first dragonborn without the gods' blessings. Whatever their origin, dragonborn have made homes for themselves on the Material Plane. Dragonborn look like wingless, bipedal dragons—scaly, bright-eyed, and thick-boned with horns on their heads—and their coloration and other features are reminiscent of their draconic ancestors.",
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Medium (about 5-7 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Draconic Ancestry",
+          "description": "Your lineage stems from a dragon progenitor. Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance.",
+          "choices": {
+            "name": "Draconic Ancestor",
+            "type": "choose_at_creation",
+            "options": [
+              {"dragon": "Black", "damage_type": "Acid"},
+              {"dragon": "Blue", "damage_type": "Lightning"},
+              {"dragon": "Brass", "damage_type": "Fire"},
+              {"dragon": "Bronze", "damage_type": "Lightning"},
+              {"dragon": "Copper", "damage_type": "Acid"},
+              {"dragon": "Gold", "damage_type": "Fire"},
+              {"dragon": "Green", "damage_type": "Poison"},
+              {"dragon": "Red", "damage_type": "Fire"},
+              {"dragon": "Silver", "damage_type": "Cold"},
+              {"dragon": "White", "damage_type": "Cold"}
+            ]
+          }
+        },
+        {
+          "name": "Breath Weapon",
+          "description": "When you take the Attack action on your turn, you can replace one of your attacks with an exhalation of magical energy in either a 15-foot Cone or a 30-foot Line that is 5 feet wide (choose the shape each time). Each creature in that area must make a Dexterity saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus). On a failed save, a creature takes 1d10 damage of the type determined by your Draconic Ancestry trait. On a successful save, a creature takes half as much damage. This damage increases by 1d10 when you reach character levels 5 (2d10), 11 (3d10), and 17 (4d10). You can use this Breath Weapon a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+          "mechanics": {
+            "replaces": "one attack of the Attack action",
+            "shape_options": ["15-foot Cone", "30-foot Line, 5 feet wide"],
+            "save": "Dexterity",
+            "save_dc_formula": "8 + Constitution modifier + Proficiency Bonus",
+            "damage_by_level": {
+              "1": "1d10",
+              "5": "2d10",
+              "11": "3d10",
+              "17": "4d10"
+            },
+            "uses": "Proficiency Bonus / Long Rest",
+            "damage_type": "(determined by Draconic Ancestry)"
+          }
+        },
+        {
+          "name": "Damage Resistance",
+          "description": "You have Resistance to the damage type determined by your Draconic Ancestry trait."
+        },
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 60 feet.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Draconic Flight",
+          "level_unlocked": 5,
+          "description": "When you reach character level 5, you can channel draconic magic to give yourself temporary flight. As a Bonus Action, you sprout spectral wings on your back that last for 10 minutes or until you retract the wings (no action required) or have the Incapacitated condition. During that time, you have a Fly Speed equal to your Speed. Your wings appear to be made of the same energy as your Breath Weapon. Once you use this trait, you can't use it again until you finish a Long Rest.",
+          "mechanics": {
+            "action_type": "Bonus Action",
+            "duration": "10 minutes or until retracted (no action) or Incapacitated",
+            "fly_speed": "equal to your Speed",
+            "uses": "1 / Long Rest",
+            "flavor": "Wings appear to be made of the same energy as your Breath Weapon."
+          }
+        }
+      ]
+    },
+    "dwarf": {
+      "name": "Dwarf",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 188
+      },
+      "ruleset": "2024",
+      "description": "Dwarves were raised from the earth in the elder days by a deity of the forge. Called by various names on different worlds—Moradin, Reorx, and others—that god gave dwarves an affinity for stone and metal and for living underground. The god also made them resilient like the mountains, with a life span of about 350 years. Squat and often bearded, the original dwarves carved cities and strongholds into mountainsides and under the earth. Their oldest legends tell of conflicts with the monsters of mountaintops and the Underdark, whether those monsters were towering giants or subterranean horrors. Inspired by those tales, dwarves of any culture often sing of valorous deeds—especially of the little overcoming the mighty. On some worlds in the multiverse, the first settlements of dwarves were built in hills or mountains, and the families who trace their ancestry to those settlements call themselves hill dwarves or mountain dwarves, respectively. The Greyhawk and Dragonlance settings have such communities.",
+      "lifespan_years": 350,
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Medium (about 4-5 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 120 feet.",
+          "mechanics": {
+            "darkvision_feet": 120
+          }
+        },
+        {
+          "name": "Dwarven Resilience",
+          "description": "You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition.",
+          "mechanics": {
+            "damage_resistances": ["Poison"],
+            "advantage_on": ["saving throws vs Poisoned condition"]
+          }
+        },
+        {
+          "name": "Dwarven Toughness",
+          "description": "Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level.",
+          "mechanics": {
+            "hp_bonus": "+1 at level 1, +1 per level thereafter"
+          }
+        },
+        {
+          "name": "Stonecunning",
+          "description": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+          "mechanics": {
+            "action_type": "Bonus Action",
+            "tremorsense_feet": 60,
+            "duration": "10 minutes",
+            "uses": "Proficiency Bonus / Long Rest",
+            "requires": "on or touching stone surface (natural or worked)"
+          }
+        }
+      ]
+    },
+    "elf": {
+      "name": "Elf",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 189
+      },
+      "ruleset": "2024",
+      "description": "Created by the god Corellon, the first elves could change their forms at will. They lost this ability when Corellon cursed them for plotting with the deity Lolth, who tried and failed to usurp Corellon's dominion. When Lolth was cast into the Abyss, most elves renounced her and earned Corellon's forgiveness, but that which Corellon had taken from them was lost forever. No longer able to shape-shift at will, the elves retreated to the Feywild, where their sorrow was deepened by that plane's influence. Over time, curiosity led many of them to explore other planes of existence, including worlds in the Material Plane. Elves have pointed ears and lack facial and body hair. They live for around 750 years, and they don't sleep but instead enter a trance when they need to rest. In that state, they remain aware of their surroundings while immersing themselves in memories and meditations. An environment subtly transforms elves after they inhabit it for a millennium or more, and it grants them certain kinds of magic. Drow, high elves, and wood elves are examples of elves who have been transformed thus.",
+      "lifespan_years": 750,
+      "lineage_lore": {
+        "Drow": "Drow typically dwell in the Underdark and have been shaped by it. Some drow individuals and societies avoid the Underdark altogether yet carry its magic. In the Eberron setting, for example, drow dwell in rainforests and cyclopean ruins on the continent of Xen'drik.",
+        "High Elf": "High elves have been infused with the magic of crossings between the Feywild and the Material Plane. On some worlds, high elves refer to themselves by other names. For example, they call themselves sun or moon elves in the Forgotten Realms setting, Silvanesti and Qualinesti in the Dragonlance setting, and Aereni in the Eberron setting.",
+        "Wood Elf": "Wood elves carry the magic of primeval forests within themselves. They are known by many other names, including wild elves, green elves, and forest elves. Grugach are reclusive wood elves of the Greyhawk setting, while the Kagonesti and the Tairnadal are wood elves of the Dragonlance and Eberron settings, respectively."
+      },
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Medium (about 5-6 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 60 feet.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Elven Lineage",
+          "description": "You are part of a lineage that grants you supernatural abilities. Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage).",
+          "choices": {
+            "name": "Elven Lineage",
+            "type": "choose_at_creation",
+            "options": [
+              {
+                "name": "Drow",
+                "level_1": {
+                  "description": "The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip.",
+                  "darkvision_feet_override": 120,
+                  "cantrips": ["Dancing Lights"]
+                },
+                "level_3_spell": "Faerie Fire",
+                "level_5_spell": "Darkness"
+              },
+              {
+                "name": "High Elf",
+                "level_1": {
+                  "description": "You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list.",
+                  "cantrips": ["Prestidigitation"],
+                  "cantrip_swap": "On Long Rest, may swap that cantrip for any Wizard cantrip"
+                },
+                "level_3_spell": "Detect Magic",
+                "level_5_spell": "Misty Step"
+              },
+              {
+                "name": "Wood Elf",
+                "level_1": {
+                  "description": "Your Speed increases to 35 feet. You also know the Druidcraft cantrip.",
+                  "speed_walk_override": 35,
+                  "cantrips": ["Druidcraft"]
+                },
+                "level_3_spell": "Longstrider",
+                "level_5_spell": "Pass without Trace"
+              }
+            ]
+          },
+          "spellcasting_ability_choices": ["Intelligence", "Wisdom", "Charisma"],
+          "spell_usage_note": "At levels 3 and 5, the indicated spell is always prepared; can be cast once without a slot per Long Rest, or via any spell slot of appropriate level."
+        },
+        {
+          "name": "Fey Ancestry",
+          "description": "You have Advantage on saving throws you make to avoid or end the Charmed condition.",
+          "mechanics": {
+            "advantage_on": ["saving throws vs Charmed condition"]
+          }
+        },
+        {
+          "name": "Keen Senses",
+          "description": "You have proficiency in the Insight, Perception, or Survival skill.",
+          "choices": {
+            "name": "Keen Senses Skill",
+            "type": "choose_at_creation",
+            "options": ["Insight", "Perception", "Survival"]
+          }
+        },
+        {
+          "name": "Trance",
+          "description": "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
+          "mechanics": {
+            "long_rest_hours": 4,
+            "immune_to": ["magical sleep"],
+            "needs_sleep": false
+          }
+        }
+      ]
+    },
+    "gnome": {
+      "name": "Gnome",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 191
+      },
+      "ruleset": "2024",
+      "description": "Gnomes are magical folk created by gods of invention, illusions, and life underground. The earliest gnomes were seldom seen by other folk due to the gnomes' secretive nature and their propensity for living in forests and burrows. What they lacked in size, they made up for in cleverness. They confounded predators with traps and labyrinthine tunnels. They also learned magic from gods like Garl Glittergold, Baervan Wildwanderer, and Baravar Cloakshadow, who visited them in disguise. That magic eventually created the lineages of forest gnomes and rock gnomes. Gnomes are petite folk with big eyes and pointed ears, who live around 425 years. Many gnomes like the feeling of a roof over their head, even if that 'roof' is nothing more than a hat.",
+      "lifespan_years": 425,
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Small"],
+        "details": "Small (about 3-4 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 60 feet.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Gnomish Cunning",
+          "description": "You have Advantage on Intelligence, Wisdom, and Charisma saving throws.",
+          "mechanics": {
+            "advantage_on": ["Intelligence saving throws", "Wisdom saving throws", "Charisma saving throws"]
+          }
+        },
+        {
+          "name": "Gnomish Lineage",
+          "description": "You are part of a lineage that grants you supernatural abilities. Choose one of the following options; whichever one you choose, Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the lineage).",
+          "choices": {
+            "name": "Gnomish Lineage",
+            "type": "choose_at_creation",
+            "options": [
+              {
+                "name": "Forest Gnome",
+                "description": "You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell.",
+                "cantrips": ["Minor Illusion"],
+                "always_prepared_spells": [
+                  {
+                    "spell": "Speak with Animals",
+                    "free_uses": "Proficiency Bonus / Long Rest",
+                    "can_use_slots": true
+                  }
+                ]
+              },
+              {
+                "name": "Rock Gnome",
+                "description": "You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. When you create the device, you determine its function by choosing one effect from Prestidigitation; the device produces that effect whenever you or another creature takes a Bonus Action to activate it with a touch. If the chosen effect has options within it, you choose one of those options for the device when you create it. For example, if you choose the spell's ignite-extinguish effect, you determine whether the device ignites or extinguishes fire; the device doesn't do both. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it with a touch as a Utilize action.",
+                "cantrips": ["Mending", "Prestidigitation"],
+                "clockwork_device": {
+                  "ac": 5,
+                  "hp": 1,
+                  "size": "Tiny",
+                  "creation_time": "10 minutes (cast Prestidigitation)",
+                  "max_active": 3,
+                  "lifespan": "8 hours or until dismantled (Utilize action, touch)",
+                  "function": "produces one chosen Prestidigitation effect when activated as a Bonus Action by touch"
+                }
+              }
+            ]
+          },
+          "spellcasting_ability_choices": ["Intelligence", "Wisdom", "Charisma"]
+        }
+      ]
+    },
+    "goliath": {
+      "name": "Goliath",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 192
+      },
+      "ruleset": "2024",
+      "description": "Towering over most folk, goliaths are distant descendants of giants. Each goliath bears the favors of the first giants—favors that manifest in various supernatural boons, including the ability to quickly grow and temporarily approach the height of goliaths' gigantic kin. Goliaths have physical characteristics that are reminiscent of the giants in their family lines. For example, some goliaths look like stone giants, while others resemble fire giants. Whatever giants they count as kin, goliaths have forged their own path in the multiverse—unencumbered by the internecine conflicts that have ravaged giantkind for ages—and seek heights above those reached by their ancestors.",
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Medium (about 7-8 feet tall)"
+      },
+      "speed": {
+        "walk": 35
+      },
+      "traits": [
+        {
+          "name": "Giant Ancestry",
+          "description": "You are descended from Giants. Choose one of the following benefits—a supernatural boon from your ancestry; you can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+          "choices": {
+            "name": "Giant Ancestry",
+            "type": "choose_at_creation",
+            "shared_uses": "Proficiency Bonus / Long Rest (applies to whichever option chosen)",
+            "options": [
+              {
+                "name": "Cloud's Jaunt",
+                "giant_kind": "Cloud Giant",
+                "description": "As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see.",
+                "action_type": "Bonus Action"
+              },
+              {
+                "name": "Fire's Burn",
+                "giant_kind": "Fire Giant",
+                "description": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.",
+                "trigger": "on hit with attack roll that deals damage",
+                "extra_damage": "1d10 Fire"
+              },
+              {
+                "name": "Frost's Chill",
+                "giant_kind": "Frost Giant",
+                "description": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.",
+                "trigger": "on hit with attack roll that deals damage",
+                "extra_damage": "1d6 Cold",
+                "extra_effect": "Speed -10 ft until start of your next turn"
+              },
+              {
+                "name": "Hill's Tumble",
+                "giant_kind": "Hill Giant",
+                "description": "When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition.",
+                "trigger": "on hit with attack roll that deals damage to Large or smaller creature",
+                "effect": "target gains Prone condition"
+              },
+              {
+                "name": "Stone's Endurance",
+                "giant_kind": "Stone Giant",
+                "description": "When you take damage, you can take a Reaction to roll 1d12. Add your Constitution modifier to the number rolled and reduce the damage by that total.",
+                "action_type": "Reaction",
+                "trigger": "when you take damage",
+                "damage_reduction": "1d12 + Constitution modifier"
+              },
+              {
+                "name": "Storm's Thunder",
+                "giant_kind": "Storm Giant",
+                "description": "When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.",
+                "action_type": "Reaction",
+                "trigger": "when you take damage from a creature within 60 ft",
+                "damage_dealt": "1d8 Thunder"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Large Form",
+          "level_unlocked": 5,
+          "description": "Starting at character level 5, you can change your size to Large as a Bonus Action if you're in a big enough space. This transformation lasts for 10 minutes or until you end it (no action required). For that duration, you have Advantage on Strength checks, and your Speed increases by 10 feet. Once you use this trait, you can't use it again until you finish a Long Rest.",
+          "mechanics": {
+            "action_type": "Bonus Action",
+            "duration": "10 minutes or until ended",
+            "size_during": "Large",
+            "speed_bonus": 10,
+            "advantage_on": ["Strength checks"],
+            "uses": "1 / Long Rest",
+            "requires": "enough space to grow to Large"
+          }
+        },
+        {
+          "name": "Powerful Build",
+          "description": "You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.",
+          "mechanics": {
+            "advantage_on": ["ability checks to end Grappled"],
+            "size_for_carrying_capacity": "one larger"
+          }
+        }
+      ]
+    },
+    "half-elf": {
+      "name": "Half-Elf",
+      "source": {
+        "book": "Basic Rules (2014) [Legacy]",
+        "page": 38
+      },
+      "ruleset": "2014_legacy",
+      "_ruleset_note": "This is the 2014 (Legacy) version of Half-Elf. It is mechanically incompatible with the 2024 PHB races above (this version provides Ability Score Increases, Languages, and Age, which the 2024 races do not). The 2024 PHB does not include Half-Elf as a separate species; instead, half-elves are typically built using the Elf species with the lineage that fits.",
+      "description": "Walking in two worlds but truly belonging to neither, half-elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves. Some half-elves live among humans, set apart by their emotional and physical differences, watching friends and loved ones age while time barely touches them. Others live with the elves, growing restless as they reach adulthood in the timeless elven realms, while their peers continue to live as children. Many half-elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life.",
+      "lifespan_years": 180,
+      "age_text": "Half-elves mature at the same rate humans do and reach adulthood around the age of 20. They live much longer than humans, however, often exceeding 180 years.",
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Half-elves are about the same size as humans, ranging from 5 to 6 feet tall. Your size is Medium."
+      },
+      "speed": {
+        "walk": 30
+      },
+      "ability_score_increase": {
+        "fixed": {"Charisma": 2},
+        "choices": {
+          "count": 2,
+          "amount": 1,
+          "from": "any other ability scores",
+          "no_duplicates": true
+        },
+        "description": "Your Charisma score increases by 2, and two other ability scores of your choice increase by 1."
+      },
+      "languages": {
+        "fixed": ["Common", "Elvish"],
+        "choices": {
+          "count": 1,
+          "from": "any one extra language"
+        },
+        "description": "You can speak, read, and write Common, Elvish, and one extra language of your choice."
+      },
+      "traits": [
+        {
+          "name": "Darkvision",
+          "description": "Thanks to your elf blood, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Fey Ancestry",
+          "description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+          "mechanics": {
+            "advantage_on": ["saving throws vs being charmed"],
+            "immune_to": ["magical sleep"]
+          }
+        },
+        {
+          "name": "Skill Versatility",
+          "description": "You gain proficiency in two skills of your choice.",
+          "choices": {
+            "name": "Skill Versatility",
+            "type": "choose_at_creation",
+            "count": 2,
+            "from": "any skill",
+            "_replaceable_by_variant": true
+          }
+        }
+      ],
+      "variants": {
+        "_note": "Some half-elves in Faerûn (and Eberron, for the Marks) have a racial trait in place of the Skill Versatility trait. With DM permission, the half-elf character can forgo Skill Versatility and instead take one of the variants below, or take the elf trait Keen Senses, or a trait based on their elf parentage.",
+        "Aquatic Half-Elf": {
+          "replaces": "Skill Versatility",
+          "trait": {
+            "name": "Aquatic Heritage",
+            "description": "A half-elf of aquatic heritage can forgo Skill Versatility and instead choose a swimming speed of 30 feet.",
+            "mechanics": {"swim_speed": 30}
+          }
+        },
+        "Drow Half-Elf": {
+          "replaces": "Skill Versatility",
+          "trait": {
+            "name": "Drow Magic",
+            "description": "A half-elf of drow descent can forgo Skill Versatility and instead choose the drow's Drow Magic: You know the dancing lights cantrip. When you reach 3rd level, you can cast the faerie fire spell once with this trait and regain the ability to do so when you finish a long rest. When you reach 5th level, you can cast the darkness spell once with this trait and regain the ability to do so when you finish a long rest. Charisma is your spellcasting ability for these spells.",
+            "mechanics": {
+              "cantrips": ["Dancing Lights"],
+              "spells_by_level": [
+                {"level": 3, "spell": "Faerie Fire", "uses": "1 / Long Rest"},
+                {"level": 5, "spell": "Darkness", "uses": "1 / Long Rest"}
+              ],
+              "spellcasting_ability": "Charisma"
+            }
+          }
+        },
+        "High Half-Elf": {
+          "replaces": "Skill Versatility",
+          "trait": {
+            "name": "High Elf Descent",
+            "description": "A half-elf of moon elf or sun elf descent can forego Skill Versatility and instead choose the high elf's Elf Weapon Training or Cantrip.",
+            "_note": "Choose Elf Weapon Training (proficiency with longswords, shortswords, shortbows, and longbows) OR a wizard cantrip (Intelligence as spellcasting ability). Refer to the High Elf entry in the 2014 PHB for the full text of these traits."
+          }
+        },
+        "Mark of Detection Half-Elf": {
+          "_setting": "Eberron — House Medani (Warning Guild)",
+          "replaces": "Skill Versatility AND Ability Score Increase",
+          "ability_score_increase": {
+            "fixed": {"Wisdom": 2},
+            "choices": {"count": 1, "amount": 1, "from": "any other ability score"},
+            "description": "Your Wisdom score increases by 2, and one other ability score of your choice increases by 1."
+          },
+          "traits": [
+            {
+              "name": "Deductive Intuition",
+              "description": "When you make an Intelligence (Investigation) or Wisdom (Insight) check, you can roll a d4 and add the number rolled to the ability check."
+            },
+            {
+              "name": "Magical Detection",
+              "description": "You can cast the detect magic and detect poison and disease spells with this trait. Starting at 3rd level, you can also cast the see invisibility spell with it. Once you cast any of these spells with this trait, you can't cast that spell with it again until you finish a long rest. Wisdom is your spellcasting ability for these spells, and you don't require material components for them.",
+              "mechanics": {
+                "spells": [
+                  {"spell": "Detect Magic", "uses": "1 / Long Rest"},
+                  {"spell": "Detect Poison and Disease", "uses": "1 / Long Rest"},
+                  {"spell": "See Invisibility", "level_required": 3, "uses": "1 / Long Rest"}
+                ],
+                "spellcasting_ability": "Wisdom",
+                "no_material_components": true
+              }
+            },
+            {
+              "name": "Spells of the Mark",
+              "description": "If you have the Spellcasting or the Pact Magic class feature, the spells on the Mark of Detection Spells table are added to the spell list of your spellcasting class.",
+              "spell_list": {
+                "1": ["Detect Evil and Good", "Detect Poison and Disease"],
+                "2": ["Detect Thoughts", "Find Traps"],
+                "3": ["Clairvoyance", "Nondetection"],
+                "4": ["Arcane Eye", "Divination"],
+                "5": ["Legend Lore"]
+              }
+            }
+          ]
+        },
+        "Mark of Storm Half-Elf": {
+          "_setting": "Eberron — House Lyrandar",
+          "replaces": "Skill Versatility AND Ability Score Increase",
+          "ability_score_increase": {
+            "fixed": {"Charisma": 2, "Dexterity": 1},
+            "description": "Your Charisma score increases by 2, and your Dexterity score increases by 1."
+          },
+          "traits": [
+            {
+              "name": "Windwright's Intuition",
+              "description": "When you make a Dexterity (Acrobatics) check or any ability check involving navigator's tools, you can roll a d4 and add the number rolled to the ability check."
+            },
+            {
+              "name": "Storm's Boon",
+              "description": "You have resistance to lightning damage.",
+              "mechanics": {"damage_resistances": ["Lightning"]}
+            },
+            {
+              "name": "Headwinds",
+              "description": "You know the gust cantrip. Starting at 3rd level, you can cast the gust of wind spell once with this trait, and you regain the ability to cast it when you finish a long rest. Charisma is your spellcasting ability for these spells.",
+              "mechanics": {
+                "cantrips": ["Gust"],
+                "spells": [
+                  {"spell": "Gust of Wind", "level_required": 3, "uses": "1 / Long Rest"}
+                ],
+                "spellcasting_ability": "Charisma"
+              }
+            },
+            {
+              "name": "Spells of the Mark",
+              "description": "If you have the Spellcasting or the Pact Magic class feature, the spells on the Mark of Storm Spells table are added to the spell list of your spellcasting class.",
+              "spell_list": {
+                "1": ["Feather Fall", "Fog Cloud"],
+                "2": ["Gust of Wind", "Levitate"],
+                "3": ["Sleet Storm", "Wind Wall"],
+                "4": ["Conjure Minor Elementals", "Control Water"],
+                "5": ["Conjure Elemental"]
+              }
+            }
+          ]
+        },
+        "Wood Half-Elf": {
+          "replaces": "Skill Versatility",
+          "trait": {
+            "name": "Wood Elf Descent",
+            "description": "A half-elf of wood elf descent can forgo Skill Versatility and instead choose the wood elf's Elf Weapon Training, Fleet of Foot, or Mask of the Wild.",
+            "_note": "Choose ONE of: Elf Weapon Training (proficiency with longswords, shortswords, shortbows, and longbows), Fleet of Foot (base walking speed becomes 35 ft), or Mask of the Wild (can attempt to hide when only lightly obscured by natural phenomena). Refer to the Wood Elf entry in the 2014 PHB for the full text."
+          }
+        }
+      }
+    },
+    "halfling": {
+      "name": "Halfling",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 193
+      },
+      "ruleset": "2024",
+      "description": "Cherished and guided by gods who value life, home, and hearth, halflings gravitate toward bucolic havens where family and community help shape their lives. That said, many halflings possess a brave and adventurous spirit that leads them on journeys of discovery, affording them the chance to explore a bigger world and make new friends along the way. Their size—similar to that of a human child—helps them pass through crowds unnoticed and slip through tight spaces. Anyone who has spent time around halflings, particularly halfling adventurers, has likely witnessed the storied 'luck of the halflings' in action. When a halfling is in mortal danger, an unseen force seems to intervene on the halfling's behalf. Many halflings believe in the power of luck, and they attribute their unusual gift to one or more of their benevolent gods, including Yondalla, Brandobaris, and Charmalaine. The same gift might contribute to their robust life spans (about 150 years). Halfling communities come in all varieties. For every sequestered shire tucked away in an unspoiled part of the world, there's a crime syndicate like the Boromar Clan in the Eberron setting or a territorial mob of halflings like those in the Dark Sun setting. Halflings who prefer to live underground are sometimes called strongheart halflings or stouts. Nomadic halflings, as well as those who live among humans and other tall folk, are sometimes called lightfoot halflings or tallfellows.",
+      "lifespan_years": 150,
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Small"],
+        "details": "Small (about 2-3 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Brave",
+          "description": "You have Advantage on saving throws you make to avoid or end the Frightened condition.",
+          "mechanics": {
+            "advantage_on": ["saving throws vs Frightened condition"]
+          }
+        },
+        {
+          "name": "Halfling Nimbleness",
+          "description": "You can move through the space of any creature that is a size larger than you, but you can't stop in the same space."
+        },
+        {
+          "name": "Luck",
+          "description": "When you roll a 1 on the d20 of a D20 Test, you can reroll the die, and you must use the new roll.",
+          "mechanics": {
+            "trigger": "natural 1 on a D20 Test",
+            "effect": "reroll, use new result"
+          }
+        },
+        {
+          "name": "Naturally Stealthy",
+          "description": "You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you."
+        }
+      ]
+    },
+    "human": {
+      "name": "Human",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 194
+      },
+      "ruleset": "2024",
+      "description": "Found throughout the multiverse, humans are as varied as they are numerous, and they endeavor to achieve as much as they can in the years they are given. Their ambition and resourcefulness are commended, respected, and feared on many worlds. Humans are as diverse in appearance as the people of Earth, and they have many gods. Scholars dispute the origin of humanity, but one of the earliest known human gatherings is said to have occurred in Sigil, the torus-shaped city at the center of the multiverse and the place where the Common language was born. From there, humans could have spread to every part of the multiverse, bringing the City of Doors' cosmopolitanism with them.",
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium", "Small"],
+        "details": "Medium (about 4-7 feet tall) or Small (about 2-4 feet tall), chosen when you select this species",
+        "choose_at_creation": true
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Resourceful",
+          "description": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+          "mechanics": {
+            "grants": "Heroic Inspiration on each Long Rest"
+          }
+        },
+        {
+          "name": "Skillful",
+          "description": "You gain proficiency in one skill of your choice.",
+          "choices": {
+            "name": "Skillful Skill",
+            "type": "choose_at_creation",
+            "count": 1,
+            "from": "any skill"
+          }
+        },
+        {
+          "name": "Versatile",
+          "description": "You gain an Origin feat of your choice.",
+          "choices": {
+            "name": "Origin Feat",
+            "type": "choose_at_creation",
+            "count": 1,
+            "from": "any Origin feat"
+          }
+        }
+      ]
+    },
+    "orc": {
+      "name": "Orc",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 195
+      },
+      "ruleset": "2024",
+      "description": "Orcs trace their creation to Gruumsh, a powerful god who roamed the wide open spaces of the Material Plane. Gruumsh equipped his children with gifts to help them wander great plains, vast caverns, and churning seas and to face the monsters that lurk there. Even when they turn their devotion to other gods, orcs retain Gruumsh's gifts: endurance, determination, and the ability to see in darkness. Orcs are, on average, tall and broad. They have gray skin, ears that are sharply pointed, and prominent lower canines that resemble small tusks. Orc youths on some worlds are told about their ancestors' great travels and travails. Inspired by those tales, many of those orcs wonder when Gruumsh will call on them to match the heroic deeds of old and if they will prove worthy of his favor. Other orcs are happy to leave old tales in the past and find their own way.",
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium"],
+        "details": "Medium (about 6-7 feet tall)"
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Adrenaline Rush",
+          "description": "You can take the Dash action as a Bonus Action. When you do so, you gain a number of Temporary Hit Points equal to your Proficiency Bonus. You can use this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Short or Long Rest.",
+          "mechanics": {
+            "action_type": "Bonus Action (Dash)",
+            "temp_hp": "Proficiency Bonus",
+            "uses": "Proficiency Bonus / Short or Long Rest"
+          }
+        },
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 120 feet.",
+          "mechanics": {
+            "darkvision_feet": 120
+          }
+        },
+        {
+          "name": "Relentless Endurance",
+          "description": "When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once you use this trait, you can't do so again until you finish a Long Rest.",
+          "mechanics": {
+            "trigger": "reduced to 0 HP (not killed outright)",
+            "effect": "drop to 1 HP instead",
+            "uses": "1 / Long Rest"
+          }
+        }
+      ]
+    },
+    "tiefling": {
+      "name": "Tiefling",
+      "source": {
+        "book": "Player's Handbook (2024)",
+        "page": 197
+      },
+      "ruleset": "2024",
+      "pronunciation": "TEE-fling",
+      "description": "Tieflings are either born in the Lower Planes or have fiendish ancestors who originated there. A tiefling is linked by blood to a devil, a demon, or some other Fiend. This connection to the Lower Planes is the tiefling's fiendish legacy, which comes with the promise of power yet has no effect on the tiefling's moral outlook. A tiefling chooses whether to embrace or lament their fiendish legacy.",
+      "legacy_lore": {
+        "Abyssal": "The entropy of the Abyss, the chaos of Pandemonium, and the despair of Carceri call to tieflings who have the abyssal legacy. Horns, fur, tusks, and peculiar scents are common physical features of such tieflings, most of whom have the blood of demons coursing through their veins.",
+        "Chthonic": "Tieflings who have the chthonic legacy feel not only the tug of Carceri but also the greed of Gehenna and the gloom of Hades. Some of these tieflings look cadaverous. Others possess the unearthly beauty of a succubus, or they have physical features in common, with a night hag, a yugoloth, or some other Neutral Evil fiendish ancestor.",
+        "Infernal": "The infernal legacy connects tieflings not only to Gehenna but also the Nine Hells and the raging battlefields of Acheron. Horns, spines, tails, golden eyes, and a faint odor of sulfur or smoke are common physical features of such tieflings, most of who trace their ancestry to devils."
+      },
+      "creature_type": "Humanoid",
+      "size": {
+        "options": ["Medium", "Small"],
+        "details": "Medium (about 4-7 feet tall) or Small (about 3-4 feet tall), chosen when you select this species",
+        "choose_at_creation": true
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Darkvision",
+          "description": "You have Darkvision with a range of 60 feet.",
+          "mechanics": {
+            "darkvision_feet": 60
+          }
+        },
+        {
+          "name": "Fiendish Legacy",
+          "description": "You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy from the Fiendish Legacies table. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select the legacy).",
+          "choices": {
+            "name": "Fiendish Legacy",
+            "type": "choose_at_creation",
+            "options": [
+              {
+                "name": "Abyssal",
+                "level_1": {
+                  "description": "You have Resistance to Poison damage. You also know the Poison Spray cantrip.",
+                  "damage_resistances": ["Poison"],
+                  "cantrips": ["Poison Spray"]
+                },
+                "level_3_spell": "Ray of Sickness",
+                "level_5_spell": "Hold Person"
+              },
+              {
+                "name": "Chthonic",
+                "level_1": {
+                  "description": "You have Resistance to Necrotic damage. You also know the Chill Touch cantrip.",
+                  "damage_resistances": ["Necrotic"],
+                  "cantrips": ["Chill Touch"]
+                },
+                "level_3_spell": "False Life",
+                "level_5_spell": "Ray of Enfeeblement"
+              },
+              {
+                "name": "Infernal",
+                "level_1": {
+                  "description": "You have Resistance to Fire damage. You also know the Fire Bolt cantrip.",
+                  "damage_resistances": ["Fire"],
+                  "cantrips": ["Fire Bolt"]
+                },
+                "level_3_spell": "Hellish Rebuke",
+                "level_5_spell": "Darkness"
+              }
+            ]
+          },
+          "spellcasting_ability_choices": ["Intelligence", "Wisdom", "Charisma"],
+          "spell_usage_note": "At levels 3 and 5, the indicated spell is always prepared; can be cast once without a slot per Long Rest, or via any spell slot of appropriate level."
+        },
+        {
+          "name": "Otherworldly Presence",
+          "description": "You know the Thaumaturgy cantrip. When you cast it with this trait, the spell uses the same spellcasting ability you use for your Fiendish Legacy Trait.",
+          "mechanics": {
+            "cantrips": ["Thaumaturgy"],
+            "spellcasting_ability": "(matches Fiendish Legacy choice: Int/Wis/Cha)"
+          }
+        }
+      ]
+    },
+    "warforged": {
+      "name": "Warforged",
+      "source": {
+        "book": "Eberron: Forge of the Artificer",
+        "page": 38
+      },
+      "ruleset": "2024",
+      "description": "Warforged are mechanical beings built as weapons to fight in the Last War. An unexpected breakthrough produced sentient beings made from wood and metal that nevertheless can feel pain and emotion. Warforged comprise a blend of organic and inorganic materials. Rootlike cords infused with alchemical fluids serve as their muscles, wrapped around a framework of steel, darkwood, or stone. Armored plates form a protective outer shell and reinforce joints. The more a warforged cultivates their individuality, the more likely they are to modify their body, seeking out an artificer to customize the look of their face, limbs, and plating.",
+      "creature_type": "Construct",
+      "size": {
+        "options": ["Medium", "Small"],
+        "details": "Medium (about 6-8 feet tall) or Small (about 3-4 feet tall), chosen when you select this species",
+        "choose_at_creation": true
+      },
+      "speed": {
+        "walk": 30
+      },
+      "traits": [
+        {
+          "name": "Construct Resilience",
+          "description": "You have Resistance to Poison damage. You also have Advantage on saving throws to avoid or end the Poisoned condition.",
+          "mechanics": {
+            "damage_resistances": ["Poison"],
+            "advantage_on": ["saving throws vs Poisoned condition"]
+          }
+        },
+        {
+          "name": "Integrated Protection",
+          "description": "You gain a +1 bonus to your Armor Class. In addition, armor you have donned can't be removed against your will while you're alive.",
+          "mechanics": {
+            "ac_bonus": 1,
+            "armor_locked_to_wearer": true
+          }
+        },
+        {
+          "name": "Sentry's Rest",
+          "description": "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 6 hours if you spend those hours in an inactive, motionless state. During this time, you appear inert but remain conscious.",
+          "mechanics": {
+            "long_rest_hours": 6,
+            "needs_sleep": false,
+            "immune_to": ["magical sleep"]
+          }
+        },
+        {
+          "name": "Specialized Design",
+          "description": "You gain one skill proficiency and one tool proficiency of your choice.",
+          "choices": [
+            {
+              "name": "Specialized Design Skill",
+              "type": "choose_at_creation",
+              "count": 1,
+              "from": "any skill"
+            },
+            {
+              "name": "Specialized Design Tool",
+              "type": "choose_at_creation",
+              "count": 1,
+              "from": "any tool"
+            }
+          ]
+        },
+        {
+          "name": "Tireless",
+          "description": "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation.",
+          "mechanics": {
+            "immune_to_exhaustion_from": ["dehydration", "malnutrition", "suffocation"]
+          }
+        }
+      ]
+    }
+  }
+}

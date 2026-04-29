@@ -14,6 +14,7 @@ import { jsPDF } from 'jspdf';
 import { NextRequest } from 'next/server';
 import type { PlayerCharacter, SrdSpell, CustomSpell } from '@/types';
 import srdSpellsData from '@/data/spells.json';
+import { spellSaveDc, spellAttackBonus } from '@/lib/character';
 
 const SRD_SPELLS: SrdSpell[] = srdSpellsData as SrdSpell[];
 const SRD_BY_NAME = new Map<string, SrdSpell>();
@@ -1027,10 +1028,10 @@ function drawSpellsPage(doc: jsPDF, c: PlayerCharacter, customByName: Map<string
 
   let y = 32;
 
-  // Spell stats bar
+  // Spell stats bar — calculated from PB + ability mod, falling back to override columns.
   const stats: QuickStat[] = [
-    { label: 'Spell Atk', value: modStr(c.spell_attack_bonus) },
-    { label: 'Spell DC', value: String(c.spell_save_dc ?? '—') },
+    { label: 'Spell Atk', value: modStr(spellAttackBonus(c)) },
+    { label: 'Spell DC', value: String(spellSaveDc(c)) },
     { label: 'Ability', value: c.spellcasting_ability || '—' },
   ];
   y = drawQuickStatsBar(doc, stats, y);

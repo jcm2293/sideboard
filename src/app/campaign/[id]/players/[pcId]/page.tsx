@@ -14,6 +14,7 @@ import type {
   SrdSpell,
   CustomSpell,
 } from '@/types';
+import { abilityModifier, spellSaveDc, spellAttackBonus, modString } from '@/lib/character';
 
 const SRD_SPELLS = srdSpellsData as SrdSpell[];
 
@@ -220,8 +221,9 @@ export default function PlayerCharacterEditPage({
   // Spellcasting
   const [isSpellcaster, setIsSpellcaster] = useState(false);
   const [spellcastingAbility, setSpellcastingAbility] = useState('INT');
-  const [spellAttackBonus, setSpellAttackBonus] = useState(0);
-  const [spellSaveDC, setSpellSaveDC] = useState(8);
+  // Override fields: null when calculation is used; non-null when user toggles override on.
+  const [spellAttackBonusOverride, setSpellAttackBonusOverride] = useState<number | null>(null);
+  const [spellSaveDcOverride, setSpellSaveDcOverride] = useState<number | null>(null);
   const [isPreparedCaster, setIsPreparedCaster] = useState(false);
   const [pactSlotLevel, setPactSlotLevel] = useState(1);
   const [pactSlotCount, setPactSlotCount] = useState(1);
@@ -302,8 +304,8 @@ export default function PlayerCharacterEditPage({
 
     if (pc.is_spellcaster != null) setIsSpellcaster(pc.is_spellcaster);
     if (pc.spellcasting_ability) setSpellcastingAbility(pc.spellcasting_ability);
-    if (pc.spell_attack_bonus != null) setSpellAttackBonus(pc.spell_attack_bonus);
-    if (pc.spell_save_dc != null) setSpellSaveDC(pc.spell_save_dc);
+    setSpellAttackBonusOverride(pc.spell_attack_bonus_override ?? null);
+    setSpellSaveDcOverride(pc.spell_save_dc_override ?? null);
     if (pc.is_prepared_caster != null) setIsPreparedCaster(pc.is_prepared_caster);
     if (pc.pact_slot_level != null) setPactSlotLevel(pc.pact_slot_level);
     if (pc.pact_slot_count != null) setPactSlotCount(pc.pact_slot_count);
@@ -420,8 +422,8 @@ export default function PlayerCharacterEditPage({
       cp, sp, ep, gp, pp,
       is_spellcaster: isSpellcaster,
       spellcasting_ability: isSpellcaster ? spellcastingAbility : null,
-      spell_attack_bonus: isSpellcaster ? spellAttackBonus : null,
-      spell_save_dc: isSpellcaster ? spellSaveDC : null,
+      spell_attack_bonus_override: isSpellcaster ? spellAttackBonusOverride : null,
+      spell_save_dc_override: isSpellcaster ? spellSaveDcOverride : null,
       is_prepared_caster: isSpellcaster ? isPreparedCaster : false,
       pact_slot_level: isSpellcaster && className.toLowerCase().includes('warlock') ? pactSlotLevel : null,
       pact_slot_count: isSpellcaster && className.toLowerCase().includes('warlock') ? pactSlotCount : null,
@@ -1309,9 +1311,28 @@ export default function PlayerCharacterEditPage({
           <span className="text-sm">This character is a spellcaster</span>
         </label>
 
-        {isSpellcaster && (
+        {isSpellcaster && (() => {
+          // Live calculation that mirrors /src/lib/character.ts so the displays
+          // update as the user changes ability/level. Override values win when set.
+          const abilityScore = (() => {
+            const k = spellcastingAbility.toUpperCase();
+            return k === 'STR' ? strScore
+              : k === 'DEX' ? dexScore
+              : k === 'CON' ? conScore
+              : k === 'INT' ? intScore
+              : k === 'WIS' ? wisScore
+              : k === 'CHA' ? chaScore
+              : 10;
+          })();
+          const calcAtk = proficiencyBonus + abilityModifier(abilityScore);
+          const calcDc = 8 + proficiencyBonus + abilityModifier(abilityScore);
+          const displayAtk = spellAttackBonusOverride ?? calcAtk;
+          const displayDc = spellSaveDcOverride ?? calcDc;
+          const overrideOn = spellAttackBonusOverride != null || spellSaveDcOverride != null;
+
+          return (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
                   Spellcasting Ability
@@ -1329,24 +1350,26 @@ export default function PlayerCharacterEditPage({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-muted mb-1">
-                  Spell Attack Bonus
+                <label className="block text-xs text-muted uppercase tracking-wider mb-1">
+                  Spell Attack
                 </label>
-                <input
-                  type="number"
-                  value={spellAttackBonus}
-                  onChange={(e) => setSpellAttackBonus(Number(e.target.value))}
-                  className={numberInputClass}
-                />
+                <div className="border border-border rounded px-3 py-2 text-sm bg-surface-light/40 font-data">
+                  {modString(displayAtk)}
+                  {spellAttackBonusOverride != null && (
+                    <span className="ml-2 text-xs text-muted">override</span>
+                  )}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-muted mb-1">Spell Save DC</label>
-                <input
-                  type="number"
-                  value={spellSaveDC}
-                  onChange={(e) => setSpellSaveDC(Number(e.target.value))}
-                  className={numberInputClass}
-                />
+                <label className="block text-xs text-muted uppercase tracking-wider mb-1">
+                  Spell Save DC
+                </label>
+                <div className="border border-border rounded px-3 py-2 text-sm bg-surface-light/40 font-data">
+                  {displayDc}
+                  {spellSaveDcOverride != null && (
+                    <span className="ml-2 text-xs text-muted">override</span>
+                  )}
+                </div>
               </div>
               <div className="flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -1359,6 +1382,52 @@ export default function PlayerCharacterEditPage({
                   <span className="text-sm">Prepared caster</span>
                 </label>
               </div>
+            </div>
+
+            {/* Override toggle */}
+            <div className="mb-4 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer text-muted">
+                <input
+                  type="checkbox"
+                  checked={overrideOn}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      // Initialize overrides to current calculated values so the user can edit from there.
+                      setSpellAttackBonusOverride(calcAtk);
+                      setSpellSaveDcOverride(calcDc);
+                    } else {
+                      setSpellAttackBonusOverride(null);
+                      setSpellSaveDcOverride(null);
+                    }
+                  }}
+                  className="accent-accent"
+                />
+                <span>
+                  Override calculated values (use only if a magic item or feature shifts these off the formula)
+                </span>
+              </label>
+              {overrideOn && (
+                <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-3 max-w-md">
+                  <div>
+                    <label className="block text-xs text-muted mb-1">Spell Attack Override</label>
+                    <input
+                      type="number"
+                      value={spellAttackBonusOverride ?? calcAtk}
+                      onChange={(e) => setSpellAttackBonusOverride(Number(e.target.value))}
+                      className={`${numberInputClass} w-20`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted mb-1">Spell DC Override</label>
+                    <input
+                      type="number"
+                      value={spellSaveDcOverride ?? calcDc}
+                      onChange={(e) => setSpellSaveDcOverride(Number(e.target.value))}
+                      className={`${numberInputClass} w-20`}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {isWarlock && (
@@ -1480,7 +1549,8 @@ export default function PlayerCharacterEditPage({
               })}
             </div>
           </>
-        )}
+          );
+        })()}
       </section>
 
       {/* ─── ADD DESCRIPTION MODAL (for spells missing from SRD + custom library) ─── */}

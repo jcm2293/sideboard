@@ -108,9 +108,11 @@ interface ParsedCharacter {
   languages: string;
   tool_proficiencies: string;
   is_spellcaster: boolean;
-  spell_attack_bonus: number | null;
-  spell_save_dc: number | null;
   spellcasting_ability: string | null;
+  // Spell DC and attack are calculated by the app from PB + ability mod.
+  // Overrides remain null on import; user toggles them on if a magic item changes the value.
+  spell_attack_bonus_override: number | null;
+  spell_save_dc_override: number | null;
   spell_slots: Record<string, number> | null;
   pact_slot_level: number | null;
   pact_slot_count: number | null;
@@ -1018,9 +1020,9 @@ export async function POST(request: Request) {
       tool_proficiencies: proficiencies.tools,
 
       is_spellcaster: isCaster,
-      spell_attack_bonus: spellInfo.spellAttackBonus,
-      spell_save_dc: spellInfo.spellSaveDC,
       spellcasting_ability: spellInfo.spellcastingAbility,
+      spell_attack_bonus_override: null,
+      spell_save_dc_override: null,
       spell_slots: progression.spellSlots,
       pact_slot_level: progression.pactSlotLevel,
       pact_slot_count: progression.pactSlotCount,

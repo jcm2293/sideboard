@@ -266,8 +266,11 @@ export interface PlayerCharacter {
 
   // Spellcasting
   is_spellcaster: boolean;
-  spell_attack_bonus: number | null;
-  spell_save_dc: number | null;
+  // Spell save DC and attack bonus are calculated from PB + ability mod
+  // (see /src/lib/character.ts). Override fields are non-null only when the
+  // character has a magic item or feature that pushes them off the formula.
+  spell_attack_bonus_override: number | null;
+  spell_save_dc_override: number | null;
   spellcasting_ability: string | null;
   spell_slots: Record<string, number> | null;
   pact_slot_level: number | null;

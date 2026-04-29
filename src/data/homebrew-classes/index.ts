@@ -3,12 +3,14 @@
 
 import type { ClassDefinition } from '@/types/homebrew-class';
 import { MAGUS, magusCantripsKnown } from './magus';
+import { HEATHBOUND, heathboundCantripsKnown } from './heathbound';
 
-export const ALL_HOMEBREW_CLASSES: ClassDefinition[] = [MAGUS];
+export const ALL_HOMEBREW_CLASSES: ClassDefinition[] = [MAGUS, HEATHBOUND];
 
 /** Cantrip-known function lookup by class id (only spellcasters that get cantrips need one). */
 export const CANTRIP_FNS: Record<string, (level: number) => number> = {
   magus: magusCantripsKnown,
+  heathbound: heathboundCantripsKnown,
 };
 
 export function findHomebrewClass(id: string): ClassDefinition | null {

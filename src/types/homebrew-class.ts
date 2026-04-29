@@ -105,6 +105,6 @@ export interface ClassDefinition {
   /** Spell names available to this class, grouped by spell level ("0", "1", ...). */
   spell_list: Record<string, string[]>;
 
-  /** Optional list of fighting styles or similar choices the wizard can surface. */
-  fighting_styles?: FeatureDefinition[];
+  /** IDs from src/data/fighting-styles.ts that this class can choose from. */
+  allowed_fighting_style_ids?: string[];
 }
