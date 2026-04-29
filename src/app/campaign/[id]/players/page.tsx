@@ -2,11 +2,11 @@
 
 import { use, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { playerCharacterStore } from '@/lib/data';
+import { playerCharacterStore, customSpellStore } from '@/lib/data';
 import { useShelfStore } from '@/stores/shelf-store';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { ALL_HOMEBREW_CLASSES } from '@/data/homebrew-classes';
-import type { PlayerCharacter } from '@/types';
+import type { PlayerCharacter, CustomSpell } from '@/types';
 
 export default function PlayersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -20,6 +20,9 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [createTab, setCreateTab] = useState<'official' | 'homebrew'>('official');
+  // Cached custom spells for the campaign — passed to PDF export so custom-spell
+  // cards render with their full description instead of name-only.
+  const [customSpells, setCustomSpells] = useState<CustomSpell[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const reuploadInputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +33,9 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       setCharacters(data);
       setLoading(false);
     });
+    customSpellStore
+      .getAll({ campaign_id: id } as Partial<CustomSpell>)
+      .then(setCustomSpells);
   }, [id]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -94,7 +100,7 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     const res = await fetch('/api/export-character', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pc),
+      body: JSON.stringify({ character: pc, customSpells }),
     });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
