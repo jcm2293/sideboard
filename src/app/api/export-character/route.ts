@@ -650,30 +650,37 @@ function drawFeatureBlock(
   const descW = opts.width;
   const bottomMargin = opts.bottomMargin ?? MARGIN;
 
+  // Establish a clean rendering context BEFORE measurement.
+  // splitTextToSize wraps based on the currently-active font/size, so we must
+  // pin both. Without this, prior section headers (bold 10pt) leak into the
+  // line-width math.
+  doc.setFont(SERIF, 'normal');
   doc.setFontSize(fontSize);
-  // Measure full block height first.
   const wrappedDesc = doc.splitTextToSize(feature.summary || '', descW) as string[];
   const blockH =
     lineH +                       // name line
     wrappedDesc.length * lineH +  // description lines
     1.5;                          // small bottom pad
 
-  // Page break if we'd overflow.
+  // Page break if we'd overflow. The callback may render its own header
+  // (which mutates font state) — we'll re-establish the body context below.
   if (y + blockH > PH - bottomMargin) {
     const next = opts.onPageBreak();
     x = next.x;
     y = next.y;
   }
 
-  // Name (bold italic), own line
+  // Re-establish font state explicitly for every draw operation. Both size
+  // and style are set so the callback's font choices can't leak through.
   setText(doc, MAROON);
   doc.setFont(SERIF, 'bolditalic');
+  doc.setFontSize(fontSize);
   doc.text(`${feature.name}.`, x, y);
   y += lineH;
 
-  // Description, wrapped, left-aligned with name
   setText(doc, BODY);
   doc.setFont(SERIF, 'normal');
+  doc.setFontSize(fontSize);
   for (const line of wrappedDesc) {
     doc.text(line, x, y);
     y += lineH;
