@@ -412,13 +412,16 @@ function drawAttacksTable(
   if (!attacks || attacks.length === 0) return y;
   y = drawSectionHeader(doc, 'ATTACKS', x, y, w);
 
-  // Column widths — 5 columns now (Range added). Sum to 1.0.
+  // Column widths — 5 columns. Sum to 1.0. Sized for Times-Roman 8pt body:
+  // Name fits weapon names through ~"Eldritch Blast"; Damage fits "1d10+5";
+  // Type fits "Bludgeoning" (longest 5e damage type, 11 chars);
+  // Range fits "30 ft./120 ft." (longest typical thrown-weapon range).
   const cols = [
-    { label: 'Name', w: 0.34 },
-    { label: 'Atk', w: 0.11 },
-    { label: 'Damage', w: 0.22 },
-    { label: 'Type', w: 0.16 },
-    { label: 'Range', w: 0.17 },
+    { label: 'Name', w: 0.30 },
+    { label: 'Atk', w: 0.10 },
+    { label: 'Damage', w: 0.18 },
+    { label: 'Type', w: 0.20 },
+    { label: 'Range', w: 0.22 },
   ];
 
   // Header row
