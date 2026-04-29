@@ -233,10 +233,10 @@ function drawQuickStatsBar(doc: jsPDF, stats: QuickStat[], y: number): number {
       doc.line(x0 + i * colW, y + 2, x0 + i * colW, y + h - 2);
     }
 
-    // Label
+    // Label — fontSize 7 since 6 boxes (vs the prior 9) leave more horizontal room.
     setText(doc, MUTED);
     doc.setFont(SERIF, 'normal');
-    doc.setFontSize(6);
+    doc.setFontSize(7);
     doc.text(stats[i].label.toUpperCase(), cx, y + 4.5, { align: 'center' });
 
     // Value
@@ -412,12 +412,13 @@ function drawAttacksTable(
   if (!attacks || attacks.length === 0) return y;
   y = drawSectionHeader(doc, 'ATTACKS', x, y, w);
 
-  // Column widths
+  // Column widths — 5 columns now (Range added). Sum to 1.0.
   const cols = [
-    { label: 'Name', w: 0.42 },
-    { label: 'Atk', w: 0.13 },
-    { label: 'Damage', w: 0.25 },
-    { label: 'Type', w: 0.20 },
+    { label: 'Name', w: 0.34 },
+    { label: 'Atk', w: 0.11 },
+    { label: 'Damage', w: 0.22 },
+    { label: 'Type', w: 0.16 },
+    { label: 'Range', w: 0.17 },
   ];
 
   // Header row
@@ -446,7 +447,7 @@ function drawAttacksTable(
     }
     setText(doc, BODY);
     cx = x;
-    const cells = [atk.name, atk.atk_bonus, atk.damage, atk.damage_type];
+    const cells = [atk.name, atk.atk_bonus, atk.damage, atk.damage_type, atk.range || ''];
     for (let j = 0; j < cols.length; j++) {
       const colWidth = w * cols[j].w;
       const text = doc.splitTextToSize(cells[j] || '', colWidth - 2)[0] || '';
@@ -464,6 +465,24 @@ function drawAttacksTable(
   return y + 3;
 }
 
+/** Compute a passive value from raw stats when char.passive_* is null. */
+function computePassive(
+  c: PlayerCharacter,
+  ability: 'wis_score' | 'int_score',
+  skillKey: string,
+): number {
+  const score = (c[ability] as number | undefined) ?? 10;
+  const mod = Math.floor((score - 10) / 2);
+  const pb = c.proficiency_bonus ?? 2;
+  const profLevel = c.skill_proficiencies?.[skillKey] ?? 'none';
+  const profBonus =
+    profLevel === 'expertise' ? pb * 2 :
+    profLevel === 'proficient' ? pb :
+    profLevel === 'half' ? Math.floor(pb / 2) :
+    0;
+  return 10 + mod + profBonus;
+}
+
 function drawSensesAndDefenses(
   doc: jsPDF,
   c: PlayerCharacter,
@@ -473,12 +492,18 @@ function drawSensesAndDefenses(
 ): number {
   const lines: { label: string; value: string }[] = [];
   if (c.senses) lines.push({ label: 'Senses', value: c.senses });
-  if (c.passive_perception != null) {
-    lines.push({ label: 'Passive Perc', value: String(c.passive_perception) });
-  }
+
+  // Three passive stats — full word "Passive", auto-calc when missing.
+  const pp = c.passive_perception ?? computePassive(c, 'wis_score', 'perception');
+  const pi = c.passive_insight ?? computePassive(c, 'wis_score', 'insight');
+  const piv = c.passive_investigation ?? computePassive(c, 'int_score', 'investigation');
+  lines.push({ label: 'Passive Perception', value: String(pp) });
+  lines.push({ label: 'Passive Insight', value: String(pi) });
+  lines.push({ label: 'Passive Investigation', value: String(piv) });
+
   if (c.damage_resistances) lines.push({ label: 'Resistances', value: c.damage_resistances });
-  if (c.damage_immunities) lines.push({ label: 'Damage Imm.', value: c.damage_immunities });
-  if (c.condition_immunities) lines.push({ label: 'Condition Imm.', value: c.condition_immunities });
+  if (c.damage_immunities) lines.push({ label: 'Damage Immunities', value: c.damage_immunities });
+  if (c.condition_immunities) lines.push({ label: 'Condition Immunities', value: c.condition_immunities });
   if (lines.length === 0) return y;
 
   y = drawSectionHeader(doc, 'SENSES & DEFENSES', x, y, w);
@@ -589,50 +614,96 @@ function drawProficiencies(
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Bottom section: features in two columns
-// ──────────────────────────────────────────────────────────────────────────
+// Feature list rendering — single column, name on its own line.
+//
+// Each feature renders as:
+//   <Feature Name>.        ← bold italic, own line
+//   <description text...>  ← wraps left-aligned with the name
+//   (4pt vertical gap before the next feature)
+//
+// The renderer is page-break aware: if a feature won't fit on the current page,
+// it calls onPageBreak() (caller decides whether to addPage and re-render a
+// "(continued)" header) and continues from the new top.
 
-function drawFeatureList(
+interface FeatureListOpts {
+  /** Width to wrap descriptions at. */
+  width: number;
+  /** Top-of-feature-area y on the current page (used for overflow detection). */
+  pageTopY: number;
+  /** Bottom margin on the page (don't draw past PH - bottomMargin). */
+  bottomMargin?: number;
+  /** Called when a feature would overflow; returns the new (x, y) to continue at. */
+  onPageBreak: () => { x: number; y: number };
+  /** Font size for feature text (description). Default 8. */
+  fontSize?: number;
+}
+
+function drawFeatureBlock(
+  doc: jsPDF,
+  feature: { name: string; summary: string },
+  x: number,
+  y: number,
+  opts: FeatureListOpts,
+): { x: number; y: number } {
+  const fontSize = opts.fontSize ?? 8;
+  const lineH = fontSize * 0.45;
+  const descW = opts.width;
+  const bottomMargin = opts.bottomMargin ?? MARGIN;
+
+  doc.setFontSize(fontSize);
+  // Measure full block height first.
+  const wrappedDesc = doc.splitTextToSize(feature.summary || '', descW) as string[];
+  const blockH =
+    lineH +                       // name line
+    wrappedDesc.length * lineH +  // description lines
+    1.5;                          // small bottom pad
+
+  // Page break if we'd overflow.
+  if (y + blockH > PH - bottomMargin) {
+    const next = opts.onPageBreak();
+    x = next.x;
+    y = next.y;
+  }
+
+  // Name (bold italic), own line
+  setText(doc, MAROON);
+  doc.setFont(SERIF, 'bolditalic');
+  doc.text(`${feature.name}.`, x, y);
+  y += lineH;
+
+  // Description, wrapped, left-aligned with name
+  setText(doc, BODY);
+  doc.setFont(SERIF, 'normal');
+  for (const line of wrappedDesc) {
+    doc.text(line, x, y);
+    y += lineH;
+  }
+
+  // 4pt gap before next feature
+  return { x, y: y + 1.4 };
+}
+
+/** Render a list of features with a section header. Returns final y. */
+function drawFeatureSection(
   doc: jsPDF,
   title: string,
   features: { name: string; summary: string }[] | null,
   x: number,
   y: number,
-  w: number,
+  opts: FeatureListOpts,
 ): number {
   if (!features || features.length === 0) return y;
 
-  y = drawSectionHeader(doc, title.toUpperCase(), x, y, w);
-  doc.setFontSize(7.5);
+  // Header at current position
+  y = drawSectionHeader(doc, title.toUpperCase(), x, y, opts.width);
 
-  const colGap = 4;
-  const colW = (w - colGap) / 2;
-  const half = Math.ceil(features.length / 2);
-
-  let y1 = y;
-  let y2 = y;
-  for (let i = 0; i < features.length; i++) {
-    const f = features[i];
-    const isLeft = i < half;
-    const cx = isLeft ? x : x + colW + colGap;
-    const cy = isLeft ? y1 : y2;
-
-    setText(doc, MAROON);
-    doc.setFont(SERIF, 'bold');
-    const nameLabel = `${f.name}.`;
-    doc.text(nameLabel, cx, cy);
-    const nameW = doc.getTextWidth(nameLabel) + 1;
-
-    setText(doc, BODY);
-    doc.setFont(SERIF, 'normal');
-    const newY = drawWrapped(doc, f.summary || '', cx + nameW, cy, colW - nameW, 3.2);
-    const advance = Math.max(newY - cy, 3.5);
-
-    if (isLeft) y1 = cy + advance + 1;
-    else y2 = cy + advance + 1;
+  for (const f of features) {
+    const result = drawFeatureBlock(doc, f, x, y, opts);
+    x = result.x;
+    y = result.y;
   }
 
-  return Math.max(y1, y2) + 2;
+  return y + 1.5;
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -654,14 +725,12 @@ function drawPage1(doc: jsPDF, c: PlayerCharacter) {
     return '30 ft.';
   })();
 
+  // Six boxes — passive stats live in Senses & Defenses now.
   const stats: QuickStat[] = [
-    { label: 'Prof', value: modStr(c.proficiency_bonus) },
-    { label: 'Pass. Perc', value: String(c.passive_perception ?? '—') },
-    { label: 'Pass. Insight', value: String(c.passive_insight ?? '—') },
-    { label: 'Pass. Inv', value: String(c.passive_investigation ?? '—') },
-    { label: 'Init', value: modStr(c.initiative_modifier) },
-    { label: 'AC', value: String(c.armor_class ?? '—') },
-    { label: 'HP', value: String(c.hp_max ?? '—') },
+    { label: 'Proficiency Bonus', value: modStr(c.proficiency_bonus) },
+    { label: 'Initiative', value: modStr(c.initiative_modifier) },
+    { label: 'Armor Class', value: String(c.armor_class ?? '—') },
+    { label: 'Max HP', value: String(c.hp_max ?? '—') },
     { label: 'Hit Dice', value: c.hit_dice_total || '—' },
     { label: 'Speed', value: speedStr },
   ];
@@ -677,28 +746,74 @@ function drawPage1(doc: jsPDF, c: PlayerCharacter) {
 
   const gridBottomY = drawAbilityGrid(doc, c, leftX, y, leftW);
 
-  // Right column
+  // Right column: stat blocks first, then Racial Traits + Feats fill remaining space.
+  // Racial/Feats live here (rather than below) so we use the previously-blank area
+  // under Proficiencies before Class Features takes the full width.
   let ry = y;
   ry = drawAttacksTable(doc, c.attacks, rightX, ry, rightW);
   ry = drawSensesAndDefenses(doc, c, rightX, ry, rightW);
   ry = drawClassResources(doc, c.class_resources, rightX, ry, rightW);
   ry = drawProficiencies(doc, c, rightX, ry, rightW);
 
-  // Bottom: features
-  let by = Math.max(gridBottomY, ry) + 4;
-  ornamentDivider(doc, MARGIN, PW - MARGIN, by);
-  by += 4;
+  // Right-column feature blocks: page-break-aware in case they grow long.
+  const startPage = doc.getNumberOfPages();
+  const rightOpts: FeatureListOpts = {
+    width: rightW,
+    pageTopY: 30,
+    bottomMargin: 8,
+    fontSize: 7.5,
+    onPageBreak: () => {
+      doc.addPage();
+      drawParchmentBg(doc);
+      drawPageHeader(doc, c, 'Continued');
+      return { x: rightX, y: 30 };
+    },
+  };
+  if (c.racial_traits && c.racial_traits.length > 0) {
+    ry = drawFeatureSection(doc, 'Racial / Species Traits', c.racial_traits, rightX, ry + 1, rightOpts);
+  }
+  if (c.feats && c.feats.length > 0) {
+    ry = drawFeatureSection(doc, 'Feats', c.feats, rightX, ry + 1, rightOpts);
+  }
+  // If the right column overflowed onto a new page, gridBottomY (from page 1) is
+  // no longer relevant — Class Features should start from ry on the current page.
+  const rightOverflowed = doc.getNumberOfPages() > startPage;
 
-  if (by < PH - 30) {
-    by = drawFeatureList(doc, 'Class Features', c.class_features, MARGIN, by, PW - 2 * MARGIN);
+  // Class Features: full-width single-column below the larger of (left, right) columns.
+  // Page-break aware — never splits a feature.
+  let by = rightOverflowed ? ry + 4 : Math.max(gridBottomY, ry) + 4;
+  if (by > PH - 25) {
+    // No room left for any class features on this page — start a fresh page
+    doc.addPage();
+    drawParchmentBg(doc);
+    drawPageHeader(doc, c, 'Continued');
+    by = 30;
+  } else {
+    ornamentDivider(doc, MARGIN, PW - MARGIN, by);
+    by += 4;
   }
-  if (by < PH - 25 && c.racial_traits && c.racial_traits.length > 0) {
-    by += 1;
-    by = drawFeatureList(doc, 'Racial / Species Traits', c.racial_traits, MARGIN, by, PW - 2 * MARGIN);
-  }
-  if (by < PH - 20 && c.feats && c.feats.length > 0) {
-    by += 1;
-    by = drawFeatureList(doc, 'Feats', c.feats, MARGIN, by, PW - 2 * MARGIN);
+
+  const fullW = PW - 2 * MARGIN;
+  let inContinuation = false;
+  const cfOpts: FeatureListOpts = {
+    width: fullW,
+    pageTopY: 30,
+    bottomMargin: 12,
+    fontSize: 8,
+    onPageBreak: () => {
+      doc.addPage();
+      drawParchmentBg(doc);
+      drawPageHeader(doc, c, 'Continued');
+      inContinuation = true;
+      const top = 30;
+      // Repeat header with "(continued)" so the reader knows context.
+      const headerY = drawSectionHeader(doc, 'CLASS FEATURES (CONTINUED)', MARGIN, top, fullW);
+      return { x: MARGIN, y: headerY };
+    },
+  };
+
+  if (c.class_features && c.class_features.length > 0) {
+    by = drawFeatureSection(doc, inContinuation ? 'Class Features (Continued)' : 'Class Features', c.class_features, MARGIN, by, cfOpts);
   }
 }
 

@@ -149,6 +149,24 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-04-29 — PDF export overhaul (Rowan Ashwell pass)
+
+**Layout reorganization.** The right column under the ability-score grid was wasting vertical space below the Proficiencies block. Racial Traits and Feats moved from the bottom of the page into the right column under Proficiencies — they fill the previously blank area. Class Features now occupy the full page width below the larger of (left, right) columns.
+
+**Top bar trimmed and clarified.** Dropped the three passive-stat boxes from the quick-stats bar (they live in Senses & Defenses now). Six boxes total: Proficiency Bonus, Initiative, Armor Class, Max HP, Hit Dice, Speed — full words, no abbreviations. Label font bumped from 6pt to 7pt now that boxes are wider.
+
+**Senses & Defenses got the passives.** Three lines: Passive Perception, Passive Insight, Passive Investigation — full word "Passive" on each. Auto-calc fallback when the column is null: `10 + abilityMod + (proficient ? PB : expertise ? PB×2 : half-prof ? floor(PB/2) : 0)`, reading from `skill_proficiencies`. Damage Immunities / Condition Immunities labels also expanded from "Damage Imm." / "Condition Imm." to full words.
+
+**Attacks table got a Range column** (5 columns: Name, Atk, Damage, Type, Range). Column widths re-balanced. Blank Range cells stay blank — no "5 ft." default fill.
+
+**Feature formatting rewrite.** New `drawFeatureSection` / `drawFeatureBlock` helpers. Each feature: bold-italic name on its own line, description left-aligned with the name on the next line (no hang indent), ~4pt vertical gap before the next. Applies to Class Features, Racial Traits, and Feats consistently.
+
+**Page-break safety.** Feature blocks are measured before drawing. If a block would overflow the page (`y + blockH > PH - bottomMargin`), the configured `onPageBreak` callback fires. For Class Features, that draws a fresh page with parchment background, page header (subtitle "Continued"), and a "CLASS FEATURES (CONTINUED)" section header so the reader knows the context. Right column overflow uses the same machinery.
+
+**Right-column overflow detection.** If Racial Traits or Feats spill onto a new page, `gridBottomY` (from page 1) is no longer relevant — Class Features starts from `ry` on the current page rather than the cached page-1 ability-grid bottom.
+
+**Arrow text corruption fixed.** The Great Weapon Fighting style's `d4→2, d6→3...` was rendering as `d4!'2, d6!'3...` because U+2192 (Rightwards Arrow) is outside jsPDF's default WinAnsi encoding. Replaced with the word "becomes" — readable across any font. Also caught and fixed two stray `→` in Magus and Heathbound Blade Dance descriptions ("DEX save for half →" → "DEX save for half:").
+
 ### 2026-04-29 — Spell stat calc + Heathbound class
 
 **Spell save DC and attack bonus are now calculated, not stored.** They derive deterministically from `proficiency_bonus + abilityModifier(score for spellcasting_ability)`, with optional override columns for the rare magic-item / feature case.

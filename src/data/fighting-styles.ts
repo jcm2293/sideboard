@@ -87,7 +87,7 @@ export const FIGHTING_STYLES: Record<string, FightingStyleDefinition> = {
     name: 'Great Weapon Fighting',
     prerequisite: 'Strength 13+',
     description:
-      'When you deal damage with a heavy melee weapon attack, you can treat any damage die that rolls lower than its average as the average roll: d4→2, d6→3, d8→4, d10→5, d12→6.',
+      'When you deal damage with a heavy melee weapon attack, you can treat any damage die that rolls lower than its average as the average roll: d4 becomes 2, d6 becomes 3, d8 becomes 4, d10 becomes 5, d12 becomes 6.',
   },
   fs_heavyweight: {
     id: 'fs_heavyweight',

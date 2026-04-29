@@ -325,7 +325,7 @@ const BLADES: SubclassDefinition = {
       id: 'blades_deadly_dance',
       name: 'Deadly Dance',
       description:
-        'While in Blade Dance, gain: Evasion (DEX save for half → take none on success, half on fail); Spellsunder rolls add INT mod (min +1); Blade Dance AC bonus becomes +3.',
+        'While in Blade Dance, gain: Evasion (DEX save for half: take none on success, half on fail); Spellsunder rolls add INT mod (min +1); Blade Dance AC bonus becomes +3.',
     },
     blades_master_of_blades: {
       id: 'blades_master_of_blades',
