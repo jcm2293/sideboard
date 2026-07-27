@@ -39,7 +39,7 @@ Primary: The developer (Jake) and 2-3 friends running D&D 5e campaigns. Secondar
 **Backend:** Supabase (Postgres + Auth + Storage). Google OAuth only for authentication. Row-level security policies scoped to user → campaign ownership.
 
 **AI:**
-- **Campaign Builder uses Claude Opus 4.7** (`claude-opus-4-7`) — writing quality is essential for collaborative world-building.
+- **Campaign Builder uses Claude Fable 5** (`claude-fable-5`) — writing quality is essential for collaborative world-building.
 - All other AI features (session log processing, quick NPC generation, lore suggestions) use Claude Sonnet 4.6 (`claude-sonnet-4-6`).
 
 **PDF Parsing:** `pdfjs-dist` for D&D Beyond character sheet extraction.
@@ -369,7 +369,7 @@ Auth middleware protects all `/campaign/*` routes. RLS policies ensure all queri
 
 ### 2. Campaign Builder (AI World-Building)
 
-A conversational AI tool at `/campaign/[id]/builder` that helps DMs create campaign worlds through guided dialogue. **Uses Claude Opus 4.7** specifically — this is the only place Opus is used.
+A conversational AI tool at `/campaign/[id]/builder` that helps DMs create campaign worlds through guided dialogue. **Uses Claude Fable 5** specifically — this is the only place a frontier-tier model is used.
 
 **Three core philosophies hard-coded into the system prompt:**
 
@@ -743,7 +743,7 @@ sideboard/
 │   │   │   ├── reference/page.tsx      # Quick Reference
 │   │   │   └── audio/page.tsx
 │   │   └── api/
-│   │       ├── ai/builder/route.ts            # Campaign Builder (Opus 4.7)
+│   │       ├── ai/builder/route.ts            # Campaign Builder (Fable 5)
 │   │       ├── ai/process-log/route.ts        # Session log AI extraction
 │   │       ├── ai/lore-suggestions/route.ts   # Post-session lore suggestions
 │   │       ├── ai/generate-npc/route.ts       # Quick NPC generation
@@ -864,7 +864,7 @@ If starting fresh, build in this order:
 3. **Sessions** — Session list, prep view (scenes + encounters), log view with AI processing
 4. **Bestiary** — Stat block form + reusable display component
 5. **Live Shelf** — Right panel, pinning, NPC compact cards, stat block side-by-side
-6. **Campaign Builder** — Chat interface with Opus 4.7, system prompt, inline save cards
+6. **Campaign Builder** — Chat interface with Fable 5, system prompt, inline save cards
 7. **Spells** — Bundle SRD JSON, filter UI, custom spells, pin to shelf
 8. **Player Characters** — Data model, PDF parser, edit view, PDF export with all three pages
 9. **Quick Reference** — Static content with search
@@ -883,7 +883,7 @@ If starting fresh, build in this order:
 
 **The Live Shelf is the differentiator.** Almost every entity in the app should have a "Pin to Shelf" button. The shelf is what makes mid-session retrieval fast.
 
-**The Campaign Builder uses Opus 4.7 specifically.** All other AI features use Sonnet. This is the only place writing quality justifies the cost.
+**The Campaign Builder uses Fable 5 specifically.** All other AI features use Sonnet. This is the only place writing quality justifies the cost.
 
 **The PDF export pulls spell descriptions from the SRD library.** Don't re-fetch or re-store. Match by spell name (case-insensitive, fuzzy).
 

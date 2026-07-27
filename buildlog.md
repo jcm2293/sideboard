@@ -12,7 +12,7 @@ The canonical product spec is `sideboard-spec-v2.md`. This file is the implement
 - **Styling:** Tailwind CSS v4, Google Fonts (Cinzel Decorative, IM Fell English SC, Crimson Text, Geist Mono)
 - **State:** Zustand (`shelf-store` only); no global app store. Per-page data fetched via the `useCampaignData` hook over `createSupabaseStore<T>` table wrappers
 - **Backend:** Supabase (Postgres + Auth + Storage). Google OAuth only. RLS enforced on every table via `campaign_id → campaigns.user_id = auth.uid()`
-- **AI:** `@anthropic-ai/sdk` v0.80. One streaming endpoint live (`/api/builder` on Opus 4.7). All other planned AI endpoints are unbuilt
+- **AI:** `@anthropic-ai/sdk` v0.80. Streaming endpoints live: `/api/builder` (Fable 5) and `/api/ai/character-advisor` (Sonnet 4.6). Other planned AI endpoints are unbuilt
 - **PDF:** `pdfjs-dist` v4.10 server-side for D&D Beyond import; `jsPDF` v4.2 for character-sheet export
 - **Deploy:** Vercel, custom domain `dmsideboard.com` (with `sideboard.vercel.app` fallback per spec)
 
@@ -51,10 +51,10 @@ The `useCampaignData(store, campaignId)` hook returns `{ items, loading, create,
 
 The data layer (`src/lib/data/`) exposes 16 typed stores all built from the same `createSupabaseStore<T>` factory (`getAll(filter)`, `getById`, `create`, `update`, `delete`). Every query passes through Supabase RLS, so there's no manual user-scope check in app code.
 
-### Campaign Builder (AI, Opus 4.7)
+### Campaign Builder (AI, Fable 5)
 The only AI endpoint live in code today.
 
-- API: `src/app/api/builder/route.ts` — `client.messages.stream` with `model: 'claude-opus-4-7'`, max 4096 tokens, SSE-formatted ReadableStream back to the browser
+- API: `src/app/api/builder/route.ts` — `client.beta.messages.stream` with `model: 'claude-fable-5'`, max 64000 tokens (Fable's always-on thinking counts against the cap), server-side refusal fallback (`fallbacks: 'default'` + beta `server-side-fallback-2026-07-01`), SSE-formatted ReadableStream back to the browser. A `stop_reason: 'refusal'` on the final message is surfaced to the client as an SSE error event
 - System prompt: `src/lib/builder/system-prompt.ts` (~150 lines). Encodes the Iceberg, Anti-Complexity, Anti-Theme-Saturation rules; the 5 conversation phases; the `:::save:TYPE\n{json}\n:::` proposal protocol with full examples for all 6 types
 - Context assembly: `src/lib/builder/context-builder.ts:buildCampaignContext(campaignId)` formats world meta + lore titles + locations + factions + NPCs + plot arcs + sessions into readable text and injects into the system prompt every turn. Also exports `getCampaignStats` for the chat header indicator
 - Save-block parser: `src/lib/builder/parse-proposals.ts` exposes `parseProposals` (extract) and `segmentContent` (interleave text and proposal cards in render). Single regex `/:::save:(\w+)\s*\n([\s\S]*?)\n:::/g`, JSON-parses payload, drops malformed blocks
@@ -148,6 +148,33 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 ## Changelog
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
+
+### 2026-07-25 — PDF export: Pact Magic legend for warlocks
+
+- `src/app/api/export-character/route.ts` — the spells page's pact-slot box now renders a legend explaining warlock casting economies: all pact spells cast at the pact slot level, slots return on Short Rest, and bracket markers on spell names ([At Will] invocation / [R] ritual, no slot / [1/LR] free trait casting). Markers ride in the spell-name strings, and `findSpell` already strips trailing brackets so description lookup is unaffected.
+- Data: Marten's spells marked (Disguise Self [At Will] via Mask of Many Faces; Tenser's/Speak with Animals [R] via Pact of the Tome; Hellish Rebuke/Darkness [1/LR] via Infernal Legacy); Pact Magic feature summary now states the 2×3rd-level slot rule; Pact Magic Slots + both Infernal Legacy casts added to class resources.
+
+### 2026-07-25 — PDF export: right-column overflow uses full width
+
+- `src/app/api/export-character/route.ts` — when Racial Traits / Feats overflow page 1's right column onto a continuation page, they previously stayed boxed to the right half. The page-break callback now releases the column constraint (x → left margin, width → full page) and `drawFeatureBlock` re-wraps the overflowing feature at the new width. Data-side: trimmed redundant 2024-Human boilerplate traits (Skillful/Versatile/Languages — covered by the numbers and Languages line) from Ren, Donovan, and Tobin; added Sneak Attack (1d6, once per turn) to Ren's class resources.
+
+### 2026-07-25 — PDF export: class-resources column collision
+
+- `src/app/api/export-character/route.ts` — `drawClassResources` right-aligned the recovery text on the same line as the uses column with no width check, so long strings ("Long Rest (regain 1 on Short Rest)") overlapped. Now measures both and wraps the recovery text to its own line on collision. Also "1 uses" → "1 use".
+
+### 2026-07-25 — PDF export: sanitize non-WinAnsi characters
+
+- `src/app/api/export-character/route.ts` — the built-in Times font only covers WinAnsi (CP1252); characters outside it (e.g. `→`) rendered as mojibake (`!'`) and corrupted jsPDF's glyph-width math, stretching the whole line's letter spacing. Added `sanitizeWinAnsi` (transliteration map: arrows → `->`, checkmarks, prime marks, ligatures, NFKD diacritic fallback, `?` as last resort) and `hardenPdfText`, which wraps `doc.text` and `doc.splitTextToSize` once at document creation so every string is sanitized at the entry point rather than at ~40 call sites. Also cleaned the one DB row that contained a `→` (Tobin's Font of Magic).
+
+### 2026-07-25 — Spell lookup: strip DDB bracket markers
+
+- `src/app/api/export-character/route.ts` — `findSpell` now strips trailing bracketed markers (`"Ceremony [R]"` → `"Ceremony"`) before matching against the SRD/custom libraries. D&D Beyond sheets tag ritual spells with `[R]` in the spell name, so every ritual spell on every imported sheet was silently failing description lookup in the PDF export.
+
+### 2026-07-24 — Campaign Builder moved to Claude Fable 5
+
+- `src/app/api/builder/route.ts` — model `claude-opus-4-7` → `claude-fable-5`, switched to `client.beta.messages.stream`. Fable-specific changes: `max_tokens` 4096 → 64000 (thinking is always on and shares the cap — 4096 would truncate replies), opted into server-side refusal fallback (`fallbacks: 'default'`, beta `server-side-fallback-2026-07-01`, passed via spread since SDK 0.80 typings predate the param), and the stream now checks `finalMessage().stop_reason === 'refusal'` and emits an SSE error event so the chat doesn't render an empty reply
+- `sideboard-spec-v2.md` — synced the same 5 model references (lines 42, 372, 746, 867, 886) to Fable 5
+- Smoke-tested live against the dev server: request accepted, response streamed, org retention config compatible (Fable requires 30-day retention)
 
 ### 2026-04-29 — PDF export overhaul (Rowan Ashwell pass)
 

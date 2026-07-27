@@ -8,14 +8,21 @@ export async function POST(request: Request) {
 
   const systemPrompt = getBuilderSystemPrompt(campaignContext);
 
-  const stream = await client.messages.stream({
-    model: 'claude-opus-4-7',
-    max_tokens: 4096,
+  const stream = await client.beta.messages.stream({
+    model: 'claude-fable-5',
+    // Fable's always-on thinking counts against max_tokens, so the cap needs
+    // headroom well beyond the visible reply length.
+    max_tokens: 64000,
     system: systemPrompt,
     messages: messages.map((m: { role: string; content: string }) => ({
       role: m.role,
       content: m.content,
     })),
+    betas: ['server-side-fallback-2026-07-01'],
+    // Fable's safety classifiers can decline a request outright; this reruns
+    // a declined request on Anthropic's recommended fallback model in the
+    // same call. Spread because SDK 0.80 typings don't know the param yet.
+    ...{ fallbacks: 'default' },
   });
 
   const encoder = new TextEncoder();
@@ -32,6 +39,14 @@ export async function POST(request: Request) {
               encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
             );
           }
+        }
+        const final = await stream.finalMessage();
+        if (final.stop_reason === 'refusal') {
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ error: 'Claude declined to respond to this request.' })}\n\n`
+            )
+          );
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         controller.close();

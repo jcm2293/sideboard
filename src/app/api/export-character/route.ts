@@ -89,6 +89,62 @@ function setDraw(doc: jsPDF, hex: string) {
   const [r, g, b] = hexToRgb(hex);
   doc.setDrawColor(r, g, b);
 }
+// The built-in Times font only covers WinAnsi (CP1252). Any character outside
+// it garbles jsPDF's output — mojibake plus broken glyph-width math that
+// stretches the whole line — so every string is transliterated before it
+// reaches the PDF.
+const WINANSI_EXTRAS = new Set('€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ');
+const NON_WINANSI_MAP: Record<string, string> = {
+  '→': '->', '⇒': '->', '←': '<-', '↔': '<->',
+  '−': '-', '‐': '-', '‑': '-',
+  '●': '•', '○': 'o', '▪': '•', '★': '*', '☆': '*',
+  '✓': 'x', '✔': 'x', '✗': 'x',
+  '≤': '<=', '≥': '>=', '≠': '!=',
+  '′': "'", '″': '"', 'ʼ': "'",
+  'ﬁ': 'fi', 'ﬂ': 'fl',
+  ' ': ' ', ' ': ' ', '​': '',
+};
+function sanitizeWinAnsi(text: string): string {
+  let out = '';
+  for (const ch of text) {
+    if (ch.charCodeAt(0) <= 0xff || WINANSI_EXTRAS.has(ch)) {
+      out += ch;
+      continue;
+    }
+    const mapped = NON_WINANSI_MAP[ch];
+    if (mapped !== undefined) {
+      out += mapped;
+      continue;
+    }
+    // Last resort: strip diacritics (é-style chars survive as base letters);
+    // anything still unencodable becomes '?'.
+    const stripped = ch.normalize('NFKD').replace(/[̀-ͯ]/g, '');
+    out += stripped !== ch && [...stripped].every((c) => c.charCodeAt(0) <= 0xff) ? stripped : '?';
+  }
+  return out;
+}
+
+/** Route every string through sanitizeWinAnsi at the two jsPDF text entry points. */
+function hardenPdfText(doc: jsPDF): jsPDF {
+  const san = (t: unknown): unknown =>
+    typeof t === 'string'
+      ? sanitizeWinAnsi(t)
+      : Array.isArray(t)
+        ? t.map((s) => (typeof s === 'string' ? sanitizeWinAnsi(s) : s))
+        : t;
+  const origText = doc.text.bind(doc);
+  doc.text = ((...args: Parameters<typeof origText>) => {
+    args[0] = san(args[0]) as (typeof args)[0];
+    return origText(...args);
+  }) as typeof doc.text;
+  const origSplit = doc.splitTextToSize.bind(doc);
+  doc.splitTextToSize = ((...args: Parameters<typeof origSplit>) => {
+    args[0] = san(args[0]) as (typeof args)[0];
+    return origSplit(...args);
+  }) as typeof doc.splitTextToSize;
+  return doc;
+}
+
 function abilityMod(score: number): number {
   return Math.floor((score - 10) / 2);
 }
@@ -543,8 +599,15 @@ function drawClassResources(
     doc.text(r.name, x, y);
     setText(doc, BODY);
     doc.setFont(SERIF, 'normal');
-    doc.text(`${r.uses} uses${die}`, x + w * 0.55, y);
+    const usesText = `${r.uses} ${r.uses === 1 ? 'use' : 'uses'}${die}`;
+    const usesX = x + w * 0.55;
+    doc.text(usesText, usesX, y);
     setText(doc, MUTED);
+    // Long recovery strings ("Long Rest (regain 1 on Short Rest)") collide
+    // with the uses column when right-aligned on the same line — measure and
+    // wrap to their own line instead of overlapping.
+    const collides = x + w - doc.getTextWidth(r.recovery) < usesX + doc.getTextWidth(usesText) + 2;
+    if (collides) y += 3.5;
     doc.text(r.recovery, x + w, y, { align: 'right' });
     y += 4;
   }
@@ -659,7 +722,7 @@ function drawFeatureBlock(
   // line-width math.
   doc.setFont(SERIF, 'normal');
   doc.setFontSize(fontSize);
-  const wrappedDesc = doc.splitTextToSize(feature.summary || '', descW) as string[];
+  let wrappedDesc = doc.splitTextToSize(feature.summary || '', descW) as string[];
   const blockH =
     lineH +                       // name line
     wrappedDesc.length * lineH +  // description lines
@@ -671,6 +734,11 @@ function drawFeatureBlock(
     const next = opts.onPageBreak();
     x = next.x;
     y = next.y;
+    // The callback may have released a column constraint (mutating
+    // opts.width) — re-wrap this feature at the current width.
+    doc.setFont(SERIF, 'normal');
+    doc.setFontSize(fontSize);
+    wrappedDesc = doc.splitTextToSize(feature.summary || '', opts.width) as string[];
   }
 
   // Re-establish font state explicitly for every draw operation. Both size
@@ -767,6 +835,7 @@ function drawPage1(doc: jsPDF, c: PlayerCharacter) {
 
   // Right-column feature blocks: page-break-aware in case they grow long.
   const startPage = doc.getNumberOfPages();
+  let rx = rightX;
   const rightOpts: FeatureListOpts = {
     width: rightW,
     pageTopY: 30,
@@ -776,14 +845,18 @@ function drawPage1(doc: jsPDF, c: PlayerCharacter) {
       doc.addPage();
       drawParchmentBg(doc);
       drawPageHeader(doc, c, 'Continued');
-      return { x: rightX, y: 30 };
+      // A continuation page has no left column — release the half-width
+      // constraint and continue at full page width.
+      rightOpts.width = PW - 2 * MARGIN;
+      rx = MARGIN;
+      return { x: MARGIN, y: 30 };
     },
   };
   if (c.racial_traits && c.racial_traits.length > 0) {
-    ry = drawFeatureSection(doc, 'Racial / Species Traits', c.racial_traits, rightX, ry + 1, rightOpts);
+    ry = drawFeatureSection(doc, 'Racial / Species Traits', c.racial_traits, rx, ry + 1, rightOpts);
   }
   if (c.feats && c.feats.length > 0) {
-    ry = drawFeatureSection(doc, 'Feats', c.feats, rightX, ry + 1, rightOpts);
+    ry = drawFeatureSection(doc, 'Feats', c.feats, rx, ry + 1, rightOpts);
   }
   // If the right column overflowed onto a new page, gridBottomY (from page 1) is
   // no longer relevant — Class Features should start from ry on the current page.
@@ -959,7 +1032,9 @@ function levelLabel(level: string): string {
 /** Look up a spell by name across SRD library + per-character custom spells. */
 function findSpell(name: string, customByName: Map<string, SrdSpell>): SrdSpell | null {
   if (!name) return null;
-  const lower = name.toLowerCase().trim();
+  // D&D Beyond sheets append bracketed markers to spell names ("Ceremony [R]");
+  // strip them so ritual spells still match the SRD/custom libraries.
+  const lower = name.replace(/\s*\[[^\]]*\]\s*$/, '').toLowerCase().trim();
   const directCustom = customByName.get(lower);
   if (directCustom) return directCustom;
   const direct = SRD_BY_NAME.get(lower);
@@ -994,7 +1069,22 @@ function drawSpellSlots(doc: jsPDF, c: PlayerCharacter, x: number, y: number, w:
     doc.setFont(SERIF, 'bold');
     doc.setFontSize(16);
     doc.text(String(c.pact_slot_count), x + boxSize / 2, y + 13, { align: 'center' });
-    return y + boxSize + 5;
+    // Pact Magic legend — warlock lists mix slot-consuming spells with at-will
+    // invocations, tome rituals, and racial free casts; spell names carry
+    // bracket markers and this explains them.
+    let ly = y + boxSize + 4;
+    setText(doc, MUTED);
+    doc.setFont(SERIF, 'italic');
+    doc.setFontSize(7);
+    const legend =
+      `All Pact Magic spells are cast at ${ord} level; expended slots return on a Short or Long Rest. ` +
+      'Leveled spells expend a pact slot unless marked — [At Will]: invocation, no slot. ' +
+      '[R]: may be cast as a ritual, no slot (+10 min). [1/LR]: free casting from a trait, once per Long Rest.';
+    for (const line of doc.splitTextToSize(legend, w) as string[]) {
+      doc.text(line, x, ly);
+      ly += 3.2;
+    }
+    return ly + 3;
   }
 
   if (!c.spell_slots) return y;
@@ -1258,11 +1348,13 @@ export async function POST(req: NextRequest) {
       customByName.set(c.name.toLowerCase().trim(), customToSrdShape(c));
     }
 
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'letter',
-    });
+    const doc = hardenPdfText(
+      new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'letter',
+      })
+    );
 
     drawPage1(doc, character);
 
