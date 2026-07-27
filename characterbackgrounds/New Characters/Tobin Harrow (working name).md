@@ -1,0 +1,15 @@
+Tobin Harrow (working name)
+
+There has been a Harrow under arms in Larracos for five generations, a fact that you will learn from any of them within the first 30 second of meeting, except for Tobin. They are Dunharg stock, the great-great-great grandmother came down from the high planes of the frontier with a shield, a sword, and a willingness to wield them for whoever paid the highest bid. Within the next generation, they had turned this into a a licensed, chartered, fully notarized family business, and within another, the Harrow crest, a crow holding a bone and a pine sprig, became synonymous with the military power of the trading empire. 
+
+The Harrow Company guards caravans, walls, warehouses, and, for the right retainer, secrets. The company motto is *HOLD.* The family considers this the height of eloquence. Tobin thinks its dumb. Captain Ansa Harrow runs the company and negotiates like a landslide. Her husband Brand, master-at-arms,is a man of few words. They have four children. Brunna, their daughter, has a barrel chest and a temper, what any self respecting Harrow parents look for. Dagen and Kolm are shaped like boulders and wield maces and flails expertly.
+
+And then there is Tobin. Smaller, built more like an elf than sturdy mountain human stock. He is the first in 5 generation to be unable to lift his great-great grandmothers sword. Physically at least.
+
+The truth is he is not weak. But whatever old bloodline runs in the Harrow veins was twisted in Tobin. It is still there. But it wrapped around something other than stature and muscle fiber. He is the first of his name to have wild magic coursing through his veins. He can lift that stupid sword. The old relic which he suspects isn’t real anyway. All he has to do is think “up” and flick his wrist, and he can lift it with magic. But he has never, ever, ever done this in front of his parents.  
+
+Now — the chroniclers will tell you that since the Fall, magic has been waking up in ordinary people. Farm children setting the curtains alight with a sneeze. Dock girls discovering a tone of voice that cannot be refused. Everyone in Larracos knows this happens. Nobody told the Harrows it could happen to a *Harrow*.
+
+It started small. Tobin was trying to practice swordplay on the manikins. He sneezed. Two of them burst into flames. He had to lie and say he had tried smoking dwarf leaf. So began the hiding years. He learned in secret, which, for wild magic, means supervised by no one, least of all himself.  He has gotten good at magic. At least he thinks so. He doesn't have much to compare it to. But he knows that even without a sword he could best any member of the harrow clan in single combat. At least if he ever admits what he is capable of to them. 
+
+Bored by the bureaucracy and bravado of the harrow compound, he spends most of his time in the company of Martenn Vell, a small lizard man who claims he used to be human and very tall, and who also practices magic, though its different than Tobin’s, and Martenn won’t tell him why. 
