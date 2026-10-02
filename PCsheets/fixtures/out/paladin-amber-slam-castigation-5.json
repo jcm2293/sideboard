@@ -1,0 +1,278 @@
+{
+  "name": "Amber Slam",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Paladin",
+  "subclass": "",
+  "level": 5,
+  "is_multiclass": false,
+  "armor_class": 8,
+  "ac_source": "",
+  "initiative_modifier": -2,
+  "speeds": {
+    "walking": "30 ft."
+  },
+  "hp_max": 34,
+  "hit_dice_total": "5d10",
+  "proficiency_bonus": 3,
+  "passive_perception": 12,
+  "passive_insight": 15,
+  "passive_investigation": 10,
+  "senses": "",
+  "str_score": 5,
+  "dex_score": 6,
+  "con_score": 11,
+  "int_score": 10,
+  "wis_score": 15,
+  "cha_score": 15,
+  "skill_modifiers": {
+    "acrobatics": 1,
+    "animal_handling": 2,
+    "arcana": 0,
+    "athletics": 0,
+    "deception": 2,
+    "history": 0,
+    "insight": 5,
+    "intimidation": 5,
+    "investigation": 0,
+    "medicine": 2,
+    "nature": 0,
+    "perception": 2,
+    "performance": 2,
+    "persuasion": 5,
+    "religion": 0,
+    "sleight_of_hand": -2,
+    "stealth": -2,
+    "survival": 2
+  },
+  "save_modifiers": {
+    "str": -3,
+    "dex": -2,
+    "con": 0,
+    "int": 0,
+    "wis": 5,
+    "cha": 5
+  },
+  "skill_proficiencies": {
+    "athletics": "proficient",
+    "acrobatics": "proficient",
+    "sleight_of_hand": "none",
+    "stealth": "none",
+    "arcana": "none",
+    "history": "none",
+    "investigation": "none",
+    "nature": "none",
+    "religion": "none",
+    "animal_handling": "none",
+    "insight": "proficient",
+    "medicine": "none",
+    "perception": "none",
+    "survival": "none",
+    "deception": "none",
+    "intimidation": "proficient",
+    "performance": "none",
+    "persuasion": "proficient"
+  },
+  "save_proficiencies": {
+    "str": "none",
+    "dex": "none",
+    "con": "none",
+    "int": "none",
+    "wis": "proficient",
+    "cha": "proficient"
+  },
+  "attacks": [
+    {
+      "name": "Warhammer",
+      "atk_bonus": "+0",
+      "damage": "1d8-3",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": "Martial, Versatile, Push"
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+0",
+      "damage": "0",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    },
+    {
+      "name": "Enhanced Unarmed Strike",
+      "atk_bonus": "+0",
+      "damage": "1d4-3",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "",
+  "damage_immunities": "",
+  "condition_immunities": "",
+  "armor_proficiencies": {
+    "light": true,
+    "medium": true,
+    "heavy": true,
+    "shields": true
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": true
+  },
+  "languages": "Common, Common Sign Language, Draconic",
+  "tool_proficiencies": "Quoits",
+  "is_spellcaster": true,
+  "spellcasting_ability": "CHA",
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": {
+    "1": 4,
+    "2": 2,
+    "3": 0,
+    "4": 0,
+    "5": 0
+  },
+  "pact_slot_level": null,
+  "pact_slot_count": null,
+  "spells": {
+    "1": [
+      "Bless",
+      "Hungering Blade",
+      "Shield of Faith",
+      "Divine Favor",
+      "Inflict Wounds",
+      "Divine Smite",
+      "Divine Smite"
+    ],
+    "2": [
+      "Hold Person",
+      "Prayer of Healing",
+      "Zone of Truth",
+      "Chain of Conviction",
+      "Hold Person",
+      "Find Steed",
+      "Find Steed"
+    ]
+  },
+  "is_prepared_caster": true,
+  "prepared_spells": null,
+  "class_resources": [
+    {
+      "name": "Lay On Hands",
+      "uses": 25,
+      "die": "",
+      "recovery": "Long Rest"
+    }
+  ],
+  "class_features": [
+    {
+      "name": "Lay On Hands",
+      "summary": "(PHB-2024 109) You have a pool of healing power that replenishes when you finish a Long Rest. With that pool, you can restore a total of 25 HP. As a Bonus Action, you can touch a creature (which could be yourself) and restore a number of HP to that creature, up to the maximum amount remaining in the pool."
+    },
+    {
+      "name": "Spellcasting",
+      "summary": "(PHB-2024 110)"
+    },
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 110)"
+    },
+    {
+      "name": "Fighting Style",
+      "summary": "(PHB-2024 110) | Fighting Style feat • br-2024 110"
+    },
+    {
+      "name": "Paladin’s Smite",
+      "summary": "(PHB-2024 110) You always have Divine Smite prepared and cast it without expending a spell slot once per Long Rest."
+    },
+    {
+      "name": "Channel Divinity",
+      "summary": "(PHB-2024 110) You can channel energy directly from the Outer Planes to fuel magical effects. Each time you use this class’s Channel Divinity, you can choose which effect to create. You can use this class’s Channel Divinity 2 times per Long Rest, but can regain one expended use after finishing a Short Rest."
+    },
+    {
+      "name": "Paladin Subclass",
+      "summary": "(PHB-2024 111) | Oath of Castigation"
+    },
+    {
+      "name": "Castigate",
+      "summary": "(TCMP1 82) As a Magic action, you can expend one use of your Channel Divinity to put your target in fiery shackles. Choose a number of creatures up to 2 you can see within 30 feet of yourself. Each creature must succeed on a Str saving throw or put in fiery shackles and have its Speed reduced to 0."
+    },
+    {
+      "name": "Incite",
+      "summary": "(TCMP1 82) As a Magic action, you can expend one use of your Channel Divinity. For the next 10 minutes, you have Advantage on Int (Investigation) and Wis (Insight) checks. You can take a Bonus Action to choose a creature you can see within 10 feet of you."
+    },
+    {
+      "name": "Oath of Castigation Spells",
+      "summary": "(TCMP1 83)"
+    },
+    {
+      "name": "Extra Attack",
+      "summary": "(PHB-2024 111) You can attack twice instead of once whenever you take the Attack action on your turn."
+    },
+    {
+      "name": "Faithful Steed",
+      "summary": "(PHB-2024 111) You always have Find Steed prepared, and can cast it once per Long Rest without expending a spell slot."
+    }
+  ],
+  "racial_traits": [
+    {
+      "name": "Speed",
+      "summary": "(PHB-2024 194) Your Speed is 30 ft."
+    },
+    {
+      "name": "Resourceful",
+      "summary": "(PHB-2024 194) You gain Heroic Inspiration whenever you finish a Long Rest."
+    },
+    {
+      "name": "Skillful",
+      "summary": "(PHB-2024 193) You gain proficiency in one skill of your choice."
+    },
+    {
+      "name": "Versatile",
+      "summary": "(PHB-2024 194) You gain an Origin feat of your choice."
+    },
+    {
+      "name": "Languages",
+      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
+    }
+  ],
+  "feats": [
+    {
+      "name": "Protection",
+      "summary": "(PHB-2024 209) When a creature you can see attacks a target other than you that is within 5 ft. of you, you can take a Reaction to interpose your Shield if you’re holding one."
+    },
+    {
+      "name": "Tavern Brawler",
+      "summary": "(PHB-2024 202) Enhanced Unarmed Strike. When you hit with your Unarmed Strike and deal damage, you can deal 1d4-3 Bludgeoning damage instead of the normal damage of an Unarmed Strike. Damage Rerolls."
+    },
+    {
+      "name": "Great Weapon Fighting",
+      "summary": "(PHB-2024 209) When you roll damage for an attack you make with a Melee weapon that you are holding with two hands, you can treat any 1 or 2 on a damage die as a 3."
+    },
+    {
+      "name": "Savage Attacker",
+      "summary": "(PHB-2024 201) Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."
+    },
+    {
+      "name": "Soldier Ability Score Improvements",
+      "summary": "(PHB-2024 185) | Increase three scores (+1 / +1 / +1) •"
+    },
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 110) | Antimatter Rifle (Sap) • Sap. If you hit a creature with an Antimatter Rifle, that creature has Disadvantage on its next attack roll before the start of your next turn. | Warhammer (Push) • Push."
+    }
+  ],
+  "equipment": [
+    {
+      "name": "Warhammer",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    }
+  ],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 0,
+  "pp": 0
+}

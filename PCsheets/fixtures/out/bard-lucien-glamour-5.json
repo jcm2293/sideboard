@@ -1,0 +1,243 @@
+{
+  "name": "Lucien",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Bard",
+  "subclass": "",
+  "level": 5,
+  "is_multiclass": false,
+  "armor_class": 14,
+  "ac_source": "",
+  "initiative_modifier": 4,
+  "speeds": {
+    "walking": "30 ft."
+  },
+  "hp_max": 28,
+  "hit_dice_total": "5d8",
+  "proficiency_bonus": 3,
+  "passive_perception": 8,
+  "passive_insight": 8,
+  "passive_investigation": 15,
+  "senses": "",
+  "str_score": 6,
+  "dex_score": 19,
+  "con_score": 7,
+  "int_score": 19,
+  "wis_score": 5,
+  "cha_score": 18,
+  "skill_modifiers": {
+    "acrobatics": 5,
+    "animal_handling": 0,
+    "arcana": 5,
+    "athletics": 1,
+    "deception": 5,
+    "history": 5,
+    "insight": -2,
+    "intimidation": 10,
+    "investigation": 5,
+    "medicine": -2,
+    "nature": 7,
+    "perception": -2,
+    "performance": 7,
+    "persuasion": 5,
+    "religion": 5,
+    "sleight_of_hand": 5,
+    "stealth": 10,
+    "survival": -2
+  },
+  "save_modifiers": {
+    "str": -2,
+    "dex": 7,
+    "con": -2,
+    "int": 4,
+    "wis": -3,
+    "cha": 7
+  },
+  "skill_proficiencies": {
+    "athletics": "proficient",
+    "acrobatics": "half",
+    "sleight_of_hand": "half",
+    "stealth": "expertise",
+    "arcana": "half",
+    "history": "half",
+    "investigation": "half",
+    "nature": "proficient",
+    "religion": "half",
+    "animal_handling": "proficient",
+    "insight": "half",
+    "medicine": "half",
+    "perception": "half",
+    "survival": "half",
+    "deception": "half",
+    "intimidation": "expertise",
+    "performance": "proficient",
+    "persuasion": "half"
+  },
+  "save_proficiencies": {
+    "str": "none",
+    "dex": "proficient",
+    "con": "none",
+    "int": "none",
+    "wis": "none",
+    "cha": "proficient"
+  },
+  "attacks": [
+    {
+      "name": "Finger Guns",
+      "atk_bonus": "+7",
+      "damage": "2d6",
+      "damage_type": "Force",
+      "range": "",
+      "notes": "Special: Range (90/360 ft.), D: 1m, V/S"
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+1",
+      "damage": "0",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "",
+  "damage_immunities": "",
+  "condition_immunities": "",
+  "armor_proficiencies": {
+    "light": true,
+    "medium": false,
+    "heavy": false,
+    "shields": false
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": false
+  },
+  "languages": "Common, Common Sign Language, Orc",
+  "tool_proficiencies": "Carpenter's Tools, Fiddle, Flute, Longhorn",
+  "is_spellcaster": true,
+  "spellcasting_ability": "CHA",
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": {
+    "1": 4,
+    "2": 3,
+    "3": 2,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0
+  },
+  "pact_slot_level": null,
+  "pact_slot_count": null,
+  "spells": {
+    "0": [
+      "Finger Guns",
+      "Friends",
+      "Vicious Mockery"
+    ],
+    "1": [
+      "Charm Person",
+      "Cure Wounds",
+      "Disguise Self",
+      "Dissonant Whispers",
+      "Elf Shot",
+      "Rumor",
+      "Tasha's Hideous Laughter",
+      "Charm Person"
+    ],
+    "2": [
+      "Cloud of Daggers",
+      "Mirror Image"
+    ],
+    "3": [
+      "Fear"
+    ]
+  },
+  "is_prepared_caster": false,
+  "prepared_spells": null,
+  "class_resources": [
+    {
+      "name": "Luck Points",
+      "uses": 3,
+      "die": "",
+      "recovery": "Long Rest"
+    }
+  ],
+  "class_features": [
+    {
+      "name": "Bardic Inspiration",
+      "summary": "(PHB-2024 59) As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6)."
+    },
+    {
+      "name": "Spellcasting",
+      "summary": "(PHB-2024 59) You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells."
+    },
+    {
+      "name": "Expertise",
+      "summary": "(PHB-2024 60) You gain Expertise in two skill proficiencies of your choice."
+    },
+    {
+      "name": "Jack of All Trades",
+      "summary": "(PHB-2024 60) You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus."
+    },
+    {
+      "name": "Bard Subclass",
+      "summary": "(PHB-2024 60) | College of Glamour"
+    },
+    {
+      "name": "Beguiling Magic",
+      "summary": "(PHB-2024 65) You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis."
+    },
+    {
+      "name": "Mantle of Inspiration",
+      "summary": "(PHB-2024 65) As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself."
+    },
+    {
+      "name": "Font of Inspiration",
+      "summary": "(PHB-2024 61) You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest. In addition, you can expend a spell slot (no action required) to regain one expended use of Bardic Inspiration."
+    }
+  ],
+  "racial_traits": [
+    {
+      "name": "Speed",
+      "summary": "(PHB-2024 194) Your Speed is 30 ft."
+    },
+    {
+      "name": "Resourceful",
+      "summary": "(PHB-2024 194) You gain Heroic Inspiration whenever you finish a Long Rest."
+    },
+    {
+      "name": "Skillful",
+      "summary": "(PHB-2024 193) You gain proficiency in one skill of your choice."
+    },
+    {
+      "name": "Versatile",
+      "summary": "(PHB-2024 194) You gain an Origin feat of your choice."
+    },
+    {
+      "name": "Languages",
+      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
+    }
+  ],
+  "feats": [
+    {
+      "name": "Lucky",
+      "summary": "(PHB-2024 201) Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest."
+    },
+    {
+      "name": "Farmer Ability Score Improvements",
+      "summary": "(PHB-2024 180) | Increase two scores (+2 / +1) •"
+    },
+    {
+      "name": "Tough",
+      "summary": "(PHB-2024 202) When you take this feat, your HP maximum increases by 10."
+    }
+  ],
+  "equipment": [],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 0,
+  "pp": 0
+}

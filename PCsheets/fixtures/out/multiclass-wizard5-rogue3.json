@@ -1,0 +1,407 @@
+{
+  "name": "samplemulti",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Wizard 5 / Rogue 3",
+  "subclass": "",
+  "level": 8,
+  "is_multiclass": true,
+  "armor_class": 14,
+  "ac_source": "",
+  "initiative_modifier": 3,
+  "speeds": {
+    "walking": "30 ft.",
+    "climbing": "30 ft."
+  },
+  "hp_max": 45,
+  "hit_dice_total": "5d6 + 3d8",
+  "proficiency_bonus": 3,
+  "passive_perception": 14,
+  "passive_insight": 17,
+  "passive_investigation": 13,
+  "senses": "Darkvision 120 ft.",
+  "str_score": 8,
+  "dex_score": 16,
+  "con_score": 12,
+  "int_score": 17,
+  "wis_score": 13,
+  "cha_score": 8,
+  "skill_modifiers": {
+    "acrobatics": 9,
+    "animal_handling": 1,
+    "arcana": 9,
+    "athletics": -1,
+    "deception": -1,
+    "history": 3,
+    "insight": 7,
+    "intimidation": -1,
+    "investigation": 3,
+    "medicine": 1,
+    "nature": 3,
+    "perception": 4,
+    "performance": -1,
+    "persuasion": -1,
+    "religion": 3,
+    "sleight_of_hand": 6,
+    "stealth": 6,
+    "survival": 1
+  },
+  "save_modifiers": {
+    "str": -1,
+    "dex": 3,
+    "con": 1,
+    "int": 6,
+    "wis": 4,
+    "cha": -1
+  },
+  "skill_proficiencies": {
+    "athletics": "none",
+    "acrobatics": "expertise",
+    "sleight_of_hand": "proficient",
+    "stealth": "proficient",
+    "arcana": "expertise",
+    "history": "none",
+    "investigation": "none",
+    "nature": "none",
+    "religion": "none",
+    "animal_handling": "none",
+    "insight": "expertise",
+    "medicine": "none",
+    "perception": "proficient",
+    "survival": "none",
+    "deception": "none",
+    "intimidation": "none",
+    "performance": "none",
+    "persuasion": "none"
+  },
+  "save_proficiencies": {
+    "str": "none",
+    "dex": "none",
+    "con": "none",
+    "int": "proficient",
+    "wis": "proficient",
+    "cha": "none"
+  },
+  "attacks": [
+    {
+      "name": "Dagger",
+      "atk_bonus": "+6",
+      "damage": "1d4+3",
+      "damage_type": "Piercing",
+      "range": "",
+      "notes": "Simple, Finesse, Light, Thrown, Nick, Range (20/60)"
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+2",
+      "damage": "0",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "",
+  "damage_immunities": "",
+  "condition_immunities": "Magical Sleep",
+  "armor_proficiencies": {
+    "light": true,
+    "medium": false,
+    "heavy": false,
+    "shields": false
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": false
+  },
+  "languages": "Common, Common Sign Language, Elvish, Goblin, Thieves’ Cant",
+  "tool_proficiencies": "Forgery Kit, Thieves' Tools",
+  "is_spellcaster": true,
+  "spellcasting_ability": "INT",
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": {
+    "1": 4,
+    "2": 3,
+    "3": 2,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0
+  },
+  "pact_slot_level": null,
+  "pact_slot_count": null,
+  "spells": {
+    "0": [
+      "Dancing Lights",
+      "Acid Splash"
+    ],
+    "1": [
+      "Faerie Fire",
+      "Faerie Fire",
+      "Chromatic Orb"
+    ],
+    "2": [
+      "Darkness",
+      "Darkness"
+    ]
+  },
+  "is_prepared_caster": true,
+  "prepared_spells": null,
+  "class_resources": null,
+  "class_features": [
+    {
+      "name": "Spellcasting",
+      "summary": "(PHB-2024 165)"
+    },
+    {
+      "name": "Ritual Adept",
+      "summary": "(PHB-2024 166)"
+    },
+    {
+      "name": "Arcane Recovery",
+      "summary": "(PHB-2024 166) When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher. You can use this feature once per Long Rest."
+    },
+    {
+      "name": "Scholar",
+      "summary": "(PHB-2024 166) You can choose one of the skills in which you’re proficient and gain Expertise in it."
+    },
+    {
+      "name": "Wizard Subclass",
+      "summary": "(PHB-2024 167) | Evoker"
+    },
+    {
+      "name": "Evocation Savant",
+      "summary": "(PHB-2024 174) Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free. Whenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free."
+    },
+    {
+      "name": "Potent Cantrip",
+      "summary": "(PHB-2024 174) When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect."
+    },
+    {
+      "name": "Memorize Spell",
+      "summary": "(PHB-2024 167) Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell."
+    },
+    {
+      "name": "Expertise",
+      "summary": "(PHB-2024 129) You gain Expertise in two of your skill proficiencies of your choice."
+    },
+    {
+      "name": "Sneak Attack",
+      "summary": "(PHB-2024 129) Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type."
+    },
+    {
+      "name": "Thieves’ Cant",
+      "summary": "(PHB-2024 129) You know Thieves’ Cant and one other language of your choice."
+    },
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 129)"
+    },
+    {
+      "name": "Cunning Action",
+      "summary": "(PHB-2024 130) On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide."
+    },
+    {
+      "name": "Rogue Subclass",
+      "summary": "(PHB-2024 130) | Thief"
+    },
+    {
+      "name": "Steady Aim",
+      "summary": "(PHB-2024 130) As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn."
+    },
+    {
+      "name": "Fast Hands",
+      "summary": "(PHB-2024 137) As a Bonus Action you can do one of the following:"
+    },
+    {
+      "name": "Take the Utilize action or take the Magic action to use a magic item that requires that action.",
+      "summary": "| Fast Hands: Sleight of Hand: 1 Bonus Action | Fast Hands: Utilize: 1 Bonus Action | Fast Hands: Use Magic Item: 1 Bonus Action"
+    },
+    {
+      "name": "Second-Story Work",
+      "summary": "(PHB-2024 137) You gain the following benefits:"
+    }
+  ],
+  "racial_traits": [
+    {
+      "name": "Speed",
+      "summary": "(PHB-2024 190) Your speed is 30 ft."
+    },
+    {
+      "name": "Darkvision",
+      "summary": "(PHB-2024 190) You have Darkvision with a range of 60 ft."
+    },
+    {
+      "name": "Elven Lineage",
+      "summary": "(PHB-2024 190) Choose a lineage from the Elven Lineages table."
+    },
+    {
+      "name": "Elven Lineage Spells",
+      "summary": "(PHB-2024 189) | Drow Lineage - Intelligence •"
+    },
+    {
+      "name": "Fey Ancestry",
+      "summary": "(PHB-2024 190) You have Advantage on saving throws you make to avoid or end the Charmed condition."
+    },
+    {
+      "name": "Keen Senses",
+      "summary": "(PHB-2024 190) You have proficiency in the Insight, Perception, or Survival skill."
+    },
+    {
+      "name": "Trance",
+      "summary": "(PHB-2024 190) You don’t need to sleep, and magic can’t put you to sleep."
+    },
+    {
+      "name": "Languages",
+      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
+    }
+  ],
+  "feats": [
+    {
+      "name": "Alert",
+      "summary": "(PHB-2024 200) Initiative Proficiency."
+    },
+    {
+      "name": "Criminal Ability Score Improvements",
+      "summary": "(PHB-2024 179) | Increase two scores (+2 / +1) •"
+    },
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 129) | Blowgun (Vex) • Vex. If you hit a creature with a Blowgun and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn. | Dagger (Nick) • Nick."
+    }
+  ],
+  "equipment": [
+    {
+      "name": "Dagger",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Dagger",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Quarterstaff",
+      "qty": 1,
+      "weight": "4 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Robe",
+      "qty": 1,
+      "weight": "4 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Backpack",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Book",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Parchment",
+      "qty": 10,
+      "weight": "--",
+      "notes": ""
+    },
+    {
+      "name": "Ink Pen",
+      "qty": 1,
+      "weight": "--",
+      "notes": ""
+    },
+    {
+      "name": "Ink",
+      "qty": 1,
+      "weight": "--",
+      "notes": ""
+    },
+    {
+      "name": "Lamp",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Oil",
+      "qty": 10,
+      "weight": "10 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Tinderbox",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Spellbook",
+      "qty": 1,
+      "weight": "3 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Dagger",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Dagger",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Thieves' Tools",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Crowbar",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Pouch",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Pouch",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Traveler's Clothes",
+      "qty": 1,
+      "weight": "4 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Enspelled Leather Armor",
+      "qty": 1,
+      "weight": "10 lb.",
+      "notes": ""
+    }
+  ],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 21,
+  "pp": 0
+}

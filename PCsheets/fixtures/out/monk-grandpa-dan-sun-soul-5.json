@@ -1,0 +1,191 @@
+{
+  "name": "Grandpa Dan",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Monk",
+  "subclass": "",
+  "level": 5,
+  "is_multiclass": false,
+  "armor_class": 15,
+  "ac_source": "",
+  "initiative_modifier": 5,
+  "speeds": {
+    "walking": "40 ft."
+  },
+  "hp_max": 48,
+  "hit_dice_total": "5d8",
+  "proficiency_bonus": 3,
+  "passive_perception": 12,
+  "passive_insight": 9,
+  "passive_investigation": 8,
+  "senses": "",
+  "str_score": 16,
+  "dex_score": 20,
+  "con_score": 18,
+  "int_score": 7,
+  "wis_score": 9,
+  "cha_score": 3,
+  "skill_modifiers": {
+    "acrobatics": 8,
+    "animal_handling": -1,
+    "arcana": -2,
+    "athletics": 6,
+    "deception": -4,
+    "history": -2,
+    "insight": -1,
+    "intimidation": -1,
+    "investigation": -2,
+    "medicine": -1,
+    "nature": -2,
+    "perception": 2,
+    "performance": -4,
+    "persuasion": -4,
+    "religion": -2,
+    "sleight_of_hand": 5,
+    "stealth": 5,
+    "survival": 2
+  },
+  "save_modifiers": {
+    "str": 6,
+    "dex": 8,
+    "con": 4,
+    "int": -2,
+    "wis": -1,
+    "cha": -4
+  },
+  "skill_proficiencies": {
+    "athletics": "proficient",
+    "acrobatics": "proficient",
+    "sleight_of_hand": "none",
+    "stealth": "none",
+    "arcana": "none",
+    "history": "none",
+    "investigation": "none",
+    "nature": "none",
+    "religion": "none",
+    "animal_handling": "none",
+    "insight": "none",
+    "medicine": "none",
+    "perception": "proficient",
+    "survival": "proficient",
+    "deception": "none",
+    "intimidation": "proficient",
+    "performance": "none",
+    "persuasion": "none"
+  },
+  "save_proficiencies": {
+    "str": "proficient",
+    "dex": "proficient",
+    "con": "none",
+    "int": "none",
+    "wis": "none",
+    "cha": "none"
+  },
+  "attacks": [
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+8",
+      "damage": "1d8+5",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+8",
+      "damage": "1d8+5",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    },
+    {
+      "name": "Flurry of Blows",
+      "atk_bonus": "+8",
+      "damage": "1d8+5",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "",
+  "damage_immunities": "",
+  "condition_immunities": "",
+  "armor_proficiencies": {
+    "light": false,
+    "medium": false,
+    "heavy": false,
+    "shields": false
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": false
+  },
+  "languages": "Common, Common Sign Language, Elvish",
+  "tool_proficiencies": "Brewer's Supplies, Playing Card Set",
+  "is_spellcaster": false,
+  "spellcasting_ability": null,
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": null,
+  "pact_slot_level": null,
+  "pact_slot_count": null,
+  "spells": null,
+  "is_prepared_caster": false,
+  "prepared_spells": null,
+  "class_resources": [
+    {
+      "name": "Focus Points",
+      "uses": 5,
+      "die": "",
+      "recovery": "Short Rest"
+    },
+    {
+      "name": "Luck Points",
+      "uses": 3,
+      "die": "",
+      "recovery": "Long Rest"
+    }
+  ],
+  "class_features": [],
+  "racial_traits": [
+    {
+      "name": "Speed",
+      "summary": "(PHB-2024 194) Your Speed is 30 ft."
+    },
+    {
+      "name": "Resourceful",
+      "summary": "(PHB-2024 194) You gain Heroic Inspiration whenever you finish a Long Rest."
+    },
+    {
+      "name": "Skillful",
+      "summary": "(PHB-2024 193) You gain proficiency in one skill of your choice."
+    },
+    {
+      "name": "Versatile",
+      "summary": "(PHB-2024 194) You gain an Origin feat of your choice."
+    },
+    {
+      "name": "Languages",
+      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
+    }
+  ],
+  "feats": [
+    {
+      "name": "Lucky",
+      "summary": "(PHB-2024 201) Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest."
+    },
+    {
+      "name": "Savage Attacker",
+      "summary": "(PHB-2024 201) Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."
+    },
+    {
+      "name": "Soldier Ability Score Improvements",
+      "summary": "(PHB-2024 185) | Increase two scores (+2 / +1) •"
+    }
+  ],
+  "equipment": [],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 0,
+  "pp": 0
+}

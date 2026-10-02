@@ -1,0 +1,261 @@
+{
+  "name": "Dash",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Warlock",
+  "subclass": "",
+  "level": 5,
+  "is_multiclass": false,
+  "armor_class": 13,
+  "ac_source": "",
+  "initiative_modifier": 3,
+  "speeds": {
+    "walking": "35 ft.",
+    "climbing": "35 ft."
+  },
+  "hp_max": 38,
+  "hit_dice_total": "5d8",
+  "proficiency_bonus": 3,
+  "passive_perception": 9,
+  "passive_insight": 6,
+  "passive_investigation": 10,
+  "senses": "Darkvision 60 ft.",
+  "str_score": 18,
+  "dex_score": 16,
+  "con_score": 15,
+  "int_score": 11,
+  "wis_score": 3,
+  "cha_score": 20,
+  "skill_modifiers": {
+    "acrobatics": 3,
+    "animal_handling": -4,
+    "arcana": 0,
+    "athletics": 7,
+    "deception": 8,
+    "history": 0,
+    "insight": -4,
+    "intimidation": 8,
+    "investigation": 0,
+    "medicine": -4,
+    "nature": 0,
+    "perception": -4,
+    "performance": 5,
+    "persuasion": 8,
+    "religion": 0,
+    "sleight_of_hand": 3,
+    "stealth": 3,
+    "survival": -4
+  },
+  "save_modifiers": {
+    "str": 4,
+    "dex": 3,
+    "con": 2,
+    "int": 0,
+    "wis": -1,
+    "cha": 8
+  },
+  "skill_proficiencies": {
+    "athletics": "proficient",
+    "acrobatics": "none",
+    "sleight_of_hand": "none",
+    "stealth": "none",
+    "arcana": "none",
+    "history": "none",
+    "investigation": "none",
+    "nature": "none",
+    "religion": "none",
+    "animal_handling": "none",
+    "insight": "none",
+    "medicine": "none",
+    "perception": "none",
+    "survival": "none",
+    "deception": "proficient",
+    "intimidation": "proficient",
+    "performance": "none",
+    "persuasion": "proficient"
+  },
+  "save_proficiencies": {
+    "str": "none",
+    "dex": "none",
+    "con": "none",
+    "int": "none",
+    "wis": "proficient",
+    "cha": "proficient"
+  },
+  "attacks": [
+    {
+      "name": "Shortsword, +1",
+      "atk_bonus": "+5",
+      "damage": "1d6+5",
+      "damage_type": "Piercing",
+      "range": "",
+      "notes": "Martial, Finesse, Light, Vex, Vengeful Blade: 2d8 Necrotic, Booming Blade: 1d8 Thunder, 2d8 Thunder"
+    },
+    {
+      "name": "Blood Bolt",
+      "atk_bonus": "+8",
+      "damage": "2d6",
+      "damage_type": "Necrotic",
+      "range": "",
+      "notes": "V/S"
+    },
+    {
+      "name": "Eldritch Blast",
+      "atk_bonus": "+8",
+      "damage": "1d10+5",
+      "damage_type": "Force",
+      "range": "",
+      "notes": "Count: 2, V/S"
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+7",
+      "damage": "5",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "Necrotic",
+  "damage_immunities": "",
+  "condition_immunities": "",
+  "armor_proficiencies": {
+    "light": true,
+    "medium": false,
+    "heavy": false,
+    "shields": false
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": false
+  },
+  "languages": "Common, Common Sign Language, Draconic",
+  "tool_proficiencies": "Disguise Kit",
+  "is_spellcaster": true,
+  "spellcasting_ability": "CHA",
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": null,
+  "pact_slot_level": 3,
+  "pact_slot_count": 2,
+  "spells": {
+    "0": [
+      "Blood Bolt",
+      "Vengeful Blade",
+      "Eldritch Blast",
+      "Vicious Mockery",
+      "Toll the Dead",
+      "Booming Blade",
+      "Resistance"
+    ],
+    "1": [
+      "Hex",
+      "Charm Person",
+      "Burning Hands",
+      "Command",
+      "Disguise Self",
+      "Binding Pledge [R]",
+      "Purify Food and Drink [R]"
+    ],
+    "2": [
+      "Blood Sacrifice",
+      "Sanguine Secrets",
+      "Misty Step",
+      "Misty Step",
+      "Scorching Ray",
+      "Suggestion"
+    ],
+    "3": [
+      "Vampiric Touch",
+      "Counterspell",
+      "Shadow Drain",
+      "Fireball",
+      "Stinking Cloud"
+    ]
+  },
+  "is_prepared_caster": false,
+  "prepared_spells": null,
+  "class_resources": null,
+  "class_features": [
+    {
+      "name": "Eldritch Invocations",
+      "summary": "(PHB-2024 153) You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation. | Agonizing Blast (Eldritch Blast) • br-2024 You can add your Cha."
+    },
+    {
+      "name": "You can use the book as a Spellcasting Focus.",
+      "summary": "The book disappears if you conjure another one or if you die."
+    },
+    {
+      "name": "Pact Magic",
+      "summary": "(PHB-2024 153)"
+    },
+    {
+      "name": "Magical Cunning",
+      "summary": "(PHB-2024 154) Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots."
+    },
+    {
+      "name": "Warlock Subclass",
+      "summary": "(PHB-2024 154) | Fiend Patron"
+    },
+    {
+      "name": "Dark One’s Blessing",
+      "summary": "(PHB-2024 161) When you reduce an enemy to 0 HP, you gain 10 Temp HP."
+    },
+    {
+      "name": "Fiend Spells",
+      "summary": "(PHB-2024 161) When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared."
+    }
+  ],
+  "racial_traits": [
+    {
+      "name": "Speed",
+      "summary": "(RtHW 8) Your speed is 35 ft."
+    },
+    {
+      "name": "Darkvision",
+      "summary": "(RtHW 8) You have Darkvision with a range of 60 feet."
+    },
+    {
+      "name": "Spider Climb",
+      "summary": "(RtHW 8) You have a Climb Speed equal to your Speed."
+    },
+    {
+      "name": "Trace of Undeath",
+      "summary": "(RtHW 8) You have Resistance to Necrotic damage."
+    },
+    {
+      "name": "Vampiric Bite",
+      "summary": "(RtHW 8) When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike."
+    },
+    {
+      "name": "Languages",
+      "summary": "(RtHW) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
+    }
+  ],
+  "feats": [
+    {
+      "name": "Fey Touched",
+      "summary": "(PHB-2024 204) Ability Score Increase. Increase your Int. , Wis."
+    },
+    {
+      "name": "Arcane Eloquence",
+      "summary": "(AU 26) You gain the following benefits. Cantrip. You learn the Vicious Mockery cantrip."
+    },
+    {
+      "name": "Bejeweled Conclave Spy Ability Score Increase",
+      "summary": "(AU 21) | Increase two scores (+2 / +1) •"
+    }
+  ],
+  "equipment": [
+    {
+      "name": "Shortsword, +1",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    }
+  ],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 0,
+  "pp": 0
+}

@@ -1,0 +1,396 @@
+{
+  "name": "Zhela Breakwater",
+  "player_name": "Heershingenmosiken",
+  "class_name": "Barbarian",
+  "subclass": "",
+  "level": 5,
+  "is_multiclass": false,
+  "armor_class": 14,
+  "ac_source": "",
+  "initiative_modifier": 2,
+  "speeds": {
+    "walking": "40 ft."
+  },
+  "hp_max": 50,
+  "hit_dice_total": "5d12",
+  "proficiency_bonus": 3,
+  "passive_perception": 12,
+  "passive_insight": 9,
+  "passive_investigation": 10,
+  "senses": "Darkvision 60 ft.",
+  "str_score": 18,
+  "dex_score": 15,
+  "con_score": 14,
+  "int_score": 10,
+  "wis_score": 8,
+  "cha_score": 12,
+  "skill_modifiers": {
+    "acrobatics": 5,
+    "animal_handling": 2,
+    "arcana": 0,
+    "athletics": 7,
+    "deception": 1,
+    "history": 0,
+    "insight": -1,
+    "intimidation": 4,
+    "investigation": 0,
+    "medicine": -1,
+    "nature": 3,
+    "perception": 2,
+    "performance": 1,
+    "persuasion": 1,
+    "religion": 0,
+    "sleight_of_hand": 2,
+    "stealth": 2,
+    "survival": 2
+  },
+  "save_modifiers": {
+    "str": 7,
+    "dex": 2,
+    "con": 5,
+    "int": 0,
+    "wis": -1,
+    "cha": 1
+  },
+  "skill_proficiencies": {
+    "athletics": "proficient",
+    "acrobatics": "proficient",
+    "sleight_of_hand": "none",
+    "stealth": "none",
+    "arcana": "none",
+    "history": "none",
+    "investigation": "none",
+    "nature": "proficient",
+    "religion": "none",
+    "animal_handling": "proficient",
+    "insight": "none",
+    "medicine": "none",
+    "perception": "proficient",
+    "survival": "proficient",
+    "deception": "none",
+    "intimidation": "proficient",
+    "performance": "none",
+    "persuasion": "none"
+  },
+  "save_proficiencies": {
+    "str": "proficient",
+    "dex": "none",
+    "con": "proficient",
+    "int": "none",
+    "wis": "none",
+    "cha": "none"
+  },
+  "attacks": [
+    {
+      "name": "Handaxe",
+      "atk_bonus": "+7",
+      "damage": "1d6+4",
+      "damage_type": "Slashing",
+      "range": "",
+      "notes": "Simple, Light, Thrown, Vex, Range (20/60)"
+    },
+    {
+      "name": "Unarmed Strike",
+      "atk_bonus": "+7",
+      "damage": "5",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    },
+    {
+      "name": "Enhanced Unarmed Strike",
+      "atk_bonus": "+7",
+      "damage": "1d4+4",
+      "damage_type": "Bludgeoning",
+      "range": "",
+      "notes": ""
+    }
+  ],
+  "damage_resistances": "",
+  "damage_immunities": "",
+  "condition_immunities": "",
+  "armor_proficiencies": {
+    "light": true,
+    "medium": true,
+    "heavy": false,
+    "shields": true
+  },
+  "weapon_proficiencies": {
+    "simple": true,
+    "martial": true
+  },
+  "languages": "Common, Orc",
+  "tool_proficiencies": "Navigator's Tools",
+  "is_spellcaster": false,
+  "spellcasting_ability": null,
+  "spell_attack_bonus_override": null,
+  "spell_save_dc_override": null,
+  "spell_slots": null,
+  "pact_slot_level": null,
+  "pact_slot_count": null,
+  "spells": null,
+  "is_prepared_caster": false,
+  "prepared_spells": null,
+  "class_resources": null,
+  "class_features": [
+    {
+      "name": "Rage",
+      "summary": "(PHB-2024 51)"
+    },
+    {
+      "name": "Unarmored Defense",
+      "summary": "(PHB-2024 51) While not wearing armor, your base AC equals 14 + any Shield bonus."
+    },
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 52) You are able to use the mastery properties of 3 kinds of Simple or Martial Melee weapons of your choice."
+    },
+    {
+      "name": "Danger Sense",
+      "summary": "(PHB-2024 52) You have Advantage on Dex. saving throws unless you have the Incapacitated condition."
+    },
+    {
+      "name": "Reckless Attack",
+      "summary": "(PHB-2024 52) When you make your first attack roll on your turn, you can decide to attack recklessly, giving you Advantage on attack rolls using Str. until the start of your next turn, but attacks against you have Advantage during that time."
+    },
+    {
+      "name": "Barbarian Subclass",
+      "summary": "(PHB-2024 52) | Path of the Storm Herald (XGtE)"
+    },
+    {
+      "name": "Primal Knowledge",
+      "summary": "(PHB-2024 52) You gain proficiency in another Barbarian skill of your choice."
+    },
+    {
+      "name": "Storm Aura",
+      "summary": "(XGtE) You gain a 10 ft. aura effect when you start your rage and as a bonus action on each of your turns."
+    },
+    {
+      "name": "4: Weapon Mastery",
+      "summary": "(PHB-2024 52)"
+    },
+    {
+      "name": "Extra Attack",
+      "summary": "(PHB-2024 53) You can attack twice instead of once whenever you take the Attack action on your turn."
+    },
+    {
+      "name": "Fast Movement",
+      "summary": "(PHB-2024 53) Your speed increases by 10 ft."
+    }
+  ],
+  "racial_traits": [
+    {
+      "name": "Darkvision",
+      "summary": "(ERftLW) You can see in darkness (shades of gray) up to 60 ft."
+    },
+    {
+      "name": "Aggressive",
+      "summary": "(ERftLW) As a bonus action, you can move up to your speed toward an enemy of your choice that you can see or hear. You must end this move closer to the enemy than you started."
+    },
+    {
+      "name": "Powerful Build",
+      "summary": "(ERftLW) You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+    },
+    {
+      "name": "Primal Intuition",
+      "summary": "(ERftLW)"
+    },
+    {
+      "name": "Languages",
+      "summary": "(ERftLW)"
+    }
+  ],
+  "feats": [
+    {
+      "name": "Weapon Mastery",
+      "summary": "(PHB-2024 52) | Greatsword (Graze) • Graze. If your attack roll with a Greatsword misses a creature, you can deal damage to it equal to the ability modifier used to make the attack. This damage is the same type dealt by the Greatsword, and can only be increased by increasing the ability modifier."
+    },
+    {
+      "name": "4: Weapon Mastery",
+      "summary": "(PHB-2024) | Handaxe (Vex) • Vex. If you hit a creature with a Handaxe and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn."
+    },
+    {
+      "name": "Sailor Ability Score Improvements",
+      "summary": "(PHB-2024 183) | Increase two scores (+2 / +1) •"
+    },
+    {
+      "name": "Tavern Brawler",
+      "summary": "(PHB-2024 202) Enhanced Unarmed Strike. When you hit with your Unarmed Strike and deal damage, you can deal 1d4+4 Bludgeoning damage instead of the normal damage of an Unarmed Strike. Damage Rerolls."
+    }
+  ],
+  "equipment": [
+    {
+      "name": "Dagger",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Handaxe",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Handaxe",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Handaxe",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Handaxe",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Greataxe",
+      "qty": 1,
+      "weight": "7 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Backpack",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rope",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Navigator's Tools",
+      "qty": 1,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Traveler's Clothes",
+      "qty": 1,
+      "weight": "4 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Bedroll",
+      "qty": 1,
+      "weight": "7 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Clothes, Common",
+      "qty": 1,
+      "weight": "3 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rations (1 day)",
+      "qty": 8,
+      "weight": "16 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Small Knife",
+      "qty": 1,
+      "weight": "--",
+      "notes": ""
+    },
+    {
+      "name": "Bedroll",
+      "qty": 1,
+      "weight": "7 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Mess Kit",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rations (1 day)",
+      "qty": 10,
+      "weight": "20 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rope, Hempen (50 feet)",
+      "qty": 1,
+      "weight": "10 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Tinderbox",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Torch",
+      "qty": 10,
+      "weight": "10 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Waterskin",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Oil",
+      "qty": 2,
+      "weight": "2 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rations",
+      "qty": 10,
+      "weight": "20 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Rope",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Bedroll",
+      "qty": 1,
+      "weight": "7 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Tinderbox",
+      "qty": 1,
+      "weight": "1 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Torch",
+      "qty": 10,
+      "weight": "10 lb.",
+      "notes": ""
+    },
+    {
+      "name": "Waterskin",
+      "qty": 1,
+      "weight": "5 lb.",
+      "notes": ""
+    }
+  ],
+  "cp": 0,
+  "sp": 0,
+  "ep": 0,
+  "gp": 35,
+  "pp": 0
+}

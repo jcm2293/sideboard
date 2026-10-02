@@ -45,3 +45,6 @@ local-data-export.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# rendered fixture sheets (regenerate with scripts/export-fixtures.ts)
+PCsheets/fixtures/out/*.pdf
