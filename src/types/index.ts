@@ -178,6 +178,10 @@ export interface SessionLog {
 
 export type ProficiencyLevel = 'none' | 'half' | 'proficient' | 'expertise';
 
+// Optional fields below come from the structured D&D Beyond import (sheet v3,
+// docs/character-sheet-spec-v3.md). Homebrew-wizard and older characters
+// don't have them; the PDF falls back to the basic fields.
+
 export interface AttackEntry {
   name: string;
   atk_bonus: string;
@@ -185,6 +189,10 @@ export interface AttackEntry {
   damage_type: string;
   range?: string;
   notes?: string;
+  /** 'rider' is damage added to a hit: Sneak Attack, Rage damage, the Martial Arts die. */
+  kind?: 'weapon' | 'unarmed' | 'spell' | 'rider';
+  /** e.g. ["Vex"], ["3 / long rest"]. */
+  tags?: string[];
 }
 
 export interface ClassResource {
@@ -192,11 +200,56 @@ export interface ClassResource {
   uses: number;
   die?: string;
   recovery: string;
+  /** `uses` is a point total to spend from (Lay On Hands 25): a write-in box, not bubbles. */
+  pool?: boolean;
+  /** 'table' when the count came from the class reference table rather than the export. */
+  source?: 'pdf' | 'table';
+}
+
+export interface ClassLevel {
+  class_name: string;
+  level: number;
+  subclass: string;
+}
+
+/** Action economy. 'special' = free or triggered; 'none' = takes no part in a turn. */
+export type ActionType = 'action' | 'bonus' | 'reaction' | 'special' | 'none';
+
+export interface FeatureUses {
+  count: number;
+  per: 'short' | 'long' | 'turn' | 'day';
+  pool?: boolean;
+  die?: string;
+  /** Beyond's name for the resource when it isn't the feature's ("Luck Points", "Focus Points"). */
+  label?: string;
+}
+
+/** An activation listed under a feature, e.g. "| Flurry of Blows: 1 Bonus Action". */
+export interface FeatureActivation {
+  label: string;
+  action: ActionType;
 }
 
 export interface FeatureEntry {
   name: string;
+  /** The first paragraph of full_text (the whole description for older records). */
   summary: string;
+  /** Complete description, paragraphs joined with \n\n. */
+  full_text?: string;
+  kind?: 'mechanical' | 'passive' | 'ribbon' | 'container';
+  /** "Warlock", "Rogue", "Dhampir", "Feats". */
+  group?: string;
+  /** "Eldritch Invocations" for Thirsting Blade. */
+  parent?: string;
+  action?: ActionType;
+  uses?: FeatureUses;
+  /** "PHB-2024 153" — never printed on the player sheet. */
+  source_ref?: string;
+  /** Chosen sub-options: ["Sea"], ["Greatsword (Graze)", "Whip (Slow)"]. */
+  options?: string[];
+  /** Body text of chosen options that have one. */
+  option_details?: { name: string; text: string }[];
+  activations?: FeatureActivation[];
 }
 
 export interface EquipmentEntry {
@@ -204,6 +257,39 @@ export interface EquipmentEntry {
   qty: number;
   weight?: string;
   notes?: string;
+  /** e.g. ["attunement?"] — Beyond doesn't export attunement state. */
+  tags?: string[];
+}
+
+export interface SpellEntry {
+  name: string;
+  level: number;
+  /** Raw Beyond source, e.g. "Fiend Spells (Always Prepared)". */
+  source: string;
+  origin: 'class' | 'subclass' | 'feat' | 'species' | 'invocation' | 'item' | 'other';
+  always_prepared: boolean;
+  costs_slot: boolean;
+  free_uses?: { count: number; per: 'long' | 'short' };
+  ritual: boolean;
+  concentration: boolean;
+  save_or_atk: string;
+  casting_time: string;
+  range: string;
+  components: string;
+  duration: string;
+  notes: string;
+  page_ref: string;
+}
+
+export interface WeaponMastery {
+  weapon: string;
+  mastery: string;
+}
+
+/** The DC on the vitals strip: Spell DC, Focus DC, Maneuver DC, or Grapple/Shove DC. */
+export interface FeatureDc {
+  label: string;
+  value: number;
 }
 
 export interface PlayerCharacter {
@@ -299,6 +385,17 @@ export interface PlayerCharacter {
 
   // Source
   pdf_url: string | null;
+
+  // Structured D&D Beyond import (sheet v3)
+  species?: string | null;
+  background?: string | null;
+  /** "Wizard 5 / Rogue 3" as [{Wizard, 5, Evoker}, {Rogue, 3, Thief}]. */
+  classes?: ClassLevel[] | null;
+  spell_details?: Record<string, SpellEntry> | null;
+  weapon_masteries?: WeaponMastery[] | null;
+  /** 8 + PB + Str mod, or Dex mod with Martial Arts when Dex is higher. */
+  grapple_shove_dc?: number | null;
+  feature_dc?: FeatureDc | null;
 
   created_at: string;
   updated_at: string;
