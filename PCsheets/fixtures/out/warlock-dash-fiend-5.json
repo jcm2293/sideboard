@@ -558,7 +558,7 @@
         "source": "Fey Touched (Always Prepared)",
         "origin": "feat",
         "always_prepared": true,
-        "costs_slot": false,
+        "costs_slot": true,
         "free_uses": {
           "count": 1,
           "per": "long"

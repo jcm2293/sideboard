@@ -34,6 +34,8 @@ check('Magical Cunning 1', res(c, 'Magical Cunning')?.uses === 1);
 check('Vampiric Bite 3', res(c, 'Vampiric Bite')?.uses === 3);
 check('Charm Person free 1', res(c, 'Charm Person (free cast)')?.uses === 1);
 check('Misty Step free 1', res(c, 'Misty Step (free cast)')?.uses === 1);
+const cpd = spell(c, 'Charm Person');
+check('Charm Person carries free 1/LR and slot', cpd?.free_uses?.count === 1 && cpd.costs_slot === true, JSON.stringify(cpd));
 check('Smooth Talker data present (activation + "1d4" on Deception/Intimidation/Persuasion text)', act(c, 'Arcane Eloquence', 'Smooth Talker', 'special') && /Deception, Intimidation, or Persuasion\) check, you can roll 1d4/.test(feat(c, 'Arcane Eloquence')!.full_text!));
 later('Smooth Talker +1d4 printed on three Cha skills');
 check('Misty Step once', spells(c).filter((s) => s.name === 'Misty Step').length === 1);
@@ -95,6 +97,10 @@ check('Bonus: Cunning Action, Steady Aim, Fast Hands ×3', feat(c, 'Cunning Acti
 check('Arcane Recovery 1/LR', res(c, 'Arcane Recovery')?.uses === 1 && res(c, 'Arcane Recovery')?.recovery === 'Long Rest');
 check('Darkvision 120, magical sleep immunity, Fey Ancestry', /Darkvision 120/.test(c.senses) && /Magical Sleep/.test(c.condition_immunities) && !!feat(c, 'Fey Ancestry'));
 const sp = ['Dancing Lights', 'Faerie Fire', 'Darkness'].map((n) => spell(c, n)); check('species spells deduped, species origin, free 1/LR on the leveled ones', sp.every((s) => s?.origin === 'species') && sp[1]?.free_uses && sp[2]?.free_uses && spells(c).length === 5);
+for (const n of ['Faerie Fire', 'Darkness']) {
+  const s = spell(c, n);
+  check(`${n} carries free 1/LR and slot`, s?.free_uses?.count === 1 && s.costs_slot === true, JSON.stringify(s));
+}
 check('inventory Dagger ×4', c.equipment.find((e) => e.name === 'Dagger')?.qty === 4);
 check('climb speed', !!c.speeds.climbing);
 

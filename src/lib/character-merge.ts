@@ -17,13 +17,16 @@ import type {
   FeatureEntry,
   PlayerCharacter,
   ProficiencyLevel,
+  SpellEntry,
 } from '@/types';
 import {
+  deriveClasses,
   modString,
   normalizeFlagKeys,
   normalizeSaveKeys,
   normalizeSkillKeys,
   normalizeSpeedKeys,
+  spellKey,
 } from '@/lib/character';
 
 export interface FieldChange {
@@ -40,6 +43,8 @@ export interface ListDiff {
 export interface PdfSpell {
   name: string;
   level: string;
+  /** The import's details for the spell, added to spell_details when the DM adds the spell. */
+  detail?: SpellEntry;
 }
 
 /** Items the PDF has and the sheet doesn't, grouped by the sheet section they'd go into. */
@@ -86,6 +91,8 @@ const ABILITIES = ['str', 'dex', 'con', 'int', 'wis', 'cha'] as const;
 const ORDINALS = ['cantrip', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
 
 type TextField =
+  | 'species'
+  | 'background'
   | 'name'
   | 'player_name'
   | 'subclass'
@@ -99,8 +106,20 @@ type TextField =
   | 'spellcasting_ability';
 
 /** List-matching key: ignores case, punctuation, and bracket markers ("Ceremony [R]" matches "Ceremony"). */
-function keyOf(name: string): string {
-  return name.toLowerCase().replace(/\[[^\]]*\]/g, '').replace(/[^a-z0-9]+/g, '');
+const keyOf = spellKey;
+
+// Structure the v3 import adds to list items. A matched sheet item keeps what
+// the DM wrote and picks up any of these it doesn't have yet.
+const FEATURE_V3_KEYS = [
+  'full_text', 'kind', 'group', 'parent', 'action', 'uses', 'source_ref', 'options', 'option_details', 'activations',
+] as const;
+
+function enrich<T extends object>(sheetItem: T, pdfItem: T, keys: readonly (keyof T)[]): T {
+  const out = { ...sheetItem };
+  for (const k of keys) {
+    if (out[k] == null && pdfItem[k] != null) out[k] = pdfItem[k];
+  }
+  return out;
 }
 
 function sameText(a: string | null | undefined, b: string | null | undefined): boolean {
@@ -155,6 +174,7 @@ function mergeByName<T extends { name: string }>(
 function diffSpells(
   sheetSpells: Record<string, string[]> | null,
   pdfSpells: Record<string, string[]> | null | undefined,
+  pdfDetails: Record<string, SpellEntry> | null | undefined,
   report: ReuploadReport,
 ): PdfSpell[] {
   if (!pdfSpells) return [];
@@ -168,7 +188,8 @@ function diffSpells(
     for (const name of names) {
       if (!name.trim() || onSheet.has(keyOf(name))) continue;
       onSheet.add(keyOf(name));
-      pdfOnly.push({ name, level });
+      const detail = Object.values(pdfDetails ?? {}).find((d) => keyOf(d.name) === keyOf(name));
+      pdfOnly.push({ name, level, ...(detail ? { detail } : {}) });
     }
   }
   const missing: string[] = [];
@@ -343,6 +364,8 @@ export function mergeReupload(
   keepSheetText('damage_immunities', 'Damage immunities');
   keepSheetText('condition_immunities', 'Condition immunities');
   keepSheetText('spellcasting_ability', 'Spellcasting ability');
+  keepSheetText('species', 'Species');
+  keepSheetText('background', 'Background');
 
   // Class: take the PDF's line when it names the same classes (so multiclass
   // levels like "Ranger 4 / Rogue 1" stay current); a reskin keeps the sheet's.
@@ -377,11 +400,37 @@ export function mergeReupload(
       merged.pact_slot_count = pdf.pact_slot_count ?? null;
     }
   }
-  const spellsOnlyInPdf = diffSpells(sheet.spells, pdf.spells, report);
+  const spellsOnlyInPdf = diffSpells(sheet.spells, pdf.spells, pdf.spell_details, report);
+
+  // Details for the spells on the sheet: the import's numbers win where it has
+  // the spell; DM-added spells keep whatever details they had.
+  const sheetSpellNames = Object.values(sheet.spells ?? {}).flat().filter((n) => n.trim());
+  if (sheetSpellNames.length > 0 && (pdf.spell_details || sheet.spell_details)) {
+    const details: Record<string, SpellEntry> = {};
+    for (const name of sheetSpellNames) {
+      const fromPdf = Object.values(pdf.spell_details ?? {}).find((d) => keyOf(d.name) === keyOf(name));
+      const fromSheet = Object.values(sheet.spell_details ?? {}).find((d) => keyOf(d.name) === keyOf(name));
+      const detail = fromPdf ?? fromSheet;
+      if (detail) details[name] = { ...detail, name };
+    }
+    merged.spell_details = details;
+  }
+
+  if (pdf.weapon_masteries && pdf.weapon_masteries.length > 0) {
+    const describe = (list: PlayerCharacter['weapon_masteries']) =>
+      (list ?? []).map((m) => `${m.weapon}: ${m.mastery}`).join(', ') || 'none';
+    if (describe(sheet.weapon_masteries) !== describe(pdf.weapon_masteries)) {
+      report.updated.push({ label: 'Weapon masteries', from: describe(sheet.weapon_masteries), to: describe(pdf.weapon_masteries) });
+    }
+    merged.weapon_masteries = pdf.weapon_masteries;
+  }
+  // Derived numbers: the renderer recomputes their values; the import's labels and basis win.
+  if (pdf.feature_dc) merged.feature_dc = pdf.feature_dc;
+  if (pdf.grapple_shove_dc != null) merged.grapple_shove_dc = pdf.grapple_shove_dc;
 
   // ── Lists ──
   const attacks = mergeByName('Attacks', sheet.attacks, pdf.attacks, report, (s, p) => {
-    const next = { ...s };
+    const next = enrich(s, p, ['kind', 'tags']);
     if (p.atk_bonus && !sameText(s.atk_bonus, p.atk_bonus)) {
       report.updated.push({ label: `${s.name} to hit`, from: s.atk_bonus || '—', to: p.atk_bonus });
       next.atk_bonus = p.atk_bonus;
@@ -395,15 +444,17 @@ export function mergeReupload(
     return next;
   });
   const resources = mergeByName('Class resources', sheet.class_resources, pdf.class_resources, report, (s, p) => {
-    if (p.uses == null || p.uses === s.uses) return s;
+    const next = enrich(s, p, ['pool', 'source']);
+    if (p.uses == null || p.uses === s.uses) return next;
     report.updated.push({ label: `${s.name} uses`, from: String(s.uses), to: String(p.uses) });
-    return { ...s, uses: p.uses };
+    return { ...next, uses: p.uses };
   });
-  const features = mergeByName('Class features', sheet.class_features, pdf.class_features, report);
-  const traits = mergeByName('Species traits', sheet.racial_traits, pdf.racial_traits, report);
-  const feats = mergeByName('Feats', sheet.feats, pdf.feats, report);
+  const withStructure = (s: FeatureEntry, p: FeatureEntry) => enrich(s, p, FEATURE_V3_KEYS);
+  const features = mergeByName('Class features', sheet.class_features, pdf.class_features, report, withStructure);
+  const traits = mergeByName('Species traits', sheet.racial_traits, pdf.racial_traits, report, withStructure);
+  const feats = mergeByName('Feats', sheet.feats, pdf.feats, report, withStructure);
   const equipment = mergeByName('Equipment', sheet.equipment, pdf.equipment, report, (s, p) => {
-    const next = { ...s };
+    const next = enrich(s, p, ['tags']);
     if (p.qty != null && p.qty !== s.qty) {
       report.updated.push({ label: `${s.name} quantity`, from: String(s.qty), to: String(p.qty) });
       next.qty = p.qty;
@@ -428,6 +479,9 @@ export function mergeReupload(
     { section: 'equipment', label: 'Equipment', items: equipment.pdfOnly },
   ];
   report.pdfOnly = offered.filter((g) => g.items.length > 0);
+
+  // Per-class entries always follow the merged (DM-owned) class line.
+  merged.classes = deriveClasses(merged.class_name ?? '', merged.level, merged.subclass ?? '');
 
   return { merged, report };
 }

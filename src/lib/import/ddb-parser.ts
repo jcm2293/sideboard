@@ -618,14 +618,9 @@ function applyActionsSections(fields: Fields, find: (name: string) => RawFeature
 // Spells (§3.6)
 // ──────────────────────────────────────────────────────────────────────────
 
-interface RawSpell extends SpellEntry {
-  /** Whether this copy carries a 1/LR-style free cast. */
-  freeCopy: boolean;
-}
-
-function parseSpellRows(input: PdfFormFields): RawSpell[] {
+function parseSpellRows(input: PdfFormFields): SpellEntry[] {
   const { fields, order } = input;
-  const rows: RawSpell[] = [];
+  const rows: SpellEntry[] = [];
   let level = 0;
   for (const name of order) {
     const header = name.match(/^spellHeader\d+$/);
@@ -659,8 +654,7 @@ function parseSpellRows(input: PdfFormFields): RawSpell[] {
       duration,
       notes,
       page_ref: fields[`spellPage${i}`] ?? '',
-      freeCopy: Boolean(free),
-    } as RawSpell);
+    } as SpellEntry);
   }
   return rows;
 }
@@ -905,7 +899,7 @@ export function parseDdbCharacter(input: PdfFormFields): ParseResult {
   };
 
   const spellDetails: Record<string, SpellEntry> = {};
-  const bySpell = new Map<string, RawSpell[]>();
+  const bySpell = new Map<string, SpellEntry[]>();
   for (const s of parseSpellRows(input)) {
     s.origin = spellOrigin(s.source);
     if (s.level === 0) s.costs_slot = false;
@@ -920,17 +914,16 @@ export function parseDdbCharacter(input: PdfFormFields): ParseResult {
   }
   for (const copies of bySpell.values()) {
     // Prefer the always-prepared copy's attribution ("Charm Person" via Beguiling Magic).
-    const primary = copies.find((c) => c.always_prepared) ?? copies[0];
-    const { freeCopy: _unused, ...entry } = primary;
-    void _unused;
+    const entry = { ...(copies.find((c) => c.always_prepared) ?? copies[0]) };
     entry.always_prepared = copies.some((c) => c.always_prepared);
     entry.ritual = copies.some((c) => c.ritual);
     entry.concentration = copies.some((c) => c.concentration);
     const free = copies.find((c) => c.free_uses)?.free_uses;
     if (free) entry.free_uses = free;
     else delete entry.free_uses;
-    // A spell costs a slot unless every copy of it is a free cast or an at-will/ritual-only grant.
-    entry.costs_slot = copies.some((c) => c.costs_slot && !c.freeCopy);
+    // A free cast never removes the slot option: Fey Touched and lineage spells can also be cast
+    // with slots. Only cantrips and at-will/ritual-only invocations skip the slot.
+    entry.costs_slot = copies.some((c) => c.costs_slot);
     for (const k of ['save_or_atk', 'casting_time', 'range', 'components', 'duration', 'notes', 'page_ref'] as const) {
       if (!entry[k]) entry[k] = copies.find((c) => c[k])?.[k] ?? '';
     }

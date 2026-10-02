@@ -2,7 +2,7 @@
 // These take a PlayerCharacter (or compatible partial) and compute values that
 // must never live as raw columns — they're driven by ability scores + PB.
 
-import type { PlayerCharacter } from '@/types';
+import type { ClassLevel, FeatureDc, PlayerCharacter } from '@/types';
 
 type AbilityCode = 'STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA';
 
@@ -58,6 +58,60 @@ export function spellAttackBonus(c: Partial<PlayerCharacter>): number {
 /** Format a modifier as "+X" or "-X". */
 export function modString(n: number): string {
   return n >= 0 ? `+${n}` : `${n}`;
+}
+
+/** 8 + PB + Str mod — or Dex mod for a Martial Arts user whose Dex is higher. */
+export function grappleShoveDc(c: Partial<PlayerCharacter>): number {
+  const pb = c.proficiency_bonus ?? 2;
+  const str = abilityModifier(c.str_score);
+  const dex = abilityModifier(c.dex_score);
+  const martialArts =
+    (c.class_features ?? []).some((f) => /^martial arts$/i.test(f.name)) || /\bmonk\b/i.test(c.class_name ?? '');
+  return 8 + pb + (martialArts && dex > str ? dex : str);
+}
+
+/**
+ * The vitals strip's feature DC. The label comes from the import (spell, Focus,
+ * Maneuver, Grapple/Shove); the value is recomputed from current scores so DM
+ * edits and reskinned casting abilities stay correct.
+ */
+export function featureDc(c: Partial<PlayerCharacter>): FeatureDc {
+  const label = c.feature_dc?.label ?? (c.is_spellcaster && c.spellcasting_ability ? 'Spell DC' : 'Grapple/Shove DC');
+  const pb = c.proficiency_bonus ?? 2;
+  switch (label) {
+    case 'Spell DC':
+      return { label, value: spellSaveDc(c) };
+    case 'Focus DC':
+      return { label, value: 8 + pb + abilityModifier(c.wis_score) };
+    case 'Maneuver DC':
+      return { label, value: 8 + pb + Math.max(abilityModifier(c.str_score), abilityModifier(c.dex_score)) };
+    case 'Grapple/Shove DC':
+      return { label, value: grappleShoveDc(c) };
+    default:
+      return { label, value: c.feature_dc?.value ?? grappleShoveDc(c) };
+  }
+}
+
+/**
+ * Per-class entries from the editable class line: "Wizard 5 / Rogue 3" with
+ * subclass "Evoker / Thief"; a single-class line ("Barbarian") takes `level`.
+ */
+export function deriveClasses(className: string, level: number, subclass: string): ClassLevel[] {
+  const parts = className.split('/').map((p) => p.trim()).filter(Boolean);
+  const subclasses = subclass.split('/').map((s) => s.trim());
+  if (parts.length <= 1) {
+    const name = (parts[0] ?? '').replace(/\s+\d+$/, '').trim();
+    return name ? [{ class_name: name, level, subclass: subclass.trim() }] : [];
+  }
+  return parts.map((part, i) => {
+    const m = part.match(/^(.+?)\s+(\d+)$/);
+    return { class_name: m ? m[1].trim() : part, level: m ? parseInt(m[2], 10) : 1, subclass: subclasses[i] ?? '' };
+  });
+}
+
+/** Spell-name key that ignores case, punctuation, and bracket markers ("Ceremony [R]" ≡ "ceremony"). */
+export function spellKey(name: string): string {
+  return name.toLowerCase().replace(/\[[^\]]*\]/g, '').replace(/[^a-z0-9]+/g, '');
 }
 
 // ──────────────────────────────────────────────────────────────────────────

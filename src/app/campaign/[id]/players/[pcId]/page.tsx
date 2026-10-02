@@ -23,6 +23,8 @@ import {
   normalizeSaveKeys,
   normalizeSkillKeys,
   normalizeSpeedKeys,
+  deriveClasses,
+  spellKey,
 } from '@/lib/character';
 import { mergeReupload, withoutPdfOnly, type PdfOnlyGroup, type ReuploadReport } from '@/lib/character-merge';
 import ReuploadReportPanel from '@/components/characters/ReuploadReportPanel';
@@ -102,6 +104,16 @@ const MOVEMENT_TYPES = ['walking', 'climbing', 'swimming', 'flying', 'burrowing'
 const RECOVERY_OPTIONS = ['Short Rest', 'Long Rest', 'Dawn', 'Once per turn'];
 
 const PROF_LEVELS: ProficiencyLevel[] = ['none', 'half', 'proficient', 'expertise'];
+
+function pruneSpellDetails(
+  details: PlayerCharacter['spell_details'] | undefined,
+  spells: Record<string, string[]>,
+): PlayerCharacter['spell_details'] {
+  if (!details) return null;
+  const onSheet = new Set(Object.values(spells).flat().map(spellKey));
+  const kept = Object.fromEntries(Object.entries(details).filter(([, d]) => onSheet.has(spellKey(d.name))));
+  return Object.keys(kept).length > 0 ? kept : null;
+}
 const SAVE_PROF_LEVELS: ProficiencyLevel[] = ['none', 'proficient'];
 
 const inputClass =
@@ -132,6 +144,11 @@ export default function PlayerCharacterEditPage({
   const [isMulticlass, setIsMulticlass] = useState(false);
   // What a re-uploaded PDF changed, kept, and offered when merged into this sheet.
   const [reuploadReport, setReuploadReport] = useState<ReuploadReport | null>(null);
+  // Structured import data (sheet v3) with no form controls; carried through to save.
+  // `classes` is re-derived from the class line on save, so it isn't held here.
+  const [importData, setImportData] = useState<
+    Pick<PlayerCharacter, 'spell_details' | 'weapon_masteries' | 'grapple_shove_dc' | 'feature_dc'>
+  >({});
   // Campaign-scoped custom spells, used to detect spells that lack a library entry.
   const [customSpells, setCustomSpells] = useState<CustomSpell[]>([]);
   // Modal state for adding a description to a not-in-library spell.
@@ -140,6 +157,8 @@ export default function PlayerCharacterEditPage({
   // Header
   const [name, setName] = useState('');
   const [playerName, setPlayerName] = useState('');
+  const [species, setSpecies] = useState('');
+  const [background, setBackground] = useState('');
   const [className, setClassName] = useState('');
   const [subclass, setSubclass] = useState('');
   const [level, setLevel] = useState(1);
@@ -250,6 +269,14 @@ export default function PlayerCharacterEditPage({
   // Populate form from a PlayerCharacter object
   function populateForm(pc: Partial<PlayerCharacter>) {
     if (pc.name) setName(pc.name);
+    if (pc.species) setSpecies(pc.species);
+    if (pc.background) setBackground(pc.background);
+    setImportData({
+      spell_details: pc.spell_details ?? null,
+      weapon_masteries: pc.weapon_masteries ?? null,
+      grapple_shove_dc: pc.grapple_shove_dc ?? null,
+      feature_dc: pc.feature_dc ?? null,
+    });
     if (pc.player_name) setPlayerName(pc.player_name);
     if (pc.class_name) setClassName(pc.class_name);
     if (pc.subclass) setSubclass(pc.subclass);
@@ -454,6 +481,14 @@ export default function PlayerCharacterEditPage({
       spells: isSpellcaster ? spells : null,
       prepared_spells: isSpellcaster && isPreparedCaster ? preparedSpells : null,
       pdf_url: null,
+      species: species.trim() || null,
+      background: background.trim() || null,
+      classes: deriveClasses(className, level, subclass),
+      // Details only for spells still on the sheet (renamed or removed spells drop theirs).
+      spell_details: isSpellcaster ? pruneSpellDetails(importData.spell_details, spells) : null,
+      weapon_masteries: importData.weapon_masteries ?? null,
+      grapple_shove_dc: importData.grapple_shove_dc ?? null,
+      feature_dc: importData.feature_dc ?? null,
     };
   }
 
@@ -612,6 +647,11 @@ export default function PlayerCharacterEditPage({
           for (const { name, level } of items) next[level] = [...(next[level] ?? []), name];
           return next;
         });
+        setImportData((prev) => {
+          const details = { ...(prev.spell_details ?? {}) };
+          for (const { name, detail } of items) if (detail) details[name] = detail;
+          return { ...prev, spell_details: details };
+        });
         break;
       }
     }
@@ -666,6 +706,28 @@ export default function PlayerCharacterEditPage({
               className={inputClass}
               placeholder="Player name"
             />
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-muted mb-1">Species</label>
+              <input
+                type="text"
+                value={species}
+                onChange={(e) => setSpecies(e.target.value)}
+                className={inputClass}
+                placeholder="e.g. Dhampir"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-muted mb-1">Background</label>
+              <input
+                type="text"
+                value={background}
+                onChange={(e) => setBackground(e.target.value)}
+                className={inputClass}
+                placeholder="e.g. Sailor"
+              />
+            </div>
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
