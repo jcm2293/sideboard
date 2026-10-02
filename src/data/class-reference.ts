@@ -241,7 +241,7 @@ export const CLASS_REFERENCE: Record<string, ClassReference> = {
         name: 'Divine Smite',
         requires: 'Divine Smite',
         damage: () => '2d8',
-        note: 'radiant; +1d8 per slot level above 1st, +1d8 vs Fiends and Undead; Bonus Action after a hit',
+        note: '+1d8 per slot level above 1st, +1d8 vs Fiends and Undead; Bonus Action after a hit',
       },
     ],
     canonicalText: {

@@ -1,243 +1,556 @@
 {
-  "name": "Lucien",
-  "player_name": "Heershingenmosiken",
-  "class_name": "Bard",
-  "subclass": "",
-  "level": 5,
-  "is_multiclass": false,
-  "armor_class": 14,
-  "ac_source": "",
-  "initiative_modifier": 4,
-  "speeds": {
-    "walking": "30 ft."
-  },
-  "hp_max": 28,
-  "hit_dice_total": "5d8",
-  "proficiency_bonus": 3,
-  "passive_perception": 8,
-  "passive_insight": 8,
-  "passive_investigation": 15,
-  "senses": "",
-  "str_score": 6,
-  "dex_score": 19,
-  "con_score": 7,
-  "int_score": 19,
-  "wis_score": 5,
-  "cha_score": 18,
-  "skill_modifiers": {
-    "acrobatics": 5,
-    "animal_handling": 0,
-    "arcana": 5,
-    "athletics": 1,
-    "deception": 5,
-    "history": 5,
-    "insight": -2,
-    "intimidation": 10,
-    "investigation": 5,
-    "medicine": -2,
-    "nature": 7,
-    "perception": -2,
-    "performance": 7,
-    "persuasion": 5,
-    "religion": 5,
-    "sleight_of_hand": 5,
-    "stealth": 10,
-    "survival": -2
-  },
-  "save_modifiers": {
-    "str": -2,
-    "dex": 7,
-    "con": -2,
-    "int": 4,
-    "wis": -3,
-    "cha": 7
-  },
-  "skill_proficiencies": {
-    "athletics": "proficient",
-    "acrobatics": "half",
-    "sleight_of_hand": "half",
-    "stealth": "expertise",
-    "arcana": "half",
-    "history": "half",
-    "investigation": "half",
-    "nature": "proficient",
-    "religion": "half",
-    "animal_handling": "proficient",
-    "insight": "half",
-    "medicine": "half",
-    "perception": "half",
-    "survival": "half",
-    "deception": "half",
-    "intimidation": "expertise",
-    "performance": "proficient",
-    "persuasion": "half"
-  },
-  "save_proficiencies": {
-    "str": "none",
-    "dex": "proficient",
-    "con": "none",
-    "int": "none",
-    "wis": "none",
-    "cha": "proficient"
-  },
-  "attacks": [
-    {
-      "name": "Finger Guns",
-      "atk_bonus": "+7",
-      "damage": "2d6",
-      "damage_type": "Force",
-      "range": "",
-      "notes": "Special: Range (90/360 ft.), D: 1m, V/S"
+  "notices": [],
+  "character": {
+    "name": "Lucien",
+    "player_name": "Heershingenmosiken",
+    "class_name": "Bard",
+    "subclass": "College of Glamour",
+    "level": 5,
+    "is_multiclass": false,
+    "armor_class": 14,
+    "ac_source": "no armor",
+    "initiative_modifier": 4,
+    "speeds": {
+      "walking": "30 ft."
     },
-    {
-      "name": "Unarmed Strike",
-      "atk_bonus": "+1",
-      "damage": "0",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
-    }
-  ],
-  "damage_resistances": "",
-  "damage_immunities": "",
-  "condition_immunities": "",
-  "armor_proficiencies": {
-    "light": true,
-    "medium": false,
-    "heavy": false,
-    "shields": false
-  },
-  "weapon_proficiencies": {
-    "simple": true,
-    "martial": false
-  },
-  "languages": "Common, Common Sign Language, Orc",
-  "tool_proficiencies": "Carpenter's Tools, Fiddle, Flute, Longhorn",
-  "is_spellcaster": true,
-  "spellcasting_ability": "CHA",
-  "spell_attack_bonus_override": null,
-  "spell_save_dc_override": null,
-  "spell_slots": {
-    "1": 4,
-    "2": 3,
-    "3": 2,
-    "4": 0,
-    "5": 0,
-    "6": 0,
-    "7": 0,
-    "8": 0,
-    "9": 0
-  },
-  "pact_slot_level": null,
-  "pact_slot_count": null,
-  "spells": {
-    "0": [
-      "Finger Guns",
-      "Friends",
-      "Vicious Mockery"
+    "hp_max": 28,
+    "hit_dice_total": "5d8",
+    "proficiency_bonus": 3,
+    "passive_perception": 8,
+    "passive_insight": 8,
+    "passive_investigation": 15,
+    "senses": "",
+    "str_score": 6,
+    "dex_score": 19,
+    "con_score": 7,
+    "int_score": 19,
+    "wis_score": 5,
+    "cha_score": 18,
+    "skill_modifiers": {
+      "acrobatics": 5,
+      "animal_handling": 0,
+      "arcana": 5,
+      "athletics": 1,
+      "deception": 5,
+      "history": 5,
+      "insight": -2,
+      "intimidation": 10,
+      "investigation": 5,
+      "medicine": -2,
+      "nature": 7,
+      "perception": -2,
+      "performance": 7,
+      "persuasion": 5,
+      "religion": 5,
+      "sleight_of_hand": 5,
+      "stealth": 10,
+      "survival": -2
+    },
+    "save_modifiers": {
+      "str": -2,
+      "dex": 7,
+      "con": -2,
+      "int": 4,
+      "wis": -3,
+      "cha": 7
+    },
+    "skill_proficiencies": {
+      "acrobatics": "half",
+      "animal_handling": "proficient",
+      "arcana": "half",
+      "athletics": "proficient",
+      "deception": "half",
+      "history": "half",
+      "insight": "half",
+      "intimidation": "expertise",
+      "investigation": "half",
+      "medicine": "half",
+      "nature": "proficient",
+      "perception": "half",
+      "performance": "proficient",
+      "persuasion": "half",
+      "religion": "half",
+      "sleight_of_hand": "half",
+      "stealth": "expertise",
+      "survival": "half"
+    },
+    "save_proficiencies": {
+      "str": "none",
+      "dex": "proficient",
+      "con": "none",
+      "int": "none",
+      "wis": "none",
+      "cha": "proficient"
+    },
+    "attacks": [
+      {
+        "name": "Finger Guns",
+        "atk_bonus": "+7",
+        "damage": "2d6",
+        "damage_type": "Force",
+        "range": "90/360",
+        "notes": "D: 1m, V/S",
+        "kind": "spell"
+      }
     ],
-    "1": [
-      "Charm Person",
-      "Cure Wounds",
-      "Disguise Self",
-      "Dissonant Whispers",
-      "Elf Shot",
-      "Rumor",
-      "Tasha's Hideous Laughter",
-      "Charm Person"
+    "damage_resistances": "",
+    "damage_immunities": "",
+    "condition_immunities": "",
+    "armor_proficiencies": {
+      "light": true,
+      "medium": false,
+      "heavy": false,
+      "shields": false
+    },
+    "weapon_proficiencies": {
+      "simple": true,
+      "martial": false
+    },
+    "languages": "Common, Common Sign Language, Orc",
+    "tool_proficiencies": "Carpenter's Tools, Fiddle, Flute, Longhorn",
+    "is_spellcaster": true,
+    "spellcasting_ability": "CHA",
+    "spell_attack_bonus_override": null,
+    "spell_save_dc_override": null,
+    "spell_slots": {
+      "1": 4,
+      "2": 3,
+      "3": 2,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "pact_slot_level": null,
+    "pact_slot_count": null,
+    "spells": {
+      "0": [
+        "Finger Guns",
+        "Friends",
+        "Vicious Mockery"
+      ],
+      "1": [
+        "Charm Person",
+        "Cure Wounds",
+        "Disguise Self",
+        "Dissonant Whispers",
+        "Elf Shot",
+        "Rumor",
+        "Tasha's Hideous Laughter"
+      ],
+      "2": [
+        "Cloud of Daggers",
+        "Mirror Image"
+      ],
+      "3": [
+        "Fear"
+      ]
+    },
+    "is_prepared_caster": false,
+    "prepared_spells": null,
+    "class_resources": [
+      {
+        "name": "Bardic Inspiration",
+        "uses": 4,
+        "recovery": "Short Rest",
+        "source": "pdf",
+        "die": "d8"
+      },
+      {
+        "name": "Beguiling Magic",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Luck Points",
+        "uses": 3,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Heroic Inspiration",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      }
     ],
-    "2": [
-      "Cloud of Daggers",
-      "Mirror Image"
+    "class_features": [
+      {
+        "name": "Bardic Inspiration",
+        "summary": "As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6). Once within the next hour, when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the total, potentially turning the failure into a success.",
+        "full_text": "As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6). Once within the next hour, when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the total, potentially turning the failure into a success.\n\nYou can confer your Bardic Inspiration die 4 times per Long Rest.",
+        "kind": "mechanical",
+        "group": "Bard",
+        "action": "bonus",
+        "uses": {
+          "count": 4,
+          "per": "short"
+        },
+        "source_ref": "PHB-2024 59"
+      },
+      {
+        "name": "Spellcasting",
+        "summary": "You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells.",
+        "full_text": "You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells.",
+        "kind": "container",
+        "group": "Bard",
+        "source_ref": "PHB-2024 59"
+      },
+      {
+        "name": "Expertise",
+        "summary": "You gain Expertise in two skill proficiencies of your choice.",
+        "full_text": "You gain Expertise in two skill proficiencies of your choice.",
+        "kind": "ribbon",
+        "group": "Bard",
+        "source_ref": "PHB-2024 60"
+      },
+      {
+        "name": "Jack of All Trades",
+        "summary": "You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus.",
+        "full_text": "You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus.",
+        "kind": "mechanical",
+        "group": "Bard",
+        "source_ref": "PHB-2024 60"
+      },
+      {
+        "name": "Beguiling Magic",
+        "summary": "You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis. saving throw. On a failed save, the target has the Charmed or Frightened condition (your choice) for 1 minute, and it repeats the save at the end of each of its turns, ending the effect on itself on a success.",
+        "full_text": "You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis. saving throw. On a failed save, the target has the Charmed or Frightened condition (your choice) for 1 minute, and it repeats the save at the end of each of its turns, ending the effect on itself on a success.\n\nYou can only use this benefit once per Long Rest, but you can also restore your use of it by expending one use of your Bardic Inspiration (no action required).",
+        "kind": "mechanical",
+        "group": "Bard",
+        "action": "action",
+        "uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "source_ref": "PHB-2024 65",
+        "activations": [
+          {
+            "label": "Regain Use",
+            "action": "none"
+          }
+        ]
+      },
+      {
+        "name": "Mantle of Inspiration",
+        "summary": "As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself. Each of those creatures gains Temporary HP equal to two times the number rolled on the Bardic Inspiration die, and then can use its reaction to move up to its Speed without provoking Opportunity Attacks.",
+        "full_text": "As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself. Each of those creatures gains Temporary HP equal to two times the number rolled on the Bardic Inspiration die, and then can use its reaction to move up to its Speed without provoking Opportunity Attacks.",
+        "kind": "mechanical",
+        "group": "Bard",
+        "action": "bonus",
+        "source_ref": "PHB-2024 65"
+      },
+      {
+        "name": "Font of Inspiration",
+        "summary": "You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest.",
+        "full_text": "You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest.\n\nIn addition, you can expend a spell slot (no action required) to regain one expended use of Bardic Inspiration.",
+        "kind": "mechanical",
+        "group": "Bard",
+        "source_ref": "PHB-2024 61",
+        "activations": [
+          {
+            "label": "Regain Bardic Inspiration",
+            "action": "special"
+          }
+        ]
+      }
     ],
-    "3": [
-      "Fear"
-    ]
-  },
-  "is_prepared_caster": false,
-  "prepared_spells": null,
-  "class_resources": [
-    {
-      "name": "Luck Points",
-      "uses": 3,
-      "die": "",
-      "recovery": "Long Rest"
+    "racial_traits": [
+      {
+        "name": "Resourceful",
+        "summary": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+        "full_text": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 194"
+      },
+      {
+        "name": "Skillful",
+        "summary": "You gain proficiency in one skill of your choice.",
+        "full_text": "You gain proficiency in one skill of your choice.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 193"
+      },
+      {
+        "name": "Versatile",
+        "summary": "You gain an Origin feat of your choice.",
+        "full_text": "You gain an Origin feat of your choice.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 194"
+      }
+    ],
+    "feats": [
+      {
+        "name": "Lucky",
+        "summary": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.",
+        "full_text": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.\n\nAdvantage. When you roll a d20 for a D20 Test, you can spend 1 Luck Point to give yourself Advantage on the roll.\n\nDisadvantage. When a creature rolls a d20 for an attack roll against you, you can spend 1 Luck Point to impose Disadvantage on that roll.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "action": "special",
+        "uses": {
+          "count": 3,
+          "per": "long",
+          "label": "Luck Points"
+        },
+        "source_ref": "PHB-2024 201"
+      },
+      {
+        "name": "Tough",
+        "summary": "When you take this feat, your HP maximum increases by 10. Whenever you gain a character level thereafter, your HP maximum increases an additional 2 HP.",
+        "full_text": "When you take this feat, your HP maximum increases by 10. Whenever you gain a character level thereafter, your HP maximum increases an additional 2 HP.",
+        "kind": "ribbon",
+        "group": "Feats",
+        "source_ref": "PHB-2024 202"
+      }
+    ],
+    "equipment": [],
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 0,
+    "pp": 0,
+    "species": "Human",
+    "background": "Farmer",
+    "classes": [
+      {
+        "class_name": "Bard",
+        "level": 5,
+        "subclass": "College of Glamour"
+      }
+    ],
+    "spell_details": {
+      "Finger Guns": {
+        "name": "Finger Guns",
+        "level": 0,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+7",
+        "casting_time": "1BA",
+        "range": "Self",
+        "components": "V,S",
+        "duration": "1 minute",
+        "notes": "Special: Range (90/360 ft.), D: 1m, V/S",
+        "page_ref": "VSSPP"
+      },
+      "Friends": {
+        "name": "Friends",
+        "level": 0,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "10 ft.",
+        "components": "S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, S/M",
+        "page_ref": "PHB-2024 277"
+      },
+      "Vicious Mockery": {
+        "name": "Vicious Mockery",
+        "level": 0,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V",
+        "duration": "Instantaneous",
+        "notes": "V",
+        "page_ref": "PHB-2024 337"
+      },
+      "Charm Person": {
+        "name": "Charm Person",
+        "level": 1,
+        "source": "Beguiling Magic (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "30 ft.",
+        "components": "V,S",
+        "duration": "1 hour",
+        "notes": "D: 1h, V/S",
+        "page_ref": "PHB-2024 249"
+      },
+      "Cure Wounds": {
+        "name": "Cure Wounds",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Touch",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "V/S",
+        "page_ref": "PHB-2024 259"
+      },
+      "Disguise Self": {
+        "name": "Disguise Self",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Self",
+        "components": "V,S",
+        "duration": "1 hour",
+        "notes": "D: 1h, V/S",
+        "page_ref": "PHB-2024 262"
+      },
+      "Dissonant Whispers": {
+        "name": "Dissonant Whispers",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V",
+        "duration": "Instantaneous",
+        "notes": "V",
+        "page_ref": "PHB-2024 264"
+      },
+      "Elf Shot": {
+        "name": "Elf Shot",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, V/M",
+        "page_ref": "BoET 61"
+      },
+      "Rumor": {
+        "name": "Rumor",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Self/100 ft. Emanation",
+        "components": "V,S",
+        "duration": "1 minute",
+        "notes": "D: 1m, 100 ft. Emanation, V/S",
+        "page_ref": "VSSPP"
+      },
+      "Tasha's Hideous Laughter": {
+        "name": "Tasha's Hideous Laughter",
+        "level": 1,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "30 ft.",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, V/S/M",
+        "page_ref": "PHB-2024 331"
+      },
+      "Cloud of Daggers": {
+        "name": "Cloud of Daggers",
+        "level": 2,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "60 ft./5 ft. Cube",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, 5 ft. Cube, V/S/M",
+        "page_ref": "PHB-2024 251"
+      },
+      "Mirror Image": {
+        "name": "Mirror Image",
+        "level": 2,
+        "source": "Beguiling Magic (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Self",
+        "components": "V,S",
+        "duration": "1 minute",
+        "notes": "D: 1m, V/S",
+        "page_ref": "PHB-2024 299"
+      },
+      "Fear": {
+        "name": "Fear",
+        "level": 3,
+        "source": "Bard",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "WIS 15",
+        "casting_time": "1A",
+        "range": "Self/30 ft. Cone",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, 30 ft. Cone, V/S/M",
+        "page_ref": "PHB-2024 271"
+      }
+    },
+    "weapon_masteries": [],
+    "grapple_shove_dc": 9,
+    "feature_dc": {
+      "label": "Spell DC",
+      "value": 15
     }
-  ],
-  "class_features": [
-    {
-      "name": "Bardic Inspiration",
-      "summary": "(PHB-2024 59) As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6)."
-    },
-    {
-      "name": "Spellcasting",
-      "summary": "(PHB-2024 59) You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells."
-    },
-    {
-      "name": "Expertise",
-      "summary": "(PHB-2024 60) You gain Expertise in two skill proficiencies of your choice."
-    },
-    {
-      "name": "Jack of All Trades",
-      "summary": "(PHB-2024 60) You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus."
-    },
-    {
-      "name": "Bard Subclass",
-      "summary": "(PHB-2024 60) | College of Glamour"
-    },
-    {
-      "name": "Beguiling Magic",
-      "summary": "(PHB-2024 65) You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis."
-    },
-    {
-      "name": "Mantle of Inspiration",
-      "summary": "(PHB-2024 65) As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself."
-    },
-    {
-      "name": "Font of Inspiration",
-      "summary": "(PHB-2024 61) You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest. In addition, you can expend a spell slot (no action required) to regain one expended use of Bardic Inspiration."
-    }
-  ],
-  "racial_traits": [
-    {
-      "name": "Speed",
-      "summary": "(PHB-2024 194) Your Speed is 30 ft."
-    },
-    {
-      "name": "Resourceful",
-      "summary": "(PHB-2024 194) You gain Heroic Inspiration whenever you finish a Long Rest."
-    },
-    {
-      "name": "Skillful",
-      "summary": "(PHB-2024 193) You gain proficiency in one skill of your choice."
-    },
-    {
-      "name": "Versatile",
-      "summary": "(PHB-2024 194) You gain an Origin feat of your choice."
-    },
-    {
-      "name": "Languages",
-      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
-    }
-  ],
-  "feats": [
-    {
-      "name": "Lucky",
-      "summary": "(PHB-2024 201) Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest."
-    },
-    {
-      "name": "Farmer Ability Score Improvements",
-      "summary": "(PHB-2024 180) | Increase two scores (+2 / +1) •"
-    },
-    {
-      "name": "Tough",
-      "summary": "(PHB-2024 202) When you take this feat, your HP maximum increases by 10."
-    }
-  ],
-  "equipment": [],
-  "cp": 0,
-  "sp": 0,
-  "ep": 0,
-  "gp": 0,
-  "pp": 0
+  }
 }

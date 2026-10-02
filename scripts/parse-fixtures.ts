@@ -20,9 +20,9 @@ async function main() {
 
   for (const file of pdfs) {
     const formFields = await extractFormFields(new Uint8Array(readFileSync(path.join(FIXTURES, file))));
-    const parsed = parseDdbCharacter(formFields);
+    const { character, notices } = parseDdbCharacter(formFields);
     const outName = file.replace(/\.pdf$/i, '.json');
-    writeFileSync(path.join(OUT, outName), JSON.stringify(parsed, null, 2) + '\n');
+    writeFileSync(path.join(OUT, outName), JSON.stringify({ notices, character }, null, 2) + '\n');
     console.log(`${file} → out/${outName}`);
   }
 }

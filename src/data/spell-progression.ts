@@ -222,6 +222,59 @@ function resolveProgression(type: CasterType, lvl: number, cantrips: number): Sp
   }
 }
 
+/**
+ * Spell slots for a character's full class list under 2024 rules. One casting
+ * class uses its own table — half casters cast from level 1, so a Paladin or
+ * Ranger reads the full-caster row at half their level, rounded up. Two or more
+ * casting classes add full-caster levels, half the Paladin/Ranger levels
+ * (rounded up), and a third of Eldritch Knight/Arcane Trickster levels
+ * (rounded down), then read the full-caster table. Pact Magic stays separate.
+ *
+ * Separate from getSpellProgression, which the homebrew wizard still uses.
+ */
+export function getProgressionForClasses(
+  classes: { class_name: string; level: number; subclass?: string }[],
+): SpellProgression {
+  const clampLevel = (l: number) => Math.max(1, Math.min(20, Math.floor(l || 1)));
+  let pactSlotLevel: number | null = null;
+  let pactSlotCount: number | null = null;
+  const casters: { type: CasterType; level: number }[] = [];
+
+  for (const c of classes) {
+    const type = classify(c.class_name, c.subclass ?? '');
+    if (type === 'warlock') {
+      const w = WARLOCK_PROG[clampLevel(c.level)];
+      pactSlotLevel = w.level;
+      pactSlotCount = w.count;
+    } else if (type !== 'none') {
+      casters.push({ type, level: clampLevel(c.level) });
+    }
+  }
+
+  let spellSlots: Record<string, number> | null = null;
+  let casterType: CasterType = pactSlotLevel != null ? 'warlock' : 'none';
+  if (casters.length === 1) {
+    const [{ type, level }] = casters;
+    casterType = type;
+    if (type === 'full') spellSlots = rowToSlotMap(FULL_CASTER_SLOTS[level]);
+    else if (type === 'half') spellSlots = rowToSlotMap(FULL_CASTER_SLOTS[Math.ceil(level / 2)].slice(0, 5));
+    else {
+      const row = priorRow(THIRD_CASTER_SLOTS, level);
+      spellSlots = row ? rowToSlotMap(row) : null;
+    }
+  } else if (casters.length > 1) {
+    casterType = 'full';
+    const casterLevel = casters.reduce(
+      (sum, c) =>
+        sum + (c.type === 'full' ? c.level : c.type === 'half' ? Math.ceil(c.level / 2) : Math.floor(c.level / 3)),
+      0,
+    );
+    if (casterLevel > 0) spellSlots = rowToSlotMap(FULL_CASTER_SLOTS[clampLevel(casterLevel)]);
+  }
+
+  return { casterType, cantripsKnown: 0, spellSlots, pactSlotLevel, pactSlotCount };
+}
+
 // Convenience: detect whether a class qualifies as a spellcaster at all,
 // useful for parser/edit-view wiring. Returns true for full/half/third/warlock.
 export function isCasterClass(className: string, subclass: string = ''): boolean {

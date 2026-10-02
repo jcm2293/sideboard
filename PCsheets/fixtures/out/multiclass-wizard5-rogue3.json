@@ -1,407 +1,605 @@
 {
-  "name": "samplemulti",
-  "player_name": "Heershingenmosiken",
-  "class_name": "Wizard 5 / Rogue 3",
-  "subclass": "",
-  "level": 8,
-  "is_multiclass": true,
-  "armor_class": 14,
-  "ac_source": "",
-  "initiative_modifier": 3,
-  "speeds": {
-    "walking": "30 ft.",
-    "climbing": "30 ft."
-  },
-  "hp_max": 45,
-  "hit_dice_total": "5d6 + 3d8",
-  "proficiency_bonus": 3,
-  "passive_perception": 14,
-  "passive_insight": 17,
-  "passive_investigation": 13,
-  "senses": "Darkvision 120 ft.",
-  "str_score": 8,
-  "dex_score": 16,
-  "con_score": 12,
-  "int_score": 17,
-  "wis_score": 13,
-  "cha_score": 8,
-  "skill_modifiers": {
-    "acrobatics": 9,
-    "animal_handling": 1,
-    "arcana": 9,
-    "athletics": -1,
-    "deception": -1,
-    "history": 3,
-    "insight": 7,
-    "intimidation": -1,
-    "investigation": 3,
-    "medicine": 1,
-    "nature": 3,
-    "perception": 4,
-    "performance": -1,
-    "persuasion": -1,
-    "religion": 3,
-    "sleight_of_hand": 6,
-    "stealth": 6,
-    "survival": 1
-  },
-  "save_modifiers": {
-    "str": -1,
-    "dex": 3,
-    "con": 1,
-    "int": 6,
-    "wis": 4,
-    "cha": -1
-  },
-  "skill_proficiencies": {
-    "athletics": "none",
-    "acrobatics": "expertise",
-    "sleight_of_hand": "proficient",
-    "stealth": "proficient",
-    "arcana": "expertise",
-    "history": "none",
-    "investigation": "none",
-    "nature": "none",
-    "religion": "none",
-    "animal_handling": "none",
-    "insight": "expertise",
-    "medicine": "none",
-    "perception": "proficient",
-    "survival": "none",
-    "deception": "none",
-    "intimidation": "none",
-    "performance": "none",
-    "persuasion": "none"
-  },
-  "save_proficiencies": {
-    "str": "none",
-    "dex": "none",
-    "con": "none",
-    "int": "proficient",
-    "wis": "proficient",
-    "cha": "none"
-  },
-  "attacks": [
-    {
-      "name": "Dagger",
-      "atk_bonus": "+6",
-      "damage": "1d4+3",
-      "damage_type": "Piercing",
-      "range": "",
-      "notes": "Simple, Finesse, Light, Thrown, Nick, Range (20/60)"
-    },
-    {
-      "name": "Unarmed Strike",
-      "atk_bonus": "+2",
-      "damage": "0",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
-    }
+  "notices": [
+    "Combined duplicate inventory lines: Dagger ×4, Pouch ×2.",
+    "Spell slots 4/3/2 come from the class table; the export only lists 4/3.",
+    "Ritual Adept: description filled from the class reference — the export left it out."
   ],
-  "damage_resistances": "",
-  "damage_immunities": "",
-  "condition_immunities": "Magical Sleep",
-  "armor_proficiencies": {
-    "light": true,
-    "medium": false,
-    "heavy": false,
-    "shields": false
-  },
-  "weapon_proficiencies": {
-    "simple": true,
-    "martial": false
-  },
-  "languages": "Common, Common Sign Language, Elvish, Goblin, Thieves’ Cant",
-  "tool_proficiencies": "Forgery Kit, Thieves' Tools",
-  "is_spellcaster": true,
-  "spellcasting_ability": "INT",
-  "spell_attack_bonus_override": null,
-  "spell_save_dc_override": null,
-  "spell_slots": {
-    "1": 4,
-    "2": 3,
-    "3": 2,
-    "4": 0,
-    "5": 0,
-    "6": 0,
-    "7": 0,
-    "8": 0,
-    "9": 0
-  },
-  "pact_slot_level": null,
-  "pact_slot_count": null,
-  "spells": {
-    "0": [
-      "Dancing Lights",
-      "Acid Splash"
+  "character": {
+    "name": "samplemulti",
+    "player_name": "Heershingenmosiken",
+    "class_name": "Wizard 5 / Rogue 3",
+    "subclass": "Evoker / Thief",
+    "level": 8,
+    "is_multiclass": true,
+    "armor_class": 14,
+    "ac_source": "Enspelled Leather Armor",
+    "initiative_modifier": 3,
+    "speeds": {
+      "walking": "30 ft.",
+      "climbing": "30 ft."
+    },
+    "hp_max": 45,
+    "hit_dice_total": "5d6 + 3d8",
+    "proficiency_bonus": 3,
+    "passive_perception": 14,
+    "passive_insight": 17,
+    "passive_investigation": 13,
+    "senses": "Darkvision 120 ft.",
+    "str_score": 8,
+    "dex_score": 16,
+    "con_score": 12,
+    "int_score": 17,
+    "wis_score": 13,
+    "cha_score": 8,
+    "skill_modifiers": {
+      "acrobatics": 9,
+      "animal_handling": 1,
+      "arcana": 9,
+      "athletics": -1,
+      "deception": -1,
+      "history": 3,
+      "insight": 7,
+      "intimidation": -1,
+      "investigation": 3,
+      "medicine": 1,
+      "nature": 3,
+      "perception": 4,
+      "performance": -1,
+      "persuasion": -1,
+      "religion": 3,
+      "sleight_of_hand": 6,
+      "stealth": 6,
+      "survival": 1
+    },
+    "save_modifiers": {
+      "str": -1,
+      "dex": 3,
+      "con": 1,
+      "int": 6,
+      "wis": 4,
+      "cha": -1
+    },
+    "skill_proficiencies": {
+      "acrobatics": "expertise",
+      "animal_handling": "none",
+      "arcana": "expertise",
+      "athletics": "none",
+      "deception": "none",
+      "history": "none",
+      "insight": "expertise",
+      "intimidation": "none",
+      "investigation": "none",
+      "medicine": "none",
+      "nature": "none",
+      "perception": "proficient",
+      "performance": "none",
+      "persuasion": "none",
+      "religion": "none",
+      "sleight_of_hand": "proficient",
+      "stealth": "proficient",
+      "survival": "none"
+    },
+    "save_proficiencies": {
+      "str": "none",
+      "dex": "none",
+      "con": "none",
+      "int": "proficient",
+      "wis": "proficient",
+      "cha": "none"
+    },
+    "attacks": [
+      {
+        "name": "Dagger",
+        "atk_bonus": "+6",
+        "damage": "1d4+3",
+        "damage_type": "Piercing",
+        "range": "20/60",
+        "notes": "Simple, Finesse, Light, Thrown",
+        "kind": "weapon",
+        "tags": [
+          "Nick"
+        ]
+      },
+      {
+        "name": "Sneak Attack",
+        "atk_bonus": "",
+        "damage": "2d6",
+        "damage_type": "",
+        "range": "",
+        "notes": "once per turn, with Advantage or an ally within 5 ft. of the target; Finesse or Ranged weapon",
+        "kind": "rider"
+      }
     ],
-    "1": [
-      "Faerie Fire",
-      "Faerie Fire",
+    "damage_resistances": "",
+    "damage_immunities": "",
+    "condition_immunities": "Magical Sleep",
+    "armor_proficiencies": {
+      "light": true,
+      "medium": false,
+      "heavy": false,
+      "shields": false
+    },
+    "weapon_proficiencies": {
+      "simple": true,
+      "martial": false
+    },
+    "languages": "Common, Common Sign Language, Elvish, Goblin, Thieves’ Cant",
+    "tool_proficiencies": "Forgery Kit, Thieves' Tools",
+    "is_spellcaster": true,
+    "spellcasting_ability": "INT",
+    "spell_attack_bonus_override": null,
+    "spell_save_dc_override": null,
+    "spell_slots": {
+      "1": 4,
+      "2": 3,
+      "3": 2,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "pact_slot_level": null,
+    "pact_slot_count": null,
+    "spells": {
+      "0": [
+        "Dancing Lights",
+        "Acid Splash"
+      ],
+      "1": [
+        "Faerie Fire",
+        "Chromatic Orb"
+      ],
+      "2": [
+        "Darkness"
+      ]
+    },
+    "is_prepared_caster": true,
+    "prepared_spells": [
       "Chromatic Orb"
     ],
-    "2": [
-      "Darkness",
-      "Darkness"
-    ]
-  },
-  "is_prepared_caster": true,
-  "prepared_spells": null,
-  "class_resources": null,
-  "class_features": [
-    {
-      "name": "Spellcasting",
-      "summary": "(PHB-2024 165)"
+    "class_resources": [
+      {
+        "name": "Arcane Recovery",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Faerie Fire (free cast)",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Darkness (free cast)",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      }
+    ],
+    "class_features": [
+      {
+        "name": "Ritual Adept",
+        "summary": "You can cast any spell in your spellbook that has the Ritual tag as a Ritual. You don't need it prepared, but you must read from the book to cast it this way.",
+        "full_text": "You can cast any spell in your spellbook that has the Ritual tag as a Ritual. You don't need it prepared, but you must read from the book to cast it this way.",
+        "kind": "ribbon",
+        "group": "Wizard",
+        "source_ref": "PHB-2024 166"
+      },
+      {
+        "name": "Arcane Recovery",
+        "summary": "When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher.",
+        "full_text": "When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher.\n\nYou can use this feature once per Long Rest.",
+        "kind": "mechanical",
+        "group": "Wizard",
+        "action": "special",
+        "uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "source_ref": "PHB-2024 166"
+      },
+      {
+        "name": "Scholar",
+        "summary": "You can choose one of the skills in which you’re proficient and gain Expertise in it.",
+        "full_text": "You can choose one of the skills in which you’re proficient and gain Expertise in it.",
+        "kind": "ribbon",
+        "group": "Wizard",
+        "source_ref": "PHB-2024 166"
+      },
+      {
+        "name": "Evocation Savant",
+        "summary": "Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free.",
+        "full_text": "Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free.\n\nWhenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free.",
+        "kind": "mechanical",
+        "group": "Wizard",
+        "source_ref": "PHB-2024 174"
+      },
+      {
+        "name": "Potent Cantrip",
+        "summary": "When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect.",
+        "full_text": "When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect.",
+        "kind": "mechanical",
+        "group": "Wizard",
+        "source_ref": "PHB-2024 174"
+      },
+      {
+        "name": "Memorize Spell",
+        "summary": "Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell.",
+        "full_text": "Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell.",
+        "kind": "ribbon",
+        "group": "Wizard",
+        "source_ref": "PHB-2024 167"
+      },
+      {
+        "name": "Expertise",
+        "summary": "You gain Expertise in two of your skill proficiencies of your choice.",
+        "full_text": "You gain Expertise in two of your skill proficiencies of your choice.",
+        "kind": "ribbon",
+        "group": "Rogue",
+        "source_ref": "PHB-2024 129"
+      },
+      {
+        "name": "Sneak Attack",
+        "summary": "Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type.",
+        "full_text": "Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type.\n\nYou don’t need Advantage on the attack if at least one of your allies is within 5 ft. of the target, the ally doesn’t have the Incapacitated condition, and you don’t have Disadvantage on the attack roll.",
+        "kind": "mechanical",
+        "group": "Rogue",
+        "action": "special",
+        "source_ref": "PHB-2024 129"
+      },
+      {
+        "name": "Thieves’ Cant",
+        "summary": "You know Thieves’ Cant and one other language of your choice.",
+        "full_text": "You know Thieves’ Cant and one other language of your choice.",
+        "kind": "ribbon",
+        "group": "Rogue",
+        "source_ref": "PHB-2024 129"
+      },
+      {
+        "name": "Weapon Mastery",
+        "summary": "",
+        "full_text": "",
+        "kind": "mechanical",
+        "group": "Rogue",
+        "source_ref": "PHB-2024 129",
+        "options": [
+          "Blowgun (Vex)",
+          "Dagger (Nick)"
+        ],
+        "option_details": [
+          {
+            "name": "Blowgun (Vex)",
+            "text": "Vex. If you hit a creature with a Blowgun and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn."
+          },
+          {
+            "name": "Dagger (Nick)",
+            "text": "Nick. When you make the extra attack of the Light property, you can make it as part of the Attack action instead of as a Bonus Action. This extra attack can only be made once per turn."
+          }
+        ]
+      },
+      {
+        "name": "Cunning Action",
+        "summary": "On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide.",
+        "full_text": "On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide.",
+        "kind": "mechanical",
+        "group": "Rogue",
+        "action": "bonus",
+        "source_ref": "PHB-2024 130"
+      },
+      {
+        "name": "Steady Aim",
+        "summary": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn.",
+        "full_text": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn.",
+        "kind": "mechanical",
+        "group": "Rogue",
+        "action": "bonus",
+        "source_ref": "PHB-2024 130"
+      },
+      {
+        "name": "Fast Hands",
+        "summary": "As a Bonus Action you can do one of the following:",
+        "full_text": "As a Bonus Action you can do one of the following:\n\n• Make a Dex. (Sleight of Hand) check to pick a lock or disarm a trap with Thieves’ Tools or to pick a pocket.\n• Take the Utilize action or take the Magic action to use a magic item that requires that action.",
+        "kind": "mechanical",
+        "group": "Rogue",
+        "source_ref": "PHB-2024 137",
+        "activations": [
+          {
+            "label": "Sleight of Hand",
+            "action": "bonus"
+          },
+          {
+            "label": "Utilize",
+            "action": "bonus"
+          },
+          {
+            "label": "Use Magic Item",
+            "action": "bonus"
+          }
+        ]
+      },
+      {
+        "name": "Second-Story Work",
+        "summary": "You gain the following benefits:",
+        "full_text": "You gain the following benefits:\n\n• You gain a Climb Speed equal to your Speed.\n• You can determine your jump distance using your Dex. rather than your Str.",
+        "kind": "ribbon",
+        "group": "Rogue",
+        "source_ref": "PHB-2024 137"
+      }
+    ],
+    "racial_traits": [
+      {
+        "name": "Elven Lineage",
+        "summary": "Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage.",
+        "full_text": "Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage.",
+        "kind": "mechanical",
+        "group": "Elf",
+        "source_ref": "PHB-2024 190",
+        "options": [
+          "Drow Lineage"
+        ],
+        "option_details": [
+          {
+            "name": "Drow Lineage",
+            "text": "The range of your Darkvision increases to 120 ft. and you gain the spells outlined in the Elven Lineages table."
+          }
+        ]
+      },
+      {
+        "name": "Fey Ancestry",
+        "summary": "You have Advantage on saving throws you make to avoid or end the Charmed condition.",
+        "full_text": "You have Advantage on saving throws you make to avoid or end the Charmed condition.",
+        "kind": "mechanical",
+        "group": "Elf",
+        "source_ref": "PHB-2024 190"
+      },
+      {
+        "name": "Keen Senses",
+        "summary": "You have proficiency in the Insight, Perception, or Survival skill.",
+        "full_text": "You have proficiency in the Insight, Perception, or Survival skill.",
+        "kind": "ribbon",
+        "group": "Elf",
+        "source_ref": "PHB-2024 190"
+      },
+      {
+        "name": "Trance",
+        "summary": "You don’t need to sleep, and magic can’t put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
+        "full_text": "You don’t need to sleep, and magic can’t put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
+        "kind": "mechanical",
+        "group": "Elf",
+        "source_ref": "PHB-2024 190"
+      }
+    ],
+    "feats": [
+      {
+        "name": "Alert",
+        "summary": "Initiative Proficiency. When you roll Initiative, add +3 to the roll.",
+        "full_text": "Initiative Proficiency. When you roll Initiative, add +3 to the roll.\n\nInitiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can’t make this swap if you or the ally has the Incapacitated condition.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "source_ref": "PHB-2024 200"
+      }
+    ],
+    "equipment": [
+      {
+        "name": "Dagger",
+        "qty": 4,
+        "weight": "4 lb."
+      },
+      {
+        "name": "Quarterstaff",
+        "qty": 1,
+        "weight": "4 lb."
+      },
+      {
+        "name": "Robe",
+        "qty": 1,
+        "weight": "4 lb."
+      },
+      {
+        "name": "Backpack",
+        "qty": 1,
+        "weight": "5 lb."
+      },
+      {
+        "name": "Book",
+        "qty": 1,
+        "weight": "5 lb."
+      },
+      {
+        "name": "Parchment",
+        "qty": 10,
+        "weight": ""
+      },
+      {
+        "name": "Ink Pen",
+        "qty": 1,
+        "weight": ""
+      },
+      {
+        "name": "Ink",
+        "qty": 1,
+        "weight": ""
+      },
+      {
+        "name": "Lamp",
+        "qty": 1,
+        "weight": "1 lb."
+      },
+      {
+        "name": "Oil",
+        "qty": 10,
+        "weight": "10 lb."
+      },
+      {
+        "name": "Tinderbox",
+        "qty": 1,
+        "weight": "1 lb."
+      },
+      {
+        "name": "Spellbook",
+        "qty": 1,
+        "weight": "3 lb."
+      },
+      {
+        "name": "Thieves' Tools",
+        "qty": 1,
+        "weight": "1 lb."
+      },
+      {
+        "name": "Crowbar",
+        "qty": 1,
+        "weight": "5 lb."
+      },
+      {
+        "name": "Pouch",
+        "qty": 2,
+        "weight": "2 lb."
+      },
+      {
+        "name": "Traveler's Clothes",
+        "qty": 1,
+        "weight": "4 lb."
+      },
+      {
+        "name": "Enspelled Leather Armor",
+        "qty": 1,
+        "weight": "10 lb.",
+        "tags": [
+          "attunement?"
+        ]
+      }
+    ],
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 21,
+    "pp": 0,
+    "species": "Elf",
+    "background": "Criminal",
+    "classes": [
+      {
+        "class_name": "Wizard",
+        "level": 5,
+        "subclass": "Evoker"
+      },
+      {
+        "class_name": "Rogue",
+        "level": 3,
+        "subclass": "Thief"
+      }
+    ],
+    "spell_details": {
+      "Dancing Lights": {
+        "name": "Dancing Lights",
+        "level": 0,
+        "source": "Elven Lineage Spells",
+        "origin": "species",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "120 ft.",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, V/S/M",
+        "page_ref": "PHB-2024 259"
+      },
+      "Acid Splash": {
+        "name": "Acid Splash",
+        "level": 0,
+        "source": "Evocation Savant",
+        "origin": "subclass",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "DEX 14",
+        "casting_time": "1A",
+        "range": "60 ft./5 ft. Sphere",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "5 ft. Sphere, V/S",
+        "page_ref": "PHB-2024 239"
+      },
+      "Faerie Fire": {
+        "name": "Faerie Fire",
+        "level": 1,
+        "source": "Elven Lineage Spells",
+        "origin": "species",
+        "always_prepared": false,
+        "costs_slot": true,
+        "free_uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "DEX 14",
+        "casting_time": "1A",
+        "range": "60 ft./20 ft. Cube",
+        "components": "V",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "1/LR, D: 1m, 20 ft. Cube, V",
+        "page_ref": "PHB-2024 271"
+      },
+      "Chromatic Orb": {
+        "name": "Chromatic Orb",
+        "level": 1,
+        "source": "Evocation Savant",
+        "origin": "subclass",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+6",
+        "casting_time": "1A",
+        "range": "90 ft.",
+        "components": "V,S,M",
+        "duration": "Instantaneous",
+        "notes": "V/S/M",
+        "page_ref": "PHB-2024 249"
+      },
+      "Darkness": {
+        "name": "Darkness",
+        "level": 2,
+        "source": "Elven Lineage Spells",
+        "origin": "species",
+        "always_prepared": false,
+        "costs_slot": true,
+        "free_uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "60 ft./15 ft. Sphere",
+        "components": "V,M",
+        "duration": "Concentration, up to 10 minutes",
+        "notes": "1/LR, D: 10m, 15 ft. Sphere, V/M",
+        "page_ref": "PHB-2024 260"
+      }
     },
-    {
-      "name": "Ritual Adept",
-      "summary": "(PHB-2024 166)"
-    },
-    {
-      "name": "Arcane Recovery",
-      "summary": "(PHB-2024 166) When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher. You can use this feature once per Long Rest."
-    },
-    {
-      "name": "Scholar",
-      "summary": "(PHB-2024 166) You can choose one of the skills in which you’re proficient and gain Expertise in it."
-    },
-    {
-      "name": "Wizard Subclass",
-      "summary": "(PHB-2024 167) | Evoker"
-    },
-    {
-      "name": "Evocation Savant",
-      "summary": "(PHB-2024 174) Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free. Whenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free."
-    },
-    {
-      "name": "Potent Cantrip",
-      "summary": "(PHB-2024 174) When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect."
-    },
-    {
-      "name": "Memorize Spell",
-      "summary": "(PHB-2024 167) Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell."
-    },
-    {
-      "name": "Expertise",
-      "summary": "(PHB-2024 129) You gain Expertise in two of your skill proficiencies of your choice."
-    },
-    {
-      "name": "Sneak Attack",
-      "summary": "(PHB-2024 129) Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type."
-    },
-    {
-      "name": "Thieves’ Cant",
-      "summary": "(PHB-2024 129) You know Thieves’ Cant and one other language of your choice."
-    },
-    {
-      "name": "Weapon Mastery",
-      "summary": "(PHB-2024 129)"
-    },
-    {
-      "name": "Cunning Action",
-      "summary": "(PHB-2024 130) On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide."
-    },
-    {
-      "name": "Rogue Subclass",
-      "summary": "(PHB-2024 130) | Thief"
-    },
-    {
-      "name": "Steady Aim",
-      "summary": "(PHB-2024 130) As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn."
-    },
-    {
-      "name": "Fast Hands",
-      "summary": "(PHB-2024 137) As a Bonus Action you can do one of the following:"
-    },
-    {
-      "name": "Take the Utilize action or take the Magic action to use a magic item that requires that action.",
-      "summary": "| Fast Hands: Sleight of Hand: 1 Bonus Action | Fast Hands: Utilize: 1 Bonus Action | Fast Hands: Use Magic Item: 1 Bonus Action"
-    },
-    {
-      "name": "Second-Story Work",
-      "summary": "(PHB-2024 137) You gain the following benefits:"
+    "weapon_masteries": [
+      {
+        "weapon": "Blowgun",
+        "mastery": "Vex"
+      },
+      {
+        "weapon": "Dagger",
+        "mastery": "Nick"
+      }
+    ],
+    "grapple_shove_dc": 10,
+    "feature_dc": {
+      "label": "Spell DC",
+      "value": 14
     }
-  ],
-  "racial_traits": [
-    {
-      "name": "Speed",
-      "summary": "(PHB-2024 190) Your speed is 30 ft."
-    },
-    {
-      "name": "Darkvision",
-      "summary": "(PHB-2024 190) You have Darkvision with a range of 60 ft."
-    },
-    {
-      "name": "Elven Lineage",
-      "summary": "(PHB-2024 190) Choose a lineage from the Elven Lineages table."
-    },
-    {
-      "name": "Elven Lineage Spells",
-      "summary": "(PHB-2024 189) | Drow Lineage - Intelligence •"
-    },
-    {
-      "name": "Fey Ancestry",
-      "summary": "(PHB-2024 190) You have Advantage on saving throws you make to avoid or end the Charmed condition."
-    },
-    {
-      "name": "Keen Senses",
-      "summary": "(PHB-2024 190) You have proficiency in the Insight, Perception, or Survival skill."
-    },
-    {
-      "name": "Trance",
-      "summary": "(PHB-2024 190) You don’t need to sleep, and magic can’t put you to sleep."
-    },
-    {
-      "name": "Languages",
-      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
-    }
-  ],
-  "feats": [
-    {
-      "name": "Alert",
-      "summary": "(PHB-2024 200) Initiative Proficiency."
-    },
-    {
-      "name": "Criminal Ability Score Improvements",
-      "summary": "(PHB-2024 179) | Increase two scores (+2 / +1) •"
-    },
-    {
-      "name": "Weapon Mastery",
-      "summary": "(PHB-2024 129) | Blowgun (Vex) • Vex. If you hit a creature with a Blowgun and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn. | Dagger (Nick) • Nick."
-    }
-  ],
-  "equipment": [
-    {
-      "name": "Dagger",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Dagger",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Quarterstaff",
-      "qty": 1,
-      "weight": "4 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Robe",
-      "qty": 1,
-      "weight": "4 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Backpack",
-      "qty": 1,
-      "weight": "5 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Book",
-      "qty": 1,
-      "weight": "5 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Parchment",
-      "qty": 10,
-      "weight": "--",
-      "notes": ""
-    },
-    {
-      "name": "Ink Pen",
-      "qty": 1,
-      "weight": "--",
-      "notes": ""
-    },
-    {
-      "name": "Ink",
-      "qty": 1,
-      "weight": "--",
-      "notes": ""
-    },
-    {
-      "name": "Lamp",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Oil",
-      "qty": 10,
-      "weight": "10 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Tinderbox",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Spellbook",
-      "qty": 1,
-      "weight": "3 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Dagger",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Dagger",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Thieves' Tools",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Crowbar",
-      "qty": 1,
-      "weight": "5 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Pouch",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Pouch",
-      "qty": 1,
-      "weight": "1 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Traveler's Clothes",
-      "qty": 1,
-      "weight": "4 lb.",
-      "notes": ""
-    },
-    {
-      "name": "Enspelled Leather Armor",
-      "qty": 1,
-      "weight": "10 lb.",
-      "notes": ""
-    }
-  ],
-  "cp": 0,
-  "sp": 0,
-  "ep": 0,
-  "gp": 21,
-  "pp": 0
+  }
 }

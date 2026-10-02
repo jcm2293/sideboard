@@ -1,261 +1,843 @@
 {
-  "name": "Dash",
-  "player_name": "Heershingenmosiken",
-  "class_name": "Warlock",
-  "subclass": "",
-  "level": 5,
-  "is_multiclass": false,
-  "armor_class": 13,
-  "ac_source": "",
-  "initiative_modifier": 3,
-  "speeds": {
-    "walking": "35 ft.",
-    "climbing": "35 ft."
-  },
-  "hp_max": 38,
-  "hit_dice_total": "5d8",
-  "proficiency_bonus": 3,
-  "passive_perception": 9,
-  "passive_insight": 6,
-  "passive_investigation": 10,
-  "senses": "Darkvision 60 ft.",
-  "str_score": 18,
-  "dex_score": 16,
-  "con_score": 15,
-  "int_score": 11,
-  "wis_score": 3,
-  "cha_score": 20,
-  "skill_modifiers": {
-    "acrobatics": 3,
-    "animal_handling": -4,
-    "arcana": 0,
-    "athletics": 7,
-    "deception": 8,
-    "history": 0,
-    "insight": -4,
-    "intimidation": 8,
-    "investigation": 0,
-    "medicine": -4,
-    "nature": 0,
-    "perception": -4,
-    "performance": 5,
-    "persuasion": 8,
-    "religion": 0,
-    "sleight_of_hand": 3,
-    "stealth": 3,
-    "survival": -4
-  },
-  "save_modifiers": {
-    "str": 4,
-    "dex": 3,
-    "con": 2,
-    "int": 0,
-    "wis": -1,
-    "cha": 8
-  },
-  "skill_proficiencies": {
-    "athletics": "proficient",
-    "acrobatics": "none",
-    "sleight_of_hand": "none",
-    "stealth": "none",
-    "arcana": "none",
-    "history": "none",
-    "investigation": "none",
-    "nature": "none",
-    "religion": "none",
-    "animal_handling": "none",
-    "insight": "none",
-    "medicine": "none",
-    "perception": "none",
-    "survival": "none",
-    "deception": "proficient",
-    "intimidation": "proficient",
-    "performance": "none",
-    "persuasion": "proficient"
-  },
-  "save_proficiencies": {
-    "str": "none",
-    "dex": "none",
-    "con": "none",
-    "int": "none",
-    "wis": "proficient",
-    "cha": "proficient"
-  },
-  "attacks": [
-    {
-      "name": "Shortsword, +1",
-      "atk_bonus": "+5",
-      "damage": "1d6+5",
-      "damage_type": "Piercing",
-      "range": "",
-      "notes": "Martial, Finesse, Light, Vex, Vengeful Blade: 2d8 Necrotic, Booming Blade: 1d8 Thunder, 2d8 Thunder"
-    },
-    {
-      "name": "Blood Bolt",
-      "atk_bonus": "+8",
-      "damage": "2d6",
-      "damage_type": "Necrotic",
-      "range": "",
-      "notes": "V/S"
-    },
-    {
-      "name": "Eldritch Blast",
-      "atk_bonus": "+8",
-      "damage": "1d10+5",
-      "damage_type": "Force",
-      "range": "",
-      "notes": "Count: 2, V/S"
-    },
-    {
-      "name": "Unarmed Strike",
-      "atk_bonus": "+7",
-      "damage": "5",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
-    }
+  "notices": [
+    "Pact of the Blade is present but no weapon attack uses Charisma: bond the pact weapon in D&D Beyond and re-export."
   ],
-  "damage_resistances": "Necrotic",
-  "damage_immunities": "",
-  "condition_immunities": "",
-  "armor_proficiencies": {
-    "light": true,
-    "medium": false,
-    "heavy": false,
-    "shields": false
-  },
-  "weapon_proficiencies": {
-    "simple": true,
-    "martial": false
-  },
-  "languages": "Common, Common Sign Language, Draconic",
-  "tool_proficiencies": "Disguise Kit",
-  "is_spellcaster": true,
-  "spellcasting_ability": "CHA",
-  "spell_attack_bonus_override": null,
-  "spell_save_dc_override": null,
-  "spell_slots": null,
-  "pact_slot_level": 3,
-  "pact_slot_count": 2,
-  "spells": {
-    "0": [
-      "Blood Bolt",
-      "Vengeful Blade",
-      "Eldritch Blast",
-      "Vicious Mockery",
-      "Toll the Dead",
-      "Booming Blade",
-      "Resistance"
+  "character": {
+    "name": "Dash",
+    "player_name": "Heershingenmosiken",
+    "class_name": "Warlock",
+    "subclass": "Fiend Patron",
+    "level": 5,
+    "is_multiclass": false,
+    "armor_class": 13,
+    "ac_source": "no armor",
+    "initiative_modifier": 3,
+    "speeds": {
+      "walking": "35 ft.",
+      "climbing": "35 ft."
+    },
+    "hp_max": 38,
+    "hit_dice_total": "5d8",
+    "proficiency_bonus": 3,
+    "passive_perception": 9,
+    "passive_insight": 6,
+    "passive_investigation": 10,
+    "senses": "Darkvision 60 ft.",
+    "str_score": 18,
+    "dex_score": 16,
+    "con_score": 15,
+    "int_score": 11,
+    "wis_score": 3,
+    "cha_score": 20,
+    "skill_modifiers": {
+      "acrobatics": 3,
+      "animal_handling": -4,
+      "arcana": 0,
+      "athletics": 7,
+      "deception": 8,
+      "history": 0,
+      "insight": -4,
+      "intimidation": 8,
+      "investigation": 0,
+      "medicine": -4,
+      "nature": 0,
+      "perception": -4,
+      "performance": 5,
+      "persuasion": 8,
+      "religion": 0,
+      "sleight_of_hand": 3,
+      "stealth": 3,
+      "survival": -4
+    },
+    "save_modifiers": {
+      "str": 4,
+      "dex": 3,
+      "con": 2,
+      "int": 0,
+      "wis": -1,
+      "cha": 8
+    },
+    "skill_proficiencies": {
+      "acrobatics": "none",
+      "animal_handling": "none",
+      "arcana": "none",
+      "athletics": "proficient",
+      "deception": "proficient",
+      "history": "none",
+      "insight": "none",
+      "intimidation": "proficient",
+      "investigation": "none",
+      "medicine": "none",
+      "nature": "none",
+      "perception": "none",
+      "performance": "none",
+      "persuasion": "proficient",
+      "religion": "none",
+      "sleight_of_hand": "none",
+      "stealth": "none",
+      "survival": "none"
+    },
+    "save_proficiencies": {
+      "str": "none",
+      "dex": "none",
+      "con": "none",
+      "int": "none",
+      "wis": "proficient",
+      "cha": "proficient"
+    },
+    "attacks": [
+      {
+        "name": "Shortsword, +1",
+        "atk_bonus": "+5",
+        "damage": "1d6+5",
+        "damage_type": "Piercing",
+        "range": "",
+        "notes": "Martial, Finesse, Light, Vengeful Blade: 2d8 Necrotic, Booming Blade: 1d8 Thunder, 2d8 Thunder",
+        "kind": "weapon",
+        "tags": [
+          "Vex"
+        ]
+      },
+      {
+        "name": "Unarmed Strike",
+        "atk_bonus": "+7",
+        "damage": "5",
+        "damage_type": "Bludgeoning",
+        "range": "",
+        "notes": "",
+        "kind": "unarmed"
+      },
+      {
+        "name": "Vampiric Bite",
+        "atk_bonus": "+7",
+        "damage": "1d4+2",
+        "damage_type": "Piercing",
+        "range": "",
+        "notes": "replaces an Unarmed Strike; empower with Drain or Strengthen",
+        "kind": "unarmed",
+        "tags": [
+          "3 / long rest"
+        ]
+      },
+      {
+        "name": "Blood Bolt",
+        "atk_bonus": "+8",
+        "damage": "2d6",
+        "damage_type": "Necrotic",
+        "range": "90 ft.",
+        "notes": "V/S",
+        "kind": "spell"
+      },
+      {
+        "name": "Eldritch Blast",
+        "atk_bonus": "+8",
+        "damage": "1d10+5",
+        "damage_type": "Force",
+        "range": "120 ft.",
+        "notes": "Count: 2, V/S",
+        "kind": "spell"
+      }
     ],
-    "1": [
-      "Hex",
-      "Charm Person",
-      "Burning Hands",
-      "Command",
-      "Disguise Self",
-      "Binding Pledge [R]",
-      "Purify Food and Drink [R]"
+    "damage_resistances": "Necrotic",
+    "damage_immunities": "",
+    "condition_immunities": "",
+    "armor_proficiencies": {
+      "light": true,
+      "medium": false,
+      "heavy": false,
+      "shields": false
+    },
+    "weapon_proficiencies": {
+      "simple": true,
+      "martial": false
+    },
+    "languages": "Common, Common Sign Language, Draconic",
+    "tool_proficiencies": "Disguise Kit",
+    "is_spellcaster": true,
+    "spellcasting_ability": "CHA",
+    "spell_attack_bonus_override": null,
+    "spell_save_dc_override": null,
+    "spell_slots": null,
+    "pact_slot_level": 3,
+    "pact_slot_count": 2,
+    "spells": {
+      "0": [
+        "Blood Bolt",
+        "Vengeful Blade",
+        "Eldritch Blast",
+        "Vicious Mockery",
+        "Toll the Dead",
+        "Booming Blade",
+        "Resistance"
+      ],
+      "1": [
+        "Hex",
+        "Charm Person",
+        "Burning Hands",
+        "Command",
+        "Disguise Self",
+        "Binding Pledge",
+        "Purify Food and Drink"
+      ],
+      "2": [
+        "Blood Sacrifice",
+        "Sanguine Secrets",
+        "Misty Step",
+        "Scorching Ray",
+        "Suggestion"
+      ],
+      "3": [
+        "Vampiric Touch",
+        "Counterspell",
+        "Shadow Drain",
+        "Fireball",
+        "Stinking Cloud"
+      ]
+    },
+    "is_prepared_caster": false,
+    "prepared_spells": null,
+    "class_resources": [
+      {
+        "name": "Pact slots (3rd level)",
+        "uses": 2,
+        "recovery": "Short Rest",
+        "source": "table"
+      },
+      {
+        "name": "Magical Cunning",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Vampiric Bite",
+        "uses": 3,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Charm Person (free cast)",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Misty Step (free cast)",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      }
     ],
-    "2": [
-      "Blood Sacrifice",
-      "Sanguine Secrets",
-      "Misty Step",
-      "Misty Step",
-      "Scorching Ray",
-      "Suggestion"
+    "class_features": [
+      {
+        "name": "Eldritch Invocations",
+        "summary": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation.",
+        "full_text": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "source_ref": "PHB-2024 153"
+      },
+      {
+        "name": "Agonizing Blast (Eldritch Blast)",
+        "summary": "You can add your Cha. modifier bonus to the damage rolls of Eldritch Blast.",
+        "full_text": "You can add your Cha. modifier bonus to the damage rolls of Eldritch Blast.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "parent": "Eldritch Invocations",
+        "source_ref": "br-2024"
+      },
+      {
+        "name": "Mask of Many Faces",
+        "summary": "You can cast Disguise Self without expending a spell slot.",
+        "full_text": "You can cast Disguise Self without expending a spell slot.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "parent": "Eldritch Invocations",
+        "source_ref": "br-2024"
+      },
+      {
+        "name": "Pact of the Blade",
+        "summary": "As a Bonus Action, you can conjure a pact weapon in your hand, or create a bond with a magic weapon you touch. You can’t bond with a magic weapon if someone else attuned to it or another Warlock is bonded with it. Until the bond ends, you’re proficient with it and can use it as a Spellcasting Focus.",
+        "full_text": "As a Bonus Action, you can conjure a pact weapon in your hand, or create a bond with a magic weapon you touch. You can’t bond with a magic weapon if someone else attuned to it or another Warlock is bonded with it. Until the bond ends, you’re proficient with it and can use it as a Spellcasting Focus.\n\nWhenever you attack with the bonded weapon, you can use your Cha. instead of Str. or Dex.; and you can cause it to deal Necrotic, Psychic, or Radiant damage or its normal damage type.\n\nYour bond with the weapons ends if you use this feature’s Bonus Action again, if the weapon is more than 5 ft. away from you for more than 1 minute, or if you die. A conjured weapon disappears when the bond ends.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "parent": "Eldritch Invocations",
+        "source_ref": "br-2024",
+        "activations": [
+          {
+            "label": "Conjure",
+            "action": "bonus"
+          },
+          {
+            "label": "Bond",
+            "action": "bonus"
+          }
+        ]
+      },
+      {
+        "name": "Pact of the Tome",
+        "summary": "At the end of a Short or Long Rest you can conjure forth a book in your hand, a Book of Shadows, which contains eldritch magic that only you can access, granting the benefits below.",
+        "full_text": "At the end of a Short or Long Rest you can conjure forth a book in your hand, a Book of Shadows, which contains eldritch magic that only you can access, granting the benefits below.\n\n• When the book appears, choose 3 cantrips and choose two level 1 spells that have the Ritual tag, which can be from any class’s spell list.\n• You can use the book as a Spellcasting Focus.\n\nThe book disappears if you conjure another one or if you die.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "parent": "Eldritch Invocations",
+        "source_ref": "br-2024"
+      },
+      {
+        "name": "Thirsting Blade",
+        "summary": "You gain the Extra Attack feature for your pact weapon only and can attack twice with the weapon instead of once when you take the Attack action.",
+        "full_text": "You gain the Extra Attack feature for your pact weapon only and can attack twice with the weapon instead of once when you take the Attack action.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "parent": "Eldritch Invocations",
+        "action": "action",
+        "source_ref": "br-2024"
+      },
+      {
+        "name": "Magical Cunning",
+        "summary": "Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots.",
+        "full_text": "Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "action": "none",
+        "uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "source_ref": "PHB-2024 154"
+      },
+      {
+        "name": "Dark One’s Blessing",
+        "summary": "When you reduce an enemy to 0 HP, you gain 10 Temp HP. You also gain this benefit if someone else reduces an enemy within 10 ft. of you to 0 HP.",
+        "full_text": "When you reduce an enemy to 0 HP, you gain 10 Temp HP. You also gain this benefit if someone else reduces an enemy within 10 ft. of you to 0 HP.",
+        "kind": "mechanical",
+        "group": "Warlock",
+        "action": "special",
+        "source_ref": "PHB-2024 161"
+      },
+      {
+        "name": "Fiend Spells",
+        "summary": "When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.",
+        "full_text": "When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.",
+        "kind": "container",
+        "group": "Warlock",
+        "source_ref": "PHB-2024 161"
+      }
     ],
-    "3": [
-      "Vampiric Touch",
-      "Counterspell",
-      "Shadow Drain",
-      "Fireball",
-      "Stinking Cloud"
-    ]
-  },
-  "is_prepared_caster": false,
-  "prepared_spells": null,
-  "class_resources": null,
-  "class_features": [
-    {
-      "name": "Eldritch Invocations",
-      "summary": "(PHB-2024 153) You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation. | Agonizing Blast (Eldritch Blast) • br-2024 You can add your Cha."
+    "racial_traits": [
+      {
+        "name": "Spider Climb",
+        "summary": "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free.",
+        "full_text": "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free.",
+        "kind": "mechanical",
+        "group": "Dhampir",
+        "source_ref": "RtHW 8"
+      },
+      {
+        "name": "Trace of Undeath",
+        "summary": "You have Resistance to Necrotic damage.",
+        "full_text": "You have Resistance to Necrotic damage.",
+        "kind": "mechanical",
+        "group": "Dhampir",
+        "source_ref": "RtHW 8"
+      },
+      {
+        "name": "Vampiric Bite",
+        "summary": "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn’t a Construct or an Undead, you can empower yourself in one of the following ways:",
+        "full_text": "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn’t a Construct or an Undead, you can empower yourself in one of the following ways:\n\nDrain. You regain Hit Points equal to the Piercing damage dealt. Strengthen. You gain a bonus to the next ability check or attack roll you make within the next minute; the bonus is equal to the Piercing damage dealt. You can empower yourself with this trait 3 times, and you regain all expended uses when you finish a Long Rest.",
+        "kind": "mechanical",
+        "group": "Dhampir",
+        "action": "special",
+        "uses": {
+          "count": 3,
+          "per": "long"
+        },
+        "source_ref": "RtHW 8"
+      }
+    ],
+    "feats": [
+      {
+        "name": "Fey Touched",
+        "summary": "Ability Score Increase. Increase your Int., Wis., or Cha. by 1.",
+        "full_text": "Ability Score Increase. Increase your Int., Wis., or Cha. by 1.\n\nFey Magic. Choose one level 1 spell from the Divination or Enchantment school of magic. You always have that spell and the Misty Step spell prepared. Once per Long Rest, you can cast each of these spells without expending a spell slot. You can also cast these spells using spell slots you have of the appropriate level. The spells’ spellcasting ability is the ability increased by this feat.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "source_ref": "PHB-2024 204",
+        "options": [
+          "Charisma"
+        ]
+      },
+      {
+        "name": "Arcane Eloquence",
+        "summary": "You gain the following benefits.",
+        "full_text": "You gain the following benefits.\n\nCantrip. You learn the Vicious Mockery cantrip. Int., Wis., or Cha. is your spellcasting ability for this spell (choose when you select this feat).\n\nSmooth Talker. When you make a Cha. (Deception, Intimidation, or Persuasion) check, you can roll 1d4 and add the number rolled to the ability check.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "source_ref": "AU 26",
+        "options": [
+          "Charisma"
+        ],
+        "option_details": [
+          {
+            "name": "Charisma",
+            "text": "Your spellcasting ability for this spell is Charisma."
+          }
+        ],
+        "activations": [
+          {
+            "label": "Smooth Talker",
+            "action": "special"
+          }
+        ]
+      }
+    ],
+    "equipment": [
+      {
+        "name": "Shortsword, +1",
+        "qty": 1,
+        "weight": "2 lb.",
+        "tags": [
+          "attunement?"
+        ]
+      }
+    ],
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 0,
+    "pp": 0,
+    "species": "Dhampir",
+    "background": "Bejeweled Conclave Spy",
+    "classes": [
+      {
+        "class_name": "Warlock",
+        "level": 5,
+        "subclass": "Fiend Patron"
+      }
+    ],
+    "spell_details": {
+      "Blood Bolt": {
+        "name": "Blood Bolt",
+        "level": 0,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "90 ft.",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "V/S",
+        "page_ref": "TCMP1 125"
+      },
+      "Vengeful Blade": {
+        "name": "Vengeful Blade",
+        "level": 0,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "Self",
+        "components": "S,M",
+        "duration": "Instantaneous",
+        "notes": "S/M",
+        "page_ref": "TIR 34"
+      },
+      "Eldritch Blast": {
+        "name": "Eldritch Blast",
+        "level": 0,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "120 ft.",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "Count: 2, V/S",
+        "page_ref": "PHB-2024 267"
+      },
+      "Vicious Mockery": {
+        "name": "Vicious Mockery",
+        "level": 0,
+        "source": "Arcane Eloquence",
+        "origin": "feat",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 16",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V",
+        "duration": "Instantaneous",
+        "notes": "V",
+        "page_ref": "PHB-2024 337"
+      },
+      "Toll the Dead": {
+        "name": "Toll the Dead",
+        "level": 0,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 16",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "V/S",
+        "page_ref": "PHB-2024 334"
+      },
+      "Booming Blade": {
+        "name": "Booming Blade",
+        "level": 0,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "Self/5 ft. Sphere",
+        "components": "S,M",
+        "duration": "1 round",
+        "notes": "D: 1Rnd, 5 ft. Sphere, S/M",
+        "page_ref": "SCAG 142"
+      },
+      "Resistance": {
+        "name": "Resistance",
+        "level": 0,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Touch",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, V/S/M",
+        "page_ref": "PHB 272"
+      },
+      "Hex": {
+        "name": "Hex",
+        "level": 1,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "",
+        "casting_time": "1BA",
+        "range": "90 ft.",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 hour",
+        "notes": "D: 1h, V/S/M",
+        "page_ref": "PHB-2024 285"
+      },
+      "Charm Person": {
+        "name": "Charm Person",
+        "level": 1,
+        "source": "Fey Touched (Always Prepared)",
+        "origin": "feat",
+        "always_prepared": true,
+        "costs_slot": false,
+        "free_uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 16",
+        "casting_time": "1A",
+        "range": "30 ft.",
+        "components": "V,S",
+        "duration": "1 hour",
+        "notes": "1/LR, D: 1h, V/S",
+        "page_ref": "PHB-2024 249"
+      },
+      "Burning Hands": {
+        "name": "Burning Hands",
+        "level": 1,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "DEX 16",
+        "casting_time": "1A",
+        "range": "Self/15 ft. Cone",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "15 ft. Cone, V/S",
+        "page_ref": "PHB-2024 248"
+      },
+      "Command": {
+        "name": "Command",
+        "level": 1,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "WIS 16",
+        "casting_time": "1A",
+        "range": "60 ft.",
+        "components": "V",
+        "duration": "Instantaneous",
+        "notes": "V",
+        "page_ref": "PHB-2024 251"
+      },
+      "Disguise Self": {
+        "name": "Disguise Self",
+        "level": 1,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "Self",
+        "components": "V,S",
+        "duration": "1 hour",
+        "notes": "D: 1h, V/S",
+        "page_ref": "PHB-2024 262"
+      },
+      "Binding Pledge": {
+        "name": "Binding Pledge",
+        "level": 1,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": true,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1m",
+        "range": "Touch",
+        "components": "V,S,M",
+        "duration": "10 days",
+        "notes": "D: 10d, V/S/M",
+        "page_ref": "GHPG 185"
+      },
+      "Purify Food and Drink": {
+        "name": "Purify Food and Drink",
+        "level": 1,
+        "source": "Eldritch Invocations",
+        "origin": "invocation",
+        "always_prepared": false,
+        "costs_slot": false,
+        "ritual": true,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1A",
+        "range": "10 ft./5 ft. Sphere",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "5 ft. Sphere, V/S",
+        "page_ref": "PHB-2024 310"
+      },
+      "Blood Sacrifice": {
+        "name": "Blood Sacrifice",
+        "level": 2,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1BA",
+        "range": "Self",
+        "components": "V,S,M",
+        "duration": "1 minute",
+        "notes": "D: 1m, V/S/M",
+        "page_ref": "TCMP1 125"
+      },
+      "Sanguine Secrets": {
+        "name": "Sanguine Secrets",
+        "level": 2,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1BA",
+        "range": "30 ft.",
+        "components": "V,S,M",
+        "duration": "1 round",
+        "notes": "D: 1Rnd, V/S/M",
+        "page_ref": "TCMP1 132"
+      },
+      "Misty Step": {
+        "name": "Misty Step",
+        "level": 2,
+        "source": "Fey Touched (Always Prepared)",
+        "origin": "feat",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "",
+        "casting_time": "1BA",
+        "range": "Self",
+        "components": "V",
+        "duration": "Instantaneous",
+        "notes": "V",
+        "page_ref": "PHB-2024 299",
+        "free_uses": {
+          "count": 1,
+          "per": "long"
+        }
+      },
+      "Scorching Ray": {
+        "name": "Scorching Ray",
+        "level": 2,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "120 ft.",
+        "components": "V,S",
+        "duration": "Instantaneous",
+        "notes": "V/S",
+        "page_ref": "PHB-2024 314"
+      },
+      "Suggestion": {
+        "name": "Suggestion",
+        "level": 2,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "WIS 16",
+        "casting_time": "1A",
+        "range": "30 ft.",
+        "components": "V,M",
+        "duration": "Concentration, up to 8 hours",
+        "notes": "D: 8h, V/M",
+        "page_ref": "PHB-2024 320"
+      },
+      "Vampiric Touch": {
+        "name": "Vampiric Touch",
+        "level": 3,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "+8",
+        "casting_time": "1A",
+        "range": "Self",
+        "components": "V,S",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, V/S",
+        "page_ref": "PHB-2024 337"
+      },
+      "Counterspell": {
+        "name": "Counterspell",
+        "level": 3,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "CON 16",
+        "casting_time": "1R",
+        "range": "60 ft.",
+        "components": "S",
+        "duration": "Instantaneous",
+        "notes": "S",
+        "page_ref": "PHB-2024 258"
+      },
+      "Shadow Drain": {
+        "name": "Shadow Drain",
+        "level": 3,
+        "source": "Warlock",
+        "origin": "class",
+        "always_prepared": false,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "CHA 16",
+        "casting_time": "1A",
+        "range": "Self/15 ft. Emanation",
+        "components": "V,S",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, 15 ft. Emanation, V/S",
+        "page_ref": "TCMP1 133"
+      },
+      "Fireball": {
+        "name": "Fireball",
+        "level": 3,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": false,
+        "save_or_atk": "DEX 16",
+        "casting_time": "1A",
+        "range": "150 ft./20 ft. Sphere",
+        "components": "V,S,M",
+        "duration": "Instantaneous",
+        "notes": "20 ft. Sphere, V/S/M",
+        "page_ref": "PHB-2024 274"
+      },
+      "Stinking Cloud": {
+        "name": "Stinking Cloud",
+        "level": 3,
+        "source": "Fiend Spells (Always Prepared)",
+        "origin": "subclass",
+        "always_prepared": true,
+        "costs_slot": true,
+        "ritual": false,
+        "concentration": true,
+        "save_or_atk": "CON 16",
+        "casting_time": "1A",
+        "range": "90 ft./20 ft. Sphere",
+        "components": "V,S,M",
+        "duration": "Concentration, up to 1 minute",
+        "notes": "D: 1m, 20 ft. Sphere, V/S/M",
+        "page_ref": "PHB-2024 320"
+      }
     },
-    {
-      "name": "You can use the book as a Spellcasting Focus.",
-      "summary": "The book disappears if you conjure another one or if you die."
-    },
-    {
-      "name": "Pact Magic",
-      "summary": "(PHB-2024 153)"
-    },
-    {
-      "name": "Magical Cunning",
-      "summary": "(PHB-2024 154) Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots."
-    },
-    {
-      "name": "Warlock Subclass",
-      "summary": "(PHB-2024 154) | Fiend Patron"
-    },
-    {
-      "name": "Dark One’s Blessing",
-      "summary": "(PHB-2024 161) When you reduce an enemy to 0 HP, you gain 10 Temp HP."
-    },
-    {
-      "name": "Fiend Spells",
-      "summary": "(PHB-2024 161) When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared."
+    "weapon_masteries": [],
+    "grapple_shove_dc": 15,
+    "feature_dc": {
+      "label": "Spell DC",
+      "value": 16
     }
-  ],
-  "racial_traits": [
-    {
-      "name": "Speed",
-      "summary": "(RtHW 8) Your speed is 35 ft."
-    },
-    {
-      "name": "Darkvision",
-      "summary": "(RtHW 8) You have Darkvision with a range of 60 feet."
-    },
-    {
-      "name": "Spider Climb",
-      "summary": "(RtHW 8) You have a Climb Speed equal to your Speed."
-    },
-    {
-      "name": "Trace of Undeath",
-      "summary": "(RtHW 8) You have Resistance to Necrotic damage."
-    },
-    {
-      "name": "Vampiric Bite",
-      "summary": "(RtHW 8) When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike."
-    },
-    {
-      "name": "Languages",
-      "summary": "(RtHW) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
-    }
-  ],
-  "feats": [
-    {
-      "name": "Fey Touched",
-      "summary": "(PHB-2024 204) Ability Score Increase. Increase your Int. , Wis."
-    },
-    {
-      "name": "Arcane Eloquence",
-      "summary": "(AU 26) You gain the following benefits. Cantrip. You learn the Vicious Mockery cantrip."
-    },
-    {
-      "name": "Bejeweled Conclave Spy Ability Score Increase",
-      "summary": "(AU 21) | Increase two scores (+2 / +1) •"
-    }
-  ],
-  "equipment": [
-    {
-      "name": "Shortsword, +1",
-      "qty": 1,
-      "weight": "2 lb.",
-      "notes": ""
-    }
-  ],
-  "cp": 0,
-  "sp": 0,
-  "ep": 0,
-  "gp": 0,
-  "pp": 0
+  }
 }

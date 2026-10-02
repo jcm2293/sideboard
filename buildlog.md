@@ -149,6 +149,22 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-10-02 — Character sheet v3, phases 0–2: the parser
+
+Implements `docs/character-sheet-spec-v3.md` §2–§4 and §9 steps 0–2. The renderer (step 3) is still the pre-v3 one.
+
+- **Phase 0.** Parser and renderer moved out of the API routes: `src/lib/import/pdf-form-fields.ts` (form fields + annotation order), `src/lib/import/ddb-parser.ts` (pure), `src/lib/pdf/character-export.ts` (`renderCharacterPdf`). `scripts/parse-fixtures.ts` writes `PCsheets/fixtures/out/*.json` from the six fixture exports; the JSON is committed so parser changes diff.
+- **Phase 1.** v3 types in `src/types/index.ts`. They are optional on `PlayerCharacter`, so wizard-built and existing characters still typecheck. Migration `009_character_sheet_v3.sql` adds the columns (not yet applied to Supabase). `src/data/class-reference.ts` covers the 2024 twelve plus Artificer; `src/data/weapons.ts` holds the PHB mastery table.
+- **Phase 2.** `ddb-parser.ts` is rewritten to §3:
+  - Lossless feature grammar: `*` headings; `|` children, options, uses, activations; bullets and run-in paragraphs. Fields are joined so a structural line never fuses with prose.
+  - Classification into container, excluded, ribbon and mechanical; Actions sections set the action economy.
+  - Attacks get range and mastery tags, are deduped, and gain rider rows from the class table plus Vampiric Bite.
+  - `spell_details` carries origin, slot vs. free-cast, and dedupe.
+  - Equipment is grouped. Feature DC and grapple/shove DC are computed. The parse route now also returns import `notices`.
+- **Slots.** `getProgressionForClasses` applies the 2024 multiclass rule and 2024 half casters (2 slots at level 1). The homebrew wizard's `getSpellProgression` path is untouched.
+- **Checks.** `scripts/export-fixtures.ts` renders fixture PDFs (gitignored). `scripts/check-fixtures.ts` runs §8's parser-level items: 70/70.
+- **Deviation from §8.** Grandpa Dan's Focus DC is 10 (8 + PB 3 + Wis −1, matching the DC 10 the export prints), not 16. 16 is his Dex-based Grapple/Shove DC.
+
 ### 2026-10-02 — API auth, re-upload merge, multiclass parse, edit-view data loss
 
 - **API auth.** Every `/api/*` handler verifies the signed-in user (`src/lib/supabase/require-user.ts`), and the middleware returns 401 for unauthenticated `/api/*` so new routes are closed by default. Before, the middleware only guarded `/` and `/campaign/*`, which left `/api/builder` (Fable 5, 64K max tokens) callable by anyone.

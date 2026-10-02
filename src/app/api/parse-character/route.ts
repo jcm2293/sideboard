@@ -19,9 +19,9 @@ export async function POST(request: Request) {
     }
 
     const formFields = await extractFormFields(new Uint8Array(await file.arrayBuffer()));
-    const character = parseDdbCharacter(formFields);
+    const { character, notices } = parseDdbCharacter(formFields);
 
-    return Response.json({ character });
+    return Response.json({ character, notices });
   } catch (error) {
     console.error('PDF parse error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error parsing PDF';

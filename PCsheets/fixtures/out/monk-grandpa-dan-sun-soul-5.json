@@ -1,191 +1,368 @@
 {
-  "name": "Grandpa Dan",
-  "player_name": "Heershingenmosiken",
-  "class_name": "Monk",
-  "subclass": "",
-  "level": 5,
-  "is_multiclass": false,
-  "armor_class": 15,
-  "ac_source": "",
-  "initiative_modifier": 5,
-  "speeds": {
-    "walking": "40 ft."
-  },
-  "hp_max": 48,
-  "hit_dice_total": "5d8",
-  "proficiency_bonus": 3,
-  "passive_perception": 12,
-  "passive_insight": 9,
-  "passive_investigation": 8,
-  "senses": "",
-  "str_score": 16,
-  "dex_score": 20,
-  "con_score": 18,
-  "int_score": 7,
-  "wis_score": 9,
-  "cha_score": 3,
-  "skill_modifiers": {
-    "acrobatics": 8,
-    "animal_handling": -1,
-    "arcana": -2,
-    "athletics": 6,
-    "deception": -4,
-    "history": -2,
-    "insight": -1,
-    "intimidation": -1,
-    "investigation": -2,
-    "medicine": -1,
-    "nature": -2,
-    "perception": 2,
-    "performance": -4,
-    "persuasion": -4,
-    "religion": -2,
-    "sleight_of_hand": 5,
-    "stealth": 5,
-    "survival": 2
-  },
-  "save_modifiers": {
-    "str": 6,
-    "dex": 8,
-    "con": 4,
-    "int": -2,
-    "wis": -1,
-    "cha": -4
-  },
-  "skill_proficiencies": {
-    "athletics": "proficient",
-    "acrobatics": "proficient",
-    "sleight_of_hand": "none",
-    "stealth": "none",
-    "arcana": "none",
-    "history": "none",
-    "investigation": "none",
-    "nature": "none",
-    "religion": "none",
-    "animal_handling": "none",
-    "insight": "none",
-    "medicine": "none",
-    "perception": "proficient",
-    "survival": "proficient",
-    "deception": "none",
-    "intimidation": "proficient",
-    "performance": "none",
-    "persuasion": "none"
-  },
-  "save_proficiencies": {
-    "str": "proficient",
-    "dex": "proficient",
-    "con": "none",
-    "int": "none",
-    "wis": "none",
-    "cha": "none"
-  },
-  "attacks": [
-    {
-      "name": "Unarmed Strike",
-      "atk_bonus": "+8",
-      "damage": "1d8+5",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
+  "notices": [],
+  "character": {
+    "name": "Grandpa Dan",
+    "player_name": "Heershingenmosiken",
+    "class_name": "Monk",
+    "subclass": "Way of the Sun Soul",
+    "level": 5,
+    "is_multiclass": false,
+    "armor_class": 15,
+    "ac_source": "Unarmored Defense",
+    "initiative_modifier": 5,
+    "speeds": {
+      "walking": "40 ft."
     },
-    {
-      "name": "Unarmed Strike",
-      "atk_bonus": "+8",
-      "damage": "1d8+5",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
+    "hp_max": 48,
+    "hit_dice_total": "5d8",
+    "proficiency_bonus": 3,
+    "passive_perception": 12,
+    "passive_insight": 9,
+    "passive_investigation": 8,
+    "senses": "",
+    "str_score": 16,
+    "dex_score": 20,
+    "con_score": 18,
+    "int_score": 7,
+    "wis_score": 9,
+    "cha_score": 3,
+    "skill_modifiers": {
+      "acrobatics": 8,
+      "animal_handling": -1,
+      "arcana": -2,
+      "athletics": 6,
+      "deception": -4,
+      "history": -2,
+      "insight": -1,
+      "intimidation": -1,
+      "investigation": -2,
+      "medicine": -1,
+      "nature": -2,
+      "perception": 2,
+      "performance": -4,
+      "persuasion": -4,
+      "religion": -2,
+      "sleight_of_hand": 5,
+      "stealth": 5,
+      "survival": 2
     },
-    {
-      "name": "Flurry of Blows",
-      "atk_bonus": "+8",
-      "damage": "1d8+5",
-      "damage_type": "Bludgeoning",
-      "range": "",
-      "notes": ""
+    "save_modifiers": {
+      "str": 6,
+      "dex": 8,
+      "con": 4,
+      "int": -2,
+      "wis": -1,
+      "cha": -4
+    },
+    "skill_proficiencies": {
+      "acrobatics": "proficient",
+      "animal_handling": "none",
+      "arcana": "none",
+      "athletics": "proficient",
+      "deception": "none",
+      "history": "none",
+      "insight": "none",
+      "intimidation": "proficient",
+      "investigation": "none",
+      "medicine": "none",
+      "nature": "none",
+      "perception": "proficient",
+      "performance": "none",
+      "persuasion": "none",
+      "religion": "none",
+      "sleight_of_hand": "none",
+      "stealth": "none",
+      "survival": "proficient"
+    },
+    "save_proficiencies": {
+      "str": "proficient",
+      "dex": "proficient",
+      "con": "none",
+      "int": "none",
+      "wis": "none",
+      "cha": "none"
+    },
+    "attacks": [
+      {
+        "name": "Unarmed Strike",
+        "atk_bonus": "+8",
+        "damage": "1d8+5",
+        "damage_type": "Bludgeoning",
+        "range": "",
+        "notes": "",
+        "kind": "unarmed"
+      },
+      {
+        "name": "Flurry of Blows",
+        "atk_bonus": "+8",
+        "damage": "1d8+5",
+        "damage_type": "Bludgeoning",
+        "range": "",
+        "notes": "",
+        "kind": "unarmed"
+      },
+      {
+        "name": "Martial Arts die",
+        "atk_bonus": "",
+        "damage": "1d8",
+        "damage_type": "",
+        "range": "",
+        "notes": "in place of Unarmed Strike and Monk weapon damage",
+        "kind": "rider"
+      }
+    ],
+    "damage_resistances": "",
+    "damage_immunities": "",
+    "condition_immunities": "",
+    "armor_proficiencies": {
+      "light": false,
+      "medium": false,
+      "heavy": false,
+      "shields": false
+    },
+    "weapon_proficiencies": {
+      "simple": true,
+      "martial": false,
+      "hand crossbow": true,
+      "scimitar": true,
+      "shortsword": true
+    },
+    "languages": "Common, Common Sign Language, Elvish",
+    "tool_proficiencies": "Brewer's Supplies, Playing Card Set",
+    "is_spellcaster": false,
+    "spellcasting_ability": null,
+    "spell_attack_bonus_override": null,
+    "spell_save_dc_override": null,
+    "spell_slots": null,
+    "pact_slot_level": null,
+    "pact_slot_count": null,
+    "spells": null,
+    "is_prepared_caster": false,
+    "prepared_spells": null,
+    "class_resources": [
+      {
+        "name": "Focus Points",
+        "uses": 5,
+        "recovery": "Short Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Uncanny Metabolism",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Luck Points",
+        "uses": 3,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      },
+      {
+        "name": "Heroic Inspiration",
+        "uses": 1,
+        "recovery": "Long Rest",
+        "source": "pdf"
+      }
+    ],
+    "class_features": [
+      {
+        "name": "Martial Arts",
+        "summary": "You gain the following benefits when unarmed or wielding only Monk weapons, provided you aren’t wearing armor or wielding a Shield.",
+        "full_text": "You gain the following benefits when unarmed or wielding only Monk weapons, provided you aren’t wearing armor or wielding a Shield.\n\n• You can make an Unarmed Strike as a Bonus Action.\n• You can roll 1d8 in place of the normal damage from your Unarmed Strikes or Monk weapons.\n• You can use Dex. instead of Str. for the attack and damage rolls of your Unarmed Strikes and Monk Weapons. In addition, when you use the Grapple or Shove option of your Unarmed Strike, you can use Dex. instead of Str. to determine the save DC.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "source_ref": "PHB-2024 101",
+        "activations": [
+          {
+            "label": "Unarmed Strike",
+            "action": "bonus"
+          }
+        ]
+      },
+      {
+        "name": "Unarmored Defense",
+        "summary": "While you aren’t wearing armor or wielding a Shield, your base AC equals 14.",
+        "full_text": "While you aren’t wearing armor or wielding a Shield, your base AC equals 14.",
+        "kind": "ribbon",
+        "group": "Monk",
+        "source_ref": "PHB-2024 101"
+      },
+      {
+        "name": "Monk’s Focus",
+        "summary": "Your focus and martial training allows you to harness a well of energy within yourself called Focus Points. You have 5 Focus Points and regain all expended points after you finish a Short or Long Rest.",
+        "full_text": "Your focus and martial training allows you to harness a well of energy within yourself called Focus Points. You have 5 Focus Points and regain all expended points after you finish a Short or Long Rest.\n\nYou can expend these points to enhance or fuel certain Monk features. You start knowing three such features:\n\nFlurry of Blows. You can expend 1 Focus Point to make two Unarmed Strikes as a Bonus Action.\n\nPatient Defense. You can take the Disengage action as a Bonus Action or expend 1 Focus Point to take both the Disengage and Dodge actions as a Bonus Action.\n\nStep of the Wind. You can take the Dash action as a Bonus Action or expend 1 Focus Point to take both the Disengage and Dash actions as a Bonus Action, and your jump distance is doubled for the turn.\n\nFeatures that use Focus Points may require your target to make a saving throw. The save DC equals 8 + Wis. modifier + Prof. Bonus.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "special",
+        "uses": {
+          "count": 5,
+          "per": "short",
+          "label": "Focus Points"
+        },
+        "source_ref": "PHB-2024 101",
+        "activations": [
+          {
+            "label": "Flurry of Blows",
+            "action": "bonus"
+          },
+          {
+            "label": "Patient Defense",
+            "action": "bonus"
+          },
+          {
+            "label": "Step of the Wind",
+            "action": "bonus"
+          }
+        ]
+      },
+      {
+        "name": "Unarmored Movement",
+        "summary": "Your speed increases by 10 ft. while you aren’t wearing armor or wielding a Shield.",
+        "full_text": "Your speed increases by 10 ft. while you aren’t wearing armor or wielding a Shield.",
+        "kind": "ribbon",
+        "group": "Monk",
+        "source_ref": "PHB-2024 102"
+      },
+      {
+        "name": "Uncanny Metabolism",
+        "summary": "Once per Long Rest, when you roll Initiative you can regain all expended Focus Points, and regain 1d8+5 HP.",
+        "full_text": "Once per Long Rest, when you roll Initiative you can regain all expended Focus Points, and regain 1d8+5 HP.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "special",
+        "uses": {
+          "count": 1,
+          "per": "long"
+        },
+        "source_ref": "PHB-2024 102"
+      },
+      {
+        "name": "Deflect Attacks",
+        "summary": "When an attack roll that includes Bludgeoning, Piercing, or Slashing damage hits you, you can take a Reaction to reduce the attack’s total damage by 1d10+10.",
+        "full_text": "When an attack roll that includes Bludgeoning, Piercing, or Slashing damage hits you, you can take a Reaction to reduce the attack’s total damage by 1d10+10.\n\nIf you reduce the damage to 0, you can expend 1 Focus Point to redirect some of the attack’s force. If you do, choose a creature you can see within 5 ft. of you if it was melee, or a creature you can see within 60 ft. that isn’t behind Total Cover if the attack was ranged. The creature must succeed on a DC 10 Dex. saving throw or take 2d8+5 damage of the same type dealt by the attack.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "source_ref": "PHB-2024 102",
+        "activations": [
+          {
+            "label": "Deflect Attack",
+            "action": "reaction"
+          },
+          {
+            "label": "Redirect Attack",
+            "action": "reaction"
+          }
+        ]
+      },
+      {
+        "name": "Radiant Sun Bolt",
+        "summary": "You gain a special ranged spell attack with a range of 30 ft. that uses your DEX modifier and deals radiant damage equal to your Martial Arts die. When you take the Attack action, you can spend 1 Focus point to make the special attack twice as a bonus action and you can use this attack as any of the attacks using the Extra Attack feature.",
+        "full_text": "You gain a special ranged spell attack with a range of 30 ft. that uses your DEX modifier and deals radiant damage equal to your Martial Arts die. When you take the Attack action, you can spend 1 Focus point to make the special attack twice as a bonus action and you can use this attack as any of the attacks using the Extra Attack feature.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "action",
+        "source_ref": "SCAG"
+      },
+      {
+        "name": "Slow Fall",
+        "summary": "You can take a Reaction when you fall to reduce any falling damage by 25.",
+        "full_text": "You can take a Reaction when you fall to reduce any falling damage by 25.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "reaction",
+        "source_ref": "PHB-2024 103"
+      },
+      {
+        "name": "Extra Attack",
+        "summary": "You can attack twice instead of once when you take the Attack action.",
+        "full_text": "You can attack twice instead of once when you take the Attack action.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "action",
+        "source_ref": "PHB-2024 103"
+      },
+      {
+        "name": "Stunning Strike",
+        "summary": "Once per turn, when you hit with a Monk weapon or Unarmed Strike, you can expend 1 Focus Point to attempt a stunning strike. The target must make a DC 10 Con. saving throw. On a failed save, the target has the Stunned condition until the start of your next turn. On a successful save, the target’s Speed is halved until the start of your next turn, and the next attack roll made against it has Advantage.",
+        "full_text": "Once per turn, when you hit with a Monk weapon or Unarmed Strike, you can expend 1 Focus Point to attempt a stunning strike. The target must make a DC 10 Con. saving throw. On a failed save, the target has the Stunned condition until the start of your next turn. On a successful save, the target’s Speed is halved until the start of your next turn, and the next attack roll made against it has Advantage.",
+        "kind": "mechanical",
+        "group": "Monk",
+        "action": "action",
+        "source_ref": "PHB-2024 103"
+      }
+    ],
+    "racial_traits": [
+      {
+        "name": "Resourceful",
+        "summary": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+        "full_text": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 194"
+      },
+      {
+        "name": "Skillful",
+        "summary": "You gain proficiency in one skill of your choice.",
+        "full_text": "You gain proficiency in one skill of your choice.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 193"
+      },
+      {
+        "name": "Versatile",
+        "summary": "You gain an Origin feat of your choice.",
+        "full_text": "You gain an Origin feat of your choice.",
+        "kind": "ribbon",
+        "group": "Human",
+        "source_ref": "PHB-2024 194"
+      }
+    ],
+    "feats": [
+      {
+        "name": "Lucky",
+        "summary": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.",
+        "full_text": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.\n\nAdvantage. When you roll a d20 for a D20 Test, you can spend 1 Luck Point to give yourself Advantage on the roll.\n\nDisadvantage. When a creature rolls a d20 for an attack roll against you, you can spend 1 Luck Point to impose Disadvantage on that roll.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "action": "special",
+        "uses": {
+          "count": 3,
+          "per": "long",
+          "label": "Luck Points"
+        },
+        "source_ref": "PHB-2024 201"
+      },
+      {
+        "name": "Savage Attacker",
+        "summary": "Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",
+        "full_text": "Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",
+        "kind": "mechanical",
+        "group": "Feats",
+        "source_ref": "PHB-2024 201"
+      }
+    ],
+    "equipment": [],
+    "cp": 0,
+    "sp": 0,
+    "ep": 0,
+    "gp": 0,
+    "pp": 0,
+    "species": "Human",
+    "background": "Soldier",
+    "classes": [
+      {
+        "class_name": "Monk",
+        "level": 5,
+        "subclass": "Way of the Sun Soul"
+      }
+    ],
+    "spell_details": null,
+    "weapon_masteries": [],
+    "grapple_shove_dc": 16,
+    "feature_dc": {
+      "label": "Focus DC",
+      "value": 10
     }
-  ],
-  "damage_resistances": "",
-  "damage_immunities": "",
-  "condition_immunities": "",
-  "armor_proficiencies": {
-    "light": false,
-    "medium": false,
-    "heavy": false,
-    "shields": false
-  },
-  "weapon_proficiencies": {
-    "simple": true,
-    "martial": false
-  },
-  "languages": "Common, Common Sign Language, Elvish",
-  "tool_proficiencies": "Brewer's Supplies, Playing Card Set",
-  "is_spellcaster": false,
-  "spellcasting_ability": null,
-  "spell_attack_bonus_override": null,
-  "spell_save_dc_override": null,
-  "spell_slots": null,
-  "pact_slot_level": null,
-  "pact_slot_count": null,
-  "spells": null,
-  "is_prepared_caster": false,
-  "prepared_spells": null,
-  "class_resources": [
-    {
-      "name": "Focus Points",
-      "uses": 5,
-      "die": "",
-      "recovery": "Short Rest"
-    },
-    {
-      "name": "Luck Points",
-      "uses": 3,
-      "die": "",
-      "recovery": "Long Rest"
-    }
-  ],
-  "class_features": [],
-  "racial_traits": [
-    {
-      "name": "Speed",
-      "summary": "(PHB-2024 194) Your Speed is 30 ft."
-    },
-    {
-      "name": "Resourceful",
-      "summary": "(PHB-2024 194) You gain Heroic Inspiration whenever you finish a Long Rest."
-    },
-    {
-      "name": "Skillful",
-      "summary": "(PHB-2024 193) You gain proficiency in one skill of your choice."
-    },
-    {
-      "name": "Versatile",
-      "summary": "(PHB-2024 194) You gain an Origin feat of your choice."
-    },
-    {
-      "name": "Languages",
-      "summary": "(PHB-2024 37) Your character knows at least three languages: Common plus two languages you roll or choose from the Standard Languages table."
-    }
-  ],
-  "feats": [
-    {
-      "name": "Lucky",
-      "summary": "(PHB-2024 201) Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest."
-    },
-    {
-      "name": "Savage Attacker",
-      "summary": "(PHB-2024 201) Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."
-    },
-    {
-      "name": "Soldier Ability Score Improvements",
-      "summary": "(PHB-2024 185) | Increase two scores (+2 / +1) •"
-    }
-  ],
-  "equipment": [],
-  "cp": 0,
-  "sp": 0,
-  "ep": 0,
-  "gp": 0,
-  "pp": 0
+  }
 }
