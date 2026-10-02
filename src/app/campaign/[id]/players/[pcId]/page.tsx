@@ -14,7 +14,18 @@ import type {
   SrdSpell,
   CustomSpell,
 } from '@/types';
-import { abilityModifier, spellSaveDc, spellAttackBonus, modString } from '@/lib/character';
+import {
+  abilityModifier,
+  spellSaveDc,
+  spellAttackBonus,
+  modString,
+  normalizeFlagKeys,
+  normalizeSaveKeys,
+  normalizeSkillKeys,
+  normalizeSpeedKeys,
+} from '@/lib/character';
+import { mergeReupload, withoutPdfOnly, type PdfOnlyGroup, type ReuploadReport } from '@/lib/character-merge';
+import ReuploadReportPanel from '@/components/characters/ReuploadReportPanel';
 
 const SRD_SPELLS = srdSpellsData as SrdSpell[];
 
@@ -72,25 +83,23 @@ const SKILLS_BY_ABILITY: Record<AbilityKey, SkillSpec[]> = {
   ],
 };
 
-// Normalize legacy keys: prior edit-view code stored saves under 'STR'/'DEX'/...
-// and skills under display labels ('Sleight of Hand'). Convert to canonical keys
-// when loading existing records so the UI renders correctly.
-function normalizeSaveKeys(raw: Record<string, number>): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const [k, v] of Object.entries(raw)) {
-    out[k.toLowerCase().slice(0, 3)] = v;
-  }
-  return out;
-}
+// Stored keys are lowercase — the parser, homebrew wizard and PDF export all
+// read that shape. Labels are display-only.
+const ARMOR_TYPES = [
+  { key: 'light', label: 'Light' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'heavy', label: 'Heavy' },
+  { key: 'shields', label: 'Shields' },
+];
+const WEAPON_TYPES = [
+  { key: 'simple', label: 'Simple' },
+  { key: 'martial', label: 'Martial' },
+];
 
-function normalizeSkillKeys(raw: Record<string, number>): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const [k, v] of Object.entries(raw)) {
-    const canonical = k.toLowerCase().replace(/ /g, '_').replace(/-/g, '_');
-    out[canonical] = v;
-  }
-  return out;
-}
+const MOVEMENT_TYPES = ['walking', 'climbing', 'swimming', 'flying', 'burrowing'];
+
+// Suggestions only — recovery is free text ("Long Rest (regain 1 on Short Rest)").
+const RECOVERY_OPTIONS = ['Short Rest', 'Long Rest', 'Dawn', 'Once per turn'];
 
 const PROF_LEVELS: ProficiencyLevel[] = ['none', 'half', 'proficient', 'expertise'];
 const SAVE_PROF_LEVELS: ProficiencyLevel[] = ['none', 'proficient'];
@@ -117,10 +126,12 @@ export default function PlayerCharacterEditPage({
   const isParsed = searchParams.get('parsed') === 'true';
 
   // Loading state
-  const [loading, setLoading] = useState(!isNew);
+  const [loading, setLoading] = useState(!isNew || isParsed);
   const [saving, setSaving] = useState(false);
   // Multiclass flag from the parse flow — surfaces a verify-slots banner.
   const [isMulticlass, setIsMulticlass] = useState(false);
+  // What a re-uploaded PDF changed, kept, and offered when merged into this sheet.
+  const [reuploadReport, setReuploadReport] = useState<ReuploadReport | null>(null);
   // Campaign-scoped custom spells, used to detect spells that lack a library entry.
   const [customSpells, setCustomSpells] = useState<CustomSpell[]>([]);
   // Modal state for adding a description to a not-in-library spell.
@@ -177,9 +188,9 @@ export default function PlayerCharacterEditPage({
   const [acSource, setAcSource] = useState('');
   const [initiativeMod, setInitiativeMod] = useState(0);
   const [hpMax, setHpMax] = useState(1);
-  const [walkingSpeed, setWalkingSpeed] = useState('30 ft.');
-  const [climbingSpeed, setClimbingSpeed] = useState('');
-  const [swimmingSpeed, setSwimmingSpeed] = useState('');
+  // Keyed by movement type. Keys outside MOVEMENT_TYPES are kept and stay
+  // editable, so a record's speeds survive a save intact.
+  const [speeds, setSpeeds] = useState<Record<string, string>>({ walking: '30 ft.' });
   const [hitDiceTotal, setHitDiceTotal] = useState('');
 
   // Attacks
@@ -192,10 +203,10 @@ export default function PlayerCharacterEditPage({
 
   // Proficiencies
   const [armorProfs, setArmorProfs] = useState<Record<string, boolean>>({
-    Light: false, Medium: false, Heavy: false, Shields: false,
+    light: false, medium: false, heavy: false, shields: false,
   });
   const [weaponProfs, setWeaponProfs] = useState<Record<string, boolean>>({
-    Simple: false, Martial: false,
+    simple: false, martial: false,
   });
   const [languages, setLanguages] = useState('');
   const [toolProficiencies, setToolProficiencies] = useState('');
@@ -272,9 +283,8 @@ export default function PlayerCharacterEditPage({
     if (pc.initiative_modifier != null) setInitiativeMod(pc.initiative_modifier);
     if (pc.hp_max != null) setHpMax(pc.hp_max);
     if (pc.speeds) {
-      if (pc.speeds.walking) setWalkingSpeed(pc.speeds.walking);
-      if (pc.speeds.climbing) setClimbingSpeed(pc.speeds.climbing);
-      if (pc.speeds.swimming) setSwimmingSpeed(pc.speeds.swimming);
+      const loaded = normalizeSpeedKeys(pc.speeds);
+      setSpeeds((prev) => ({ ...prev, ...loaded }));
     }
     if (pc.hit_dice_total) setHitDiceTotal(pc.hit_dice_total);
 
@@ -284,8 +294,14 @@ export default function PlayerCharacterEditPage({
     if (pc.damage_immunities) setDamageImmunities(pc.damage_immunities);
     if (pc.condition_immunities) setConditionImmunities(pc.condition_immunities);
 
-    if (pc.armor_proficiencies) setArmorProfs(pc.armor_proficiencies);
-    if (pc.weapon_proficiencies) setWeaponProfs(pc.weapon_proficiencies);
+    if (pc.armor_proficiencies) {
+      const loaded = normalizeFlagKeys(pc.armor_proficiencies);
+      setArmorProfs((prev) => ({ ...prev, ...loaded }));
+    }
+    if (pc.weapon_proficiencies) {
+      const loaded = normalizeFlagKeys(pc.weapon_proficiencies);
+      setWeaponProfs((prev) => ({ ...prev, ...loaded }));
+    }
     if (pc.languages) setLanguages(pc.languages);
     if (pc.tool_proficiencies) setToolProficiencies(pc.tool_proficiencies);
 
@@ -314,39 +330,48 @@ export default function PlayerCharacterEditPage({
     if (pc.prepared_spells) setPreparedSpells(pc.prepared_spells);
   }
 
-  // Load character data
+  // Load character data: an existing sheet, a freshly parsed PDF (new upload),
+  // or both — a re-upload, merged into the existing sheet.
   useEffect(() => {
+    let cancelled = false;
     async function load() {
-      // Check for parsed data from PDF upload flow
-      if (isParsed) {
+      const raw = isParsed ? sessionStorage.getItem('parsedCharacter') : null;
+      let parsed: Partial<PlayerCharacter> | null = null;
+      if (raw) {
         try {
-          const raw = sessionStorage.getItem('parsedCharacter');
-          if (raw) {
-            const parsed = JSON.parse(raw) as Partial<PlayerCharacter> & { is_multiclass?: boolean };
-            populateForm(parsed);
-            // is_multiclass already set by populateForm above
-            sessionStorage.removeItem('parsedCharacter');
-          }
+          parsed = JSON.parse(raw) as Partial<PlayerCharacter>;
         } catch {
-          // ignore parse errors
+          // ignore malformed hand-off data
         }
-        setLoading(false);
-        return;
       }
 
-      if (!isNew) {
-        const pc = await playerCharacterStore.getById(pcId);
-        if (pc) populateForm(pc);
-        setLoading(false);
-      }
+      const [existing, cs] = await Promise.all([
+        isNew ? Promise.resolve(undefined) : playerCharacterStore.getById(pcId),
+        // Campaign custom spells drive the Add-Description workflow.
+        customSpellStore.getAll({ campaign_id: id } as Partial<CustomSpell>),
+      ]);
+      // Strict Mode runs this effect twice in dev; only the live run may
+      // populate the form and consume the hand-off.
+      if (cancelled) return;
 
-      // Always load campaign's custom spells — used by the Add-Description workflow.
-      const cs = await customSpellStore.getAll({ campaign_id: id } as Partial<CustomSpell>);
+      if (existing && parsed) {
+        const { merged, report } = mergeReupload(existing, parsed);
+        populateForm(merged);
+        setReuploadReport(report);
+      } else if (parsed) {
+        populateForm(parsed);
+      } else if (existing) {
+        populateForm(existing);
+      }
+      if (raw) sessionStorage.removeItem('parsedCharacter');
       setCustomSpells(cs);
+      setLoading(false);
     }
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pcId, isNew, isParsed]);
+    return () => {
+      cancelled = true;
+    };
+  }, [id, pcId, isNew, isParsed]);
 
   // Set of every known spell name (SRD + this campaign's custom spells) for fast missing-spell detection.
   const knownSpellSet = useMemo(() => {
@@ -400,11 +425,9 @@ export default function PlayerCharacterEditPage({
       ac_source: acSource,
       initiative_modifier: initiativeMod,
       hp_max: hpMax,
-      speeds: {
-        walking: walkingSpeed,
-        ...(climbingSpeed ? { climbing: climbingSpeed } : {}),
-        ...(swimmingSpeed ? { swimming: swimmingSpeed } : {}),
-      },
+      speeds: Object.fromEntries(
+        Object.entries(speeds).filter(([type, value]) => type === 'walking' || value.trim()),
+      ),
       hit_dice_total: hitDiceTotal,
       attacks,
       damage_resistances: damageResistances,
@@ -435,13 +458,21 @@ export default function PlayerCharacterEditPage({
   }
 
   async function handleSave() {
+    if (
+      reuploadReport?.warnings.length &&
+      !confirm(`${reuploadReport.warnings.join('\n\n')}\n\nSave anyway?`)
+    ) {
+      return;
+    }
     setSaving(true);
     try {
       const data = buildCharacterData();
-      if (isNew || isParsed) {
+      // A re-upload arrives as /players/{pcId}?parsed=true and must update that
+      // character; only /players/new creates one.
+      if (isNew) {
         await playerCharacterStore.create(data);
-      } else {
-        await playerCharacterStore.update(pcId, data);
+      } else if (!(await playerCharacterStore.update(pcId, data))) {
+        throw new Error(`Update failed for character ${pcId}`);
       }
       router.push(`/campaign/${id}/players`);
     } catch (err) {
@@ -460,7 +491,10 @@ export default function PlayerCharacterEditPage({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ character: data, customSpells }),
       });
-      if (!res.ok) throw new Error('Export failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Export failed (${res.status})`);
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -470,7 +504,7 @@ export default function PlayerCharacterEditPage({
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Export failed:', err);
-      alert('PDF export failed. The endpoint may not be built yet.');
+      alert(`PDF export failed: ${err instanceof Error ? err.message : 'unknown error'}`);
     }
   }
 
@@ -538,6 +572,52 @@ export default function PlayerCharacterEditPage({
     );
   }
 
+  // Copy items a re-uploaded PDF has (and this sheet doesn't) onto the sheet.
+  function addFromPdf(group: PdfOnlyGroup, indexes: number[]) {
+    switch (group.section) {
+      case 'attacks': {
+        const items = indexes.map((i) => group.items[i]);
+        setAttacks((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'class_resources': {
+        const items = indexes.map((i) => group.items[i]);
+        setClassResources((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'class_features': {
+        const items = indexes.map((i) => group.items[i]);
+        setClassFeatures((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'racial_traits': {
+        const items = indexes.map((i) => group.items[i]);
+        setRacialTraits((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'feats': {
+        const items = indexes.map((i) => group.items[i]);
+        setFeats((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'equipment': {
+        const items = indexes.map((i) => group.items[i]);
+        setEquipment((prev) => [...prev, ...items]);
+        break;
+      }
+      case 'spells': {
+        const items = indexes.map((i) => group.items[i]);
+        setSpells((prev) => {
+          const next = { ...prev };
+          for (const { name, level } of items) next[level] = [...(next[level] ?? []), name];
+          return next;
+        });
+        break;
+      }
+    }
+    setReuploadReport((r) => (r ? withoutPdfOnly(r, group.section, indexes) : r));
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -553,6 +633,14 @@ export default function PlayerCharacterEditPage({
       <h1 className="font-display text-2xl text-accent mb-6">
         {isNew ? 'Create Character' : `Edit ${name || 'Character'}`}
       </h1>
+
+      {reuploadReport && (
+        <ReuploadReportPanel
+          report={reuploadReport}
+          onAdd={addFromPdf}
+          onDismiss={() => setReuploadReport(null)}
+        />
+      )}
 
       {/* ─── HEADER ─── */}
       <section className="card-parchment rounded-lg p-5 mb-6">
@@ -832,35 +920,23 @@ export default function PlayerCharacterEditPage({
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-muted mb-1">Walking Speed *</label>
-            <input
-              type="text"
-              required
-              value={walkingSpeed}
-              onChange={(e) => setWalkingSpeed(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-muted mb-1">Climbing Speed</label>
-            <input
-              type="text"
-              value={climbingSpeed}
-              onChange={(e) => setClimbingSpeed(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-muted mb-1">Swimming Speed</label>
-            <input
-              type="text"
-              value={swimmingSpeed}
-              onChange={(e) => setSwimmingSpeed(e.target.value)}
-              className={inputClass}
-            />
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+          {[...MOVEMENT_TYPES, ...Object.keys(speeds).filter((t) => !MOVEMENT_TYPES.includes(t))].map(
+            (type) => (
+              <div key={type}>
+                <label className="block text-sm font-medium text-muted mb-1">
+                  {type[0].toUpperCase() + type.slice(1)} Speed{type === 'walking' ? ' *' : ''}
+                </label>
+                <input
+                  type="text"
+                  required={type === 'walking'}
+                  value={speeds[type] ?? ''}
+                  onChange={(e) => setSpeeds((prev) => ({ ...prev, [type]: e.target.value }))}
+                  className={inputClass}
+                />
+              </div>
+            ),
+          )}
         </div>
         <div className="max-w-xs">
           <label className="block text-sm font-medium text-muted mb-1">Hit Dice Total</label>
@@ -987,7 +1063,7 @@ export default function PlayerCharacterEditPage({
         <div className="mb-4">
           <label className="block text-sm font-medium text-muted mb-2">Armor</label>
           <div className="flex gap-2 flex-wrap">
-            {Object.keys(armorProfs).map((key) => (
+            {ARMOR_TYPES.map(({ key, label }) => (
               <button
                 key={key}
                 type="button"
@@ -998,7 +1074,7 @@ export default function PlayerCharacterEditPage({
                     : 'bg-surface-light border border-border text-muted'
                 }`}
               >
-                {key}
+                {label}
               </button>
             ))}
           </div>
@@ -1006,7 +1082,7 @@ export default function PlayerCharacterEditPage({
         <div className="mb-4">
           <label className="block text-sm font-medium text-muted mb-2">Weapons</label>
           <div className="flex gap-2 flex-wrap">
-            {Object.keys(weaponProfs).map((key) => (
+            {WEAPON_TYPES.map(({ key, label }) => (
               <button
                 key={key}
                 type="button"
@@ -1017,7 +1093,7 @@ export default function PlayerCharacterEditPage({
                     : 'bg-surface-light border border-border text-muted'
                 }`}
               >
-                {key}
+                {label}
               </button>
             ))}
           </div>
@@ -1070,14 +1146,14 @@ export default function PlayerCharacterEditPage({
               className={inputClass}
               placeholder="e.g. d6"
             />
-            <select
+            <input
+              type="text"
+              list="recovery-options"
               value={res.recovery}
               onChange={(e) => updateClassResource(i, 'recovery', e.target.value)}
               className={inputClass}
-            >
-              <option value="Short Rest">Short Rest</option>
-              <option value="Long Rest">Long Rest</option>
-            </select>
+              placeholder="Recovery"
+            />
             <button
               type="button"
               onClick={() => removeClassResource(i)}
@@ -1099,6 +1175,11 @@ export default function PlayerCharacterEditPage({
         >
           + Add Resource
         </button>
+        <datalist id="recovery-options">
+          {RECOVERY_OPTIONS.map((option) => (
+            <option key={option} value={option} />
+          ))}
+        </datalist>
       </section>
 
       {/* ─── CLASS FEATURES ─── */}

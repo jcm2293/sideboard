@@ -97,11 +97,17 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
   }
 
   async function handleExport(pc: PlayerCharacter) {
+    setError(null);
     const res = await fetch('/api/export-character', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ character: pc, customSpells }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setError(data?.error || `Export failed (${res.status})`);
+      return;
+    }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

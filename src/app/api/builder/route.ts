@@ -1,9 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getBuilderSystemPrompt } from '@/lib/builder/system-prompt';
+import { rejectUnauthenticated } from '@/lib/supabase/require-user';
 
 const client = new Anthropic();
 
 export async function POST(request: Request) {
+  const denied = await rejectUnauthenticated();
+  if (denied) return denied;
+
   const { messages, campaignContext } = await request.json();
 
   const systemPrompt = getBuilderSystemPrompt(campaignContext);

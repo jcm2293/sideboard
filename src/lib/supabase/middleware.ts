@@ -35,6 +35,12 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
+  // API routes re-check auth in their handlers; this keeps any new route
+  // closed by default.
+  if (!user && path.startsWith('/api/')) {
+    return NextResponse.json({ error: 'Not signed in.' }, { status: 401 });
+  }
+
   // Protect / and /campaign/* routes — redirect to login if no session
   if (!user && (path === '/' || path.startsWith('/campaign'))) {
     const url = request.nextUrl.clone();

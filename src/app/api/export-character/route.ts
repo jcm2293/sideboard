@@ -15,6 +15,7 @@ import { NextRequest } from 'next/server';
 import type { PlayerCharacter, SrdSpell, CustomSpell } from '@/types';
 import srdSpellsData from '@/data/spells.json';
 import { spellSaveDc, spellAttackBonus } from '@/lib/character';
+import { rejectUnauthenticated } from '@/lib/supabase/require-user';
 
 const SRD_SPELLS: SrdSpell[] = srdSpellsData as SrdSpell[];
 const SRD_BY_NAME = new Map<string, SrdSpell>();
@@ -1335,6 +1336,9 @@ function drawSpellsPage(doc: jsPDF, c: PlayerCharacter, customByName: Map<string
 // ──────────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const denied = await rejectUnauthenticated();
+  if (denied) return denied;
+
   try {
     // Accept either a bare PlayerCharacter or { character, customSpells }.
     // The wrapper form lets the client pass campaign-scoped custom spells so the

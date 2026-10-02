@@ -6,6 +6,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import type { WizardState, WizardStep } from '@/lib/homebrew/wizard-reducer';
+import { rejectUnauthenticated } from '@/lib/supabase/require-user';
 
 const client = new Anthropic();
 
@@ -72,6 +73,9 @@ const STEP_DECISION: Record<WizardStep, string> = {
 };
 
 export async function POST(request: Request) {
+  const denied = await rejectUnauthenticated();
+  if (denied) return denied;
+
   try {
     const { wizardState, currentStep } = (await request.json()) as {
       wizardState: WizardState;

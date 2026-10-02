@@ -59,3 +59,54 @@ export function spellAttackBonus(c: Partial<PlayerCharacter>): number {
 export function modString(n: number): string {
   return n >= 0 ? `+${n}` : `${n}`;
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// Canonical jsonb key shapes. The parser, homebrew wizard, edit view and PDF
+// export all read these; older records and manual entry used other spellings.
+// ──────────────────────────────────────────────────────────────────────────
+
+/** Saves: lowercase 3-letter ability ('str'). Older records used 'STR'. */
+export function normalizeSaveKeys(raw: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(raw)) {
+    out[k.toLowerCase().slice(0, 3)] = v;
+  }
+  return out;
+}
+
+/** Skills: snake_case ('sleight_of_hand'). Older records used display labels. */
+export function normalizeSkillKeys(raw: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(raw)) {
+    out[k.toLowerCase().replace(/[ -]/g, '_')] = v;
+  }
+  return out;
+}
+
+/** Armor / weapon proficiency flags: lowercase ('light', 'martial'). */
+export function normalizeFlagKeys(raw: Record<string, boolean> | null | undefined): Record<string, boolean> {
+  const out: Record<string, boolean> = {};
+  for (const [k, v] of Object.entries(raw ?? {})) {
+    const key = k.toLowerCase();
+    out[key] = out[key] || Boolean(v);
+  }
+  return out;
+}
+
+const SPEED_ALIASES: Record<string, string> = {
+  walk: 'walking',
+  climb: 'climbing',
+  swim: 'swimming',
+  fly: 'flying',
+  burrow: 'burrowing',
+};
+
+/** Speeds: D&D Beyond's movement names ('walking', 'flying', ...). */
+export function normalizeSpeedKeys(raw: Record<string, string> | null | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw ?? {})) {
+    const key = k.trim().toLowerCase();
+    out[SPEED_ALIASES[key] ?? key] = v;
+  }
+  return out;
+}

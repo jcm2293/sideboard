@@ -1,6 +1,7 @@
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import path from 'path';
 import { getSpellProgression, parseClassLine } from '@/data/spell-progression';
+import { rejectUnauthenticated } from '@/lib/supabase/require-user';
 import type { ProficiencyLevel } from '@/types';
 
 // Point worker to actual file for server-side usage
@@ -136,13 +137,24 @@ function parseClassLevel(raw: string): {
   level: number;
   subclass: string;
   isMulticlass: boolean;
+  primaryClass: string;
+  primaryLevel: number;
 } {
   const parsed = parseClassLine(raw);
+  // Multiclass sheets are stored with the per-class breakdown and the total
+  // character level ("Ranger 4 / Rogue 1", level 5). The highest-level class
+  // still drives the spell-slot lookup.
   return {
-    class_name: parsed.primaryClass,
-    level: parsed.primaryLevel,
+    class_name: parsed.isMulticlass
+      ? parsed.classes.map((c) => `${c.name} ${c.level}`).join(' / ')
+      : parsed.primaryClass,
+    level: parsed.isMulticlass
+      ? parsed.classes.reduce((sum, c) => sum + c.level, 0)
+      : parsed.primaryLevel,
     subclass: parsed.subclass,
     isMulticlass: parsed.isMulticlass,
+    primaryClass: parsed.primaryClass,
+    primaryLevel: parsed.primaryLevel,
   };
 }
 
@@ -929,6 +941,9 @@ function parseClassResources(fields: FormFields): { name: string; uses: number; 
 }
 
 export async function POST(request: Request) {
+  const denied = await rejectUnauthenticated();
+  if (denied) return denied;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -953,12 +968,12 @@ export async function POST(request: Request) {
 
     // Spell-slot lookup overrides anything the PDF says about slot counts.
     // Multiclass: callers pick highest-level class for primary; user verifies in edit view.
-    const progression = getSpellProgression(classLevel.class_name, classLevel.level, classLevel.subclass);
+    const progression = getSpellProgression(classLevel.primaryClass, classLevel.primaryLevel, classLevel.subclass);
     const isCaster = spellInfo.isSpellcaster || progression.casterType !== 'none';
     const spellList = isCaster ? parseSpellsFromAnnotations(spellOrder).spells : null;
 
     const classResources = parseClassResources(fields);
-    const isPreparedCaster = /cleric|druid|wizard|paladin/i.test(classLevel.class_name);
+    const isPreparedCaster = /cleric|druid|wizard|paladin/i.test(classLevel.primaryClass);
 
     // Proficiency level (none/half/proficient/expertise) inferred per skill/save
     // by comparing the modifier delta against the proficiency bonus.
