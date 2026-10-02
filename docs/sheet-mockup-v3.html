@@ -1,0 +1,374 @@
+<title>Dash Berman Sheet Redesign</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: letter-proportioned parchment sheets on a dark desk; page 1 = combat reference (vitals strip, narrow stats rail, wide "what can I do" column); page 2 = compact spell index. Single-theme on purpose: this is a print proof of the Sideboard parchment system. */
+:root{
+  --parchment:#F4E4C1; --parchment-alt:#EDD6A8; --cream:#FDF1DC;
+  --maroon:#58180D; --maroon-ink:#3E1109; --gold:#B8860B; --gold-soft:#D9B35C;
+  --ink:#1A1210; --muted:#6E5F4E; --rule:#C9A96E;
+  --desk:#2A2320; --desk-fg:#D8CDBB;
+  --display:"Cinzel","Times New Roman",serif;
+  --body:"Crimson Pro","Georgia",serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--desk-fg);font-family:var(--body);padding-block:28px;padding-inline:16px}
+.intro{max-width:816px;margin:0 auto 20px;font-size:15px;line-height:1.45}
+.intro h1{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.04em;margin:0 0 6px;color:#F1E6CF}
+.intro p{margin:0 0 6px}
+.intro b{color:#F1E6CF;font-weight:600}
+.sheet{max-width:816px;margin:0 auto 32px;background:var(--parchment);color:var(--ink);box-shadow:0 18px 50px rgba(0,0,0,.45);position:relative;min-width:0}
+.sheet::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.18),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(88,24,13,.07),transparent 50%);pointer-events:none}
+.band{background:var(--maroon);color:#F6EAD0;padding:14px 26px 12px;border-top:4px solid var(--gold);display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.band .name{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.02em;line-height:1}
+.band .sub{font-size:14.5px;margin-top:6px;color:#E6D4B0}
+.band .sub b{color:#F6EAD0;font-weight:600}
+.band .right{text-align:right;font-size:13px;color:#E6D4B0;line-height:1.35}
+.band .right .pg{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft)}
+.page{padding:16px 26px 26px;position:relative}
+/* vitals strip */
+.vitals{display:grid;grid-template-columns:repeat(7,1fr);border:1.5px solid var(--maroon);background:var(--cream);margin-bottom:14px}
+.vitals>div{padding:7px 4px 6px;text-align:center;border-left:1px solid var(--rule)}
+.vitals>div:first-child{border-left:0}
+.vitals .l{font-family:var(--display);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.vitals .v{font-family:var(--display);font-weight:700;font-size:19px;color:var(--maroon);line-height:1.15;margin-top:2px;font-variant-numeric:tabular-nums}
+.vitals .s{font-size:10.5px;color:var(--muted);line-height:1.1}
+/* two columns */
+.cols{display:grid;grid-template-columns:200px 1fr;gap:16px;min-width:0}
+@media (max-width:640px){.cols{grid-template-columns:1fr}.vitals{grid-template-columns:repeat(4,1fr)}.vitals>div:nth-child(5){border-left:0}}
+h3{font-family:var(--display);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);margin:0 0 5px;padding-bottom:3px;border-bottom:1.5px solid var(--maroon);display:flex;justify-content:space-between;align-items:baseline}
+h3 small{font-family:var(--body);font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+section{margin-bottom:13px;min-width:0}
+/* abilities rail */
+.abil{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ab{background:var(--cream);border:1px solid var(--maroon);text-align:center;padding:5px 2px 4px}
+.ab .k{font-family:var(--display);font-size:9px;letter-spacing:.12em;color:var(--muted)}
+.ab .m{font-family:var(--display);font-weight:700;font-size:20px;color:var(--maroon);line-height:1}
+.ab .sc{font-size:10.5px;color:var(--muted);line-height:1.2}
+.ab .sv{font-size:10.5px;margin-top:2px;border-top:1px solid var(--rule);padding-top:2px;color:var(--ink)}
+.ab .sv i{font-style:normal;color:var(--muted)}
+.dot{display:inline-block;width:7px;height:7px;border:1px solid var(--maroon);border-radius:50%;vertical-align:1px;margin-right:4px}
+.dot.on{background:var(--maroon)}
+.skills{list-style:none;margin:0;padding:0;font-size:11.5px;line-height:1.55;column-count:1}
+.skills li{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.skills li .n{white-space:nowrap}
+.skills li .a{font-size:9px;color:var(--muted);letter-spacing:.06em;margin-left:4px}
+.skills li .mod{font-variant-numeric:tabular-nums;font-weight:600;min-width:26px;text-align:right}
+.skills li.p .mod{color:var(--maroon)}
+.kv{font-size:11.5px;line-height:1.5}
+.kv b{font-weight:600;color:var(--maroon-ink)}
+.abgroups{display:flex;flex-direction:column;gap:5px}
+.ag{background:var(--cream);border:1px solid var(--maroon)}
+.agh{display:grid;grid-template-columns:30px 1fr auto;grid-template-rows:auto auto;column-gap:6px;align-items:baseline;padding:3px 6px 2px;border-bottom:1px solid var(--rule);background:rgba(237,214,168,.5)}
+.agh .k{font-family:var(--display);font-size:9.5px;letter-spacing:.12em;color:var(--maroon);grid-row:1/3;align-self:center}
+.agh .m{font-family:var(--display);font-weight:700;font-size:17px;color:var(--maroon);line-height:1}
+.agh .sc{font-size:10px;color:var(--muted);grid-column:3;grid-row:1;text-align:right}
+.agh .sv{font-size:10px;color:var(--ink);grid-column:2/4;grid-row:2;text-align:right}
+.ag .skills{padding:2px 6px 3px;font-size:11px;line-height:1.45}
+.ag:nth-child(3) .agh{border-bottom:0}
+/* right column */
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{font-family:var(--display);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#F6EAD0;background:var(--maroon);text-align:left;padding:3px 6px;font-weight:600}
+td{padding:3.5px 6px;vertical-align:top;border-bottom:1px solid rgba(201,169,110,.45)}
+tr:nth-child(even) td{background:rgba(237,214,168,.55)}
+td.num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+td .nm{font-weight:600}
+td .note{display:block;font-size:10px;color:var(--muted);line-height:1.25;margin-top:1px}
+.chip{display:inline-block;font-family:var(--display);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gold);color:var(--maroon-ink);padding:1px 4px 0;border-radius:2px;margin-left:4px;vertical-align:1px;background:rgba(253,241,220,.7)}
+.chip.slot{background:var(--maroon);color:#F6EAD0;border-color:var(--maroon)}
+.chip.free{border-color:var(--maroon)}
+/* your turn */
+.turn{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:11.5px;line-height:1.4}
+@media (max-width:640px){.turn{grid-template-columns:1fr}}
+.turn h4{font-family:var(--display);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--maroon);margin:0 0 3px;display:flex;align-items:center;gap:6px}
+.turn h4::after{content:"";flex:1;border-top:1px solid var(--rule)}
+.turn ul{margin:0;padding:0;list-style:none}
+.turn li{padding-left:10px;text-indent:-10px;margin-bottom:2px}
+.turn li::before{content:"\25C6";font-size:6px;color:var(--gold);margin-right:5px;vertical-align:2px}
+.turn li b{font-weight:600}
+.turn li i{color:var(--muted);font-style:italic}
+/* resources */
+.res{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:11.5px}
+@media (max-width:640px){.res{grid-template-columns:1fr}}
+.res .r{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-bottom:1px dotted var(--rule);padding:2px 0}
+.res .r b{font-weight:600}
+.res .r i{color:var(--muted);font-size:10px;font-style:normal;white-space:nowrap}
+.bub{white-space:nowrap}
+.bub span{display:inline-block;width:10px;height:10px;border:1.2px solid var(--maroon);border-radius:50%;margin-left:3px;vertical-align:-1px;background:var(--cream)}
+.inv{font-size:11.5px}
+.inv td{padding:2.5px 6px}
+.foot{font-size:9.5px;color:var(--muted);text-align:center;margin-top:10px;font-style:italic}
+/* page 2 spell index */
+.spells td{padding:3px 6px}
+.lvl td{background:transparent!important;border-bottom:0;padding:9px 0 2px}
+.lvl .lb{font-family:var(--display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);display:flex;align-items:center;gap:8px}
+.lvl .lb::after,.lvl .lb::before{content:"";flex:1;border-top:1px solid var(--maroon)}
+.conc{font-family:var(--display);font-size:8px;border:1px solid var(--maroon);border-radius:50%;width:13px;height:13px;display:inline-flex;align-items:center;justify-content:center;color:var(--maroon);margin-left:3px;vertical-align:1px}
+.spellstrip{display:grid;grid-template-columns:1fr 1fr 1fr 2.4fr;border:1.5px solid var(--maroon);background:var(--cream);margin-bottom:12px}
+@media (max-width:640px){.spellstrip{grid-template-columns:1fr 1fr 1fr}.spellstrip .slots{grid-column:1/-1;border-left:0;border-top:1px solid var(--rule)}}
+.spellstrip>div{padding:8px 10px;border-left:1px solid var(--rule)}
+.spellstrip>div:first-child{border-left:0}
+.spellstrip .l{font-family:var(--display);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.spellstrip .big{text-align:center}
+.spellstrip .big .v{font-family:var(--display);font-weight:700;font-size:28px;color:var(--maroon);line-height:1.1;margin-top:2px}
+.spellstrip .slots .bubbles{margin:5px 0 3px}
+.spellstrip .slots .bubbles span{display:inline-block;width:22px;height:22px;border:2px solid var(--maroon);border-radius:50%;margin-right:8px;background:#fff8ea;box-shadow:inset 0 0 0 3px var(--cream)}
+.spellstrip .slots .s{font-size:10.5px;color:var(--muted)}
+.legend{font-size:10.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px}
+.legend .chip{margin-left:0}
+.lvlbar{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);display:flex;align-items:center;gap:10px;margin:2px 0 10px}
+.lvlbar::before,.lvlbar::after{content:"";flex:1;border-top:1.5px solid var(--maroon)}
+.cards{columns:2;column-gap:14px}
+@media (max-width:640px){.cards{columns:1}}
+.card{break-inside:avoid;background:var(--cream);border:1px solid var(--maroon);padding:8px 10px 6px;margin-bottom:10px;font-size:11.5px;line-height:1.4}
+.card .ch{border-bottom:1px solid var(--rule);padding-bottom:4px;margin-bottom:5px}
+.card .cn{font-family:var(--display);font-weight:600;font-size:12.5px;color:var(--maroon);letter-spacing:.02em}
+.card .cm{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.card p{margin:0 0 5px}
+.card p.hl{font-size:10.5px;color:var(--maroon-ink);border-top:1px dotted var(--rule);padding-top:4px}
+.card p.hl i{color:var(--muted)}
+.card p.muted{color:var(--muted);font-style:italic}
+.callout{max-width:816px;margin:0 auto 22px;background:#3A2E28;border-left:3px solid var(--gold);padding:10px 14px;font-size:13.5px;line-height:1.45;color:#E7DCC8}
+.callout b{color:#F6EAD0}
+</style>
+
+<div class="intro">
+  <h1>Dash Berman · proposed sheet layout</h1>
+  <p>Built from the D&amp;D Beyond export's own form fields, nothing invented except the bonded-weapon numbers (see note). Page 1 is organized by <b>what the player is doing at the table</b>: the DM asks for a roll (left rail), it's your turn (right column), something happens to you (vitals and defenses).</p>
+</div>
+
+<div class="sheet">
+  <div class="band">
+    <div>
+      <div class="name">Dash Berman</div>
+      <div class="sub"><b>Dhampir</b> &middot; <b>Warlock 5</b>, Fiend Patron &middot; Bejeweled Conclave Spy &middot; <i>played by Jake</i></div>
+    </div>
+    <div class="right"><div class="pg">Combat reference</div>Exported 2 Oct 2026</div>
+  </div>
+  <div class="page">
+    <div class="vitals">
+      <div><div class="l">Armor class</div><div class="v">13</div><div class="s">no armor</div></div>
+      <div><div class="l">Hit points</div><div class="v">38</div><div class="s">5d8 hit dice</div></div>
+      <div><div class="l">Initiative</div><div class="v">+3</div><div class="s">&nbsp;</div></div>
+      <div><div class="l">Speed</div><div class="v">35</div><div class="s">walk &middot; climb</div></div>
+      <div><div class="l">Proficiency</div><div class="v">+3</div><div class="s">&nbsp;</div></div>
+      <div><div class="l">Spell DC</div><div class="v">16</div><div class="s">atk +8 &middot; Cha</div></div>
+      <div><div class="l">Passive perc.</div><div class="v">9</div><div class="s">darkvision 60 ft</div></div>
+    </div>
+
+    <div class="cols">
+      <!-- LEFT RAIL -->
+      <div>
+        <section>
+          <h3>Abilities &amp; skills <small>&#9679; proficient</small></h3>
+          <div class="abgroups">
+            <div class="ag"><div class="agh"><span class="k">STR</span><span class="m">+4</span><span class="sc">18</span><span class="sv">save +4</span></div>
+              <ul class="skills"><li class="p"><span class="n"><span class="dot on"></span>Athletics</span><span class="mod">+7</span></li></ul></div>
+            <div class="ag"><div class="agh"><span class="k">DEX</span><span class="m">+3</span><span class="sc">16</span><span class="sv">save +3</span></div>
+              <ul class="skills"><li><span class="n"><span class="dot"></span>Acrobatics</span><span class="mod">+3</span></li><li><span class="n"><span class="dot"></span>Sleight of Hand</span><span class="mod">+3</span></li><li><span class="n"><span class="dot"></span>Stealth</span><span class="mod">+3</span></li></ul></div>
+            <div class="ag"><div class="agh"><span class="k">CON</span><span class="m">+2</span><span class="sc">15</span><span class="sv">save +2</span></div></div>
+            <div class="ag"><div class="agh"><span class="k">INT</span><span class="m">+0</span><span class="sc">11</span><span class="sv">save +0</span></div>
+              <ul class="skills"><li><span class="n"><span class="dot"></span>Arcana</span><span class="mod">+0</span></li><li><span class="n"><span class="dot"></span>History</span><span class="mod">+0</span></li><li><span class="n"><span class="dot"></span>Investigation</span><span class="mod">+0</span></li><li><span class="n"><span class="dot"></span>Nature</span><span class="mod">+0</span></li><li><span class="n"><span class="dot"></span>Religion</span><span class="mod">+0</span></li></ul></div>
+            <div class="ag"><div class="agh"><span class="k">WIS</span><span class="m">&minus;4</span><span class="sc">3</span><span class="sv"><span class="dot on"></span>save &minus;1</span></div>
+              <ul class="skills"><li><span class="n"><span class="dot"></span>Animal Handling</span><span class="mod">&minus;4</span></li><li><span class="n"><span class="dot"></span>Insight</span><span class="mod">&minus;4</span></li><li><span class="n"><span class="dot"></span>Medicine</span><span class="mod">&minus;4</span></li><li><span class="n"><span class="dot"></span>Perception</span><span class="mod">&minus;4</span></li><li><span class="n"><span class="dot"></span>Survival</span><span class="mod">&minus;4</span></li></ul></div>
+            <div class="ag"><div class="agh"><span class="k">CHA</span><span class="m">+5</span><span class="sc">20</span><span class="sv"><span class="dot on"></span>save +8</span></div>
+              <ul class="skills"><li class="p"><span class="n"><span class="dot on"></span>Deception</span><span class="mod">+8 <small>+1d4</small></span></li><li class="p"><span class="n"><span class="dot on"></span>Intimidation</span><span class="mod">+8 <small>+1d4</small></span></li><li><span class="n"><span class="dot"></span>Performance</span><span class="mod">+5</span></li><li class="p"><span class="n"><span class="dot on"></span>Persuasion</span><span class="mod">+8 <small>+1d4</small></span></li></ul></div>
+          </div>
+          <div class="kv" style="margin-top:5px;font-size:10.5px;color:var(--muted)">Passive Insight 6 &middot; Passive Investigation 10</div>
+        </section>
+
+        <section>
+          <h3>Defenses &amp; senses</h3>
+          <div class="kv"><b>Resistance</b> necrotic<br><b>Darkvision</b> 60 ft<br><b>Climb</b> walls and ceilings, hands free</div>
+        </section>
+
+        <section>
+          <h3>Proficiencies</h3>
+          <div class="kv"><b>Armor</b> light<br><b>Weapons</b> simple, + bonded pact weapon<br><b>Tools</b> disguise kit<br><b>Languages</b> Common, Common Sign, Draconic</div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="min-width:0">
+        <section>
+          <h3>Attacks &amp; cantrips <small>spell attack +8 &middot; save DC 16</small></h3>
+          <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th style="width:38%">Name</th><th>Hit / DC</th><th>Damage</th><th>Range</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Shortsword +1</span><span class="chip">pact weapon</span><span class="note">Cha to hit. Finesse, light, Vex mastery. Damage may be necrotic, psychic or radiant.</span></td><td class="num">+9</td><td class="num">1d6+6 piercing</td><td>5 ft</td></tr>
+              <tr><td><span class="nm">Vampiric Bite</span><span class="chip">3 / long rest</span><span class="note">Replaces an unarmed strike. On damage: heal that much, or bank it as a bonus to your next check or attack.</span></td><td class="num">+7</td><td class="num">1d4+2 piercing</td><td>5 ft</td></tr>
+              <tr><td><span class="nm">Eldritch Blast</span><span class="note">Two beams, separate rolls.</span></td><td class="num">+8</td><td class="num">1d10+5 force &times;2</td><td>120 ft</td></tr>
+              <tr><td><span class="nm">Blood Bolt</span><span class="chip">homebrew</span></td><td class="num">+8</td><td class="num">2d6 necrotic</td><td>90 ft</td></tr>
+              <tr><td><span class="nm">Booming Blade</span><span class="note">One weapon attack. Target takes 2d8 thunder if it willingly moves before your next turn.</span></td><td class="num">weapon</td><td class="num">+1d8 thunder</td><td>5 ft</td></tr>
+              <tr><td><span class="nm">Vengeful Blade</span><span class="chip">homebrew</span><span class="note">One weapon attack with a necrotic rider.</span></td><td class="num">weapon</td><td class="num">+2d8 necrotic</td><td>5 ft</td></tr>
+              <tr><td><span class="nm">Toll the Dead</span><span class="note">1d12 if the target is already hurt.</span></td><td class="num">Wis 16</td><td class="num">2d8 necrotic</td><td>60 ft</td></tr>
+              <tr><td><span class="nm">Vicious Mockery</span><span class="note">Also: disadvantage on its next attack.</span></td><td class="num">Wis 16</td><td class="num">2d4 psychic</td><td>60 ft</td></tr>
+              <tr><td><span class="nm">Unarmed Strike</span></td><td class="num">+7</td><td class="num">5 bludgeoning</td><td>5 ft</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </section>
+
+        <section>
+          <h3>Your turn</h3>
+          <div class="turn">
+            <div>
+              <h4>Action</h4>
+              <ul>
+                <li><b>Attack twice</b> with the pact weapon <i>(Thirsting Blade)</i></li>
+                <li><b>Cast</b> a cantrip or a spell</li>
+                <li><b>Vampiric Touch</b> &middot; 3d6 necrotic, heal half, repeat each turn <i>(slot, concentration)</i></li>
+                <li><b>Disguise Self</b> at will <i>(Mask of Many Faces)</i></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Bonus action</h4>
+              <ul>
+                <li><b>Hex</b> &middot; +1d6 necrotic on every hit, disadvantage on one ability <i>(slot, concentration)</i></li>
+                <li><b>Misty Step</b> &middot; teleport 30 ft <i>(free 1/LR, then a slot)</i></li>
+                <li><b>Blood Sacrifice</b> / <b>Sanguine Secrets</b> <i>(homebrew, slot)</i></li>
+                <li><b>Conjure or bond</b> your pact weapon</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Reaction</h4>
+              <ul><li><b>Counterspell</b> &middot; 60 ft; Con save DC 16 if their spell is 4th level or higher <i>(slot)</i></li></ul>
+            </div>
+            <div>
+              <h4>Always on</h4>
+              <ul>
+                <li><b>Smooth Talker</b> &middot; +1d4 on Deception, Intimidation, Persuasion</li>
+                <li><b>Dark One's Blessing</b> &middot; 10 temp HP when an enemy drops to 0 within 10 ft of you</li>
+                <li><b>Agonizing Blast</b> &middot; +5 damage per Eldritch Blast beam (already in the table)</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Resources <small>mark as used</small></h3>
+          <div class="res">
+            <div class="r"><span><b>Pact slots</b> <i>3rd level &middot; short rest</i></span><span class="bub"><span></span><span></span></span></div>
+            <div class="r"><span><b>Magical Cunning</b> <i>1 min rite, regain 1 slot &middot; long rest</i></span><span class="bub"><span></span></span></div>
+            <div class="r"><span><b>Vampiric Bite</b> empower <i>long rest</i></span><span class="bub"><span></span><span></span><span></span></span></div>
+            <div class="r"><span><b>Charm Person</b> free cast <i>long rest</i></span><span class="bub"><span></span></span></div>
+            <div class="r"><span><b>Misty Step</b> free cast <i>long rest</i></span><span class="bub"><span></span></span></div>
+            <div class="r"><span><b>Heroic Inspiration</b></span><span class="bub"><span></span></span></div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Inventory <small>2 lb &middot; 0 gp</small></h3>
+          <table class="inv"><tbody>
+            <tr><td><span class="nm">Shortsword +1</span></td><td>1</td><td>2 lb</td><td class="note">bonded pact weapon</td></tr>
+          </tbody></table>
+        </section>
+      </div>
+    </div>
+    <div class="foot">Full rules text for every feature and spell is on the following pages. Page references dropped from the player copy.</div>
+  </div>
+</div>
+
+<div class="callout"><b>Note on the shortsword.</b> The D&amp;D Beyond export lists it at +5 / 1d6+5 because the weapon isn't flagged as bonded in Beyond, so it's rolling Strength with no proficiency. Bonded through Pact of the Blade it's Charisma + proficiency + 1: <b>+9 to hit, 1d6+6</b>. The mockup shows the bonded numbers; the parser can't infer that, so fix it on the Beyond side (Manage &rarr; Pact Weapon) before re-exporting.</div>
+
+<div class="sheet">
+  <div class="band">
+    <div>
+      <div class="name">Dash Berman</div>
+      <div class="sub"><b>Dhampir</b> &middot; <b>Warlock 5</b>, Fiend Patron &middot; Bejeweled Conclave Spy &middot; <i>played by Jake</i></div>
+    </div>
+    <div class="right"><div class="pg">Spell index</div>Pact Magic &middot; Cha &middot; DC 16 &middot; atk +8</div>
+  </div>
+  <div class="page">
+    <div class="spellstrip">
+      <div class="big"><div class="l">Spell save DC</div><div class="v">16</div></div>
+      <div class="big"><div class="l">Spell attack</div><div class="v">+8</div></div>
+      <div class="big"><div class="l">Ability</div><div class="v" style="font-size:16px;padding-top:4px">CHA</div></div>
+      <div class="slots">
+        <div class="l">Pact slots &middot; all cast at 3rd level</div>
+        <div class="bubbles"><span></span><span></span></div>
+        <div class="s">regain on a short rest &middot; Magical Cunning restores one, 1/long rest <span class="bub"><span></span></span></div>
+      </div>
+    </div>
+    <p class="legend">
+      <span class="chip slot">slot</span> costs a pact slot
+      <span class="chip free">free 1/LR</span> once per long rest without a slot
+      <span class="chip">at will</span> no slot, ever
+      <span class="chip">ritual</span> no slot, +10 min
+      <span class="conc">C</span> concentration
+    </p>
+    <div style="overflow-x:auto">
+    <table class="spells">
+      <thead><tr><th style="width:34%">Spell</th><th>Time</th><th>Range</th><th>Hit / DC</th><th>Duration</th><th>From</th></tr></thead>
+      <tbody>
+        <tr class="lvl"><td colspan="6"><div class="lb">Cantrips</div></td></tr>
+        <tr><td><span class="nm">Blood Bolt</span></td><td>1 A</td><td>90 ft</td><td class="num">+8</td><td>&mdash;</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Booming Blade</span></td><td>1 A</td><td>self, 5 ft</td><td class="num">weapon</td><td>1 round</td><td>Tome</td></tr>
+        <tr><td><span class="nm">Eldritch Blast</span></td><td>1 A</td><td>120 ft</td><td class="num">+8</td><td>&mdash;</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Resistance</span><span class="conc">C</span></td><td>1 A</td><td>touch</td><td>&mdash;</td><td>1 min</td><td>Tome</td></tr>
+        <tr><td><span class="nm">Toll the Dead</span></td><td>1 A</td><td>60 ft</td><td class="num">Wis 16</td><td>&mdash;</td><td>Tome</td></tr>
+        <tr><td><span class="nm">Vengeful Blade</span></td><td>1 A</td><td>self</td><td class="num">+8</td><td>&mdash;</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Vicious Mockery</span></td><td>1 A</td><td>60 ft</td><td class="num">Wis 16</td><td>&mdash;</td><td>Arcane Eloquence</td></tr>
+        <tr class="lvl"><td colspan="6"><div class="lb">1st level</div></td></tr>
+        <tr><td><span class="nm">Hex</span><span class="conc">C</span><span class="chip slot">slot</span></td><td>1 BA</td><td>90 ft</td><td>&mdash;</td><td>1 hr</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Charm Person</span><span class="chip free">free 1/LR</span></td><td>1 A</td><td>30 ft</td><td class="num">Wis 16</td><td>1 hr</td><td>Fey Touched</td></tr>
+        <tr><td><span class="nm">Burning Hands</span><span class="chip slot">slot</span></td><td>1 A</td><td>15 ft cone</td><td class="num">Dex 16</td><td>&mdash;</td><td>Fiend, always prepared</td></tr>
+        <tr><td><span class="nm">Command</span><span class="chip slot">slot</span></td><td>1 A</td><td>60 ft</td><td class="num">Wis 16</td><td>&mdash;</td><td>Fiend, always prepared</td></tr>
+        <tr><td><span class="nm">Disguise Self</span><span class="chip">at will</span></td><td>1 A</td><td>self</td><td>&mdash;</td><td>1 hr</td><td>Mask of Many Faces</td></tr>
+        <tr><td><span class="nm">Binding Pledge</span><span class="chip">ritual</span></td><td>1 min</td><td>touch</td><td>&mdash;</td><td>10 days</td><td>Tome</td></tr>
+        <tr><td><span class="nm">Purify Food and Drink</span><span class="chip">ritual</span></td><td>1 A</td><td>10 ft</td><td>&mdash;</td><td>&mdash;</td><td>Tome</td></tr>
+        <tr class="lvl"><td colspan="6"><div class="lb">2nd level</div></td></tr>
+        <tr><td><span class="nm">Misty Step</span><span class="chip free">free 1/LR</span><span class="chip slot">then slot</span></td><td>1 BA</td><td>self</td><td>&mdash;</td><td>&mdash;</td><td>Fey Touched</td></tr>
+        <tr><td><span class="nm">Blood Sacrifice</span><span class="chip slot">slot</span></td><td>1 BA</td><td>self</td><td>&mdash;</td><td>1 min</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Sanguine Secrets</span><span class="chip slot">slot</span></td><td>1 BA</td><td>30 ft</td><td>&mdash;</td><td>1 round</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Scorching Ray</span><span class="chip slot">slot</span></td><td>1 A</td><td>120 ft</td><td class="num">+8</td><td>&mdash;</td><td>Fiend, always prepared</td></tr>
+        <tr><td><span class="nm">Suggestion</span><span class="conc">C</span><span class="chip slot">slot</span></td><td>1 A</td><td>30 ft</td><td class="num">Wis 16</td><td>8 hr</td><td>Fiend, always prepared</td></tr>
+        <tr class="lvl"><td colspan="6"><div class="lb">3rd level &middot; pact slots cast here</div></td></tr>
+        <tr><td><span class="nm">Vampiric Touch</span><span class="conc">C</span><span class="chip slot">slot</span></td><td>1 A</td><td>self</td><td class="num">+8</td><td>1 min</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Counterspell</span><span class="chip slot">slot</span></td><td>1 R</td><td>60 ft</td><td class="num">Con 16</td><td>&mdash;</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Shadow Drain</span><span class="conc">C</span><span class="chip slot">slot</span></td><td>1 A</td><td>15 ft emanation</td><td class="num">Cha 16</td><td>1 min</td><td>Warlock</td></tr>
+        <tr><td><span class="nm">Fireball</span><span class="chip slot">slot</span></td><td>1 A</td><td>150 ft, 20 ft sphere</td><td class="num">Dex 16</td><td>&mdash;</td><td>Fiend, always prepared</td></tr>
+        <tr><td><span class="nm">Stinking Cloud</span><span class="conc">C</span><span class="chip slot">slot</span></td><td>1 A</td><td>90 ft, 20 ft sphere</td><td class="num">Con 16</td><td>1 min</td><td>Fiend, always prepared</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="foot">Full descriptions start on the next page, grouped the same way. Every row above comes straight from the Beyond export's per-spell fields (time, range, save/attack, duration, source, notes), so homebrew spells get a full row even when the SRD lookup misses. Full spell text follows on the card pages.</div>
+  </div>
+</div>
+
+<div class="sheet">
+  <div class="band">
+    <div>
+      <div class="name">Dash Berman</div>
+      <div class="sub"><b>Dhampir</b> &middot; <b>Warlock 5</b>, Fiend Patron &middot; Bejeweled Conclave Spy &middot; <i>played by Jake</i></div>
+    </div>
+    <div class="right"><div class="pg">Spell descriptions</div>DC 16 &middot; atk +8 &middot; pact slots cast at 3rd</div>
+  </div>
+  <div class="page">
+    <div class="lvlbar">1st level</div>
+    <div class="cards">
+      <div class="card">
+        <div class="ch"><span class="cn">Hex</span><span class="conc">C</span><span class="chip slot">slot</span><span class="cm">enchantment &middot; 1 bonus action &middot; 90 ft &middot; V, S, M &middot; up to 1 hr</span></div>
+        <p>You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability.</p>
+        <p>If the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature.</p>
+        <p class="hl"><b>Using a higher-level slot.</b> Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours). <i>Cast from a pact slot: 8 hours.</i></p>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="cn">Charm Person</span><span class="chip free">free 1/LR</span><span class="cm">enchantment &middot; 1 action &middot; 30 ft &middot; V, S &middot; 1 hr</span></div>
+        <p>One Humanoid you can see within range makes a Wisdom saving throw. It does so with Advantage if you or your allies are fighting it. On a failed save, the target has the Charmed condition until the spell ends or until you or your allies damage it. The Charmed creature is Friendly to you. When the spell ends, the target knows it was Charmed by you.</p>
+        <p class="hl"><b>Using a higher-level slot.</b> One additional creature per slot level above 1. <i>Cast from a pact slot: three targets.</i></p>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="cn">Command</span><span class="chip slot">slot</span><span class="cm">enchantment &middot; 1 action &middot; 60 ft &middot; V &middot; instantaneous &middot; Fiend, always prepared</span></div>
+        <p>You speak a one-word command to a creature you can see within range. The target must succeed on a Wisdom saving throw or follow the command on its next turn. Choose the command from these options:</p>
+        <p><b>Approach.</b> The target moves toward you by the shortest route, ending its turn if it moves within 5 feet of you.<br><b>Drop.</b> The target drops whatever it is holding and then ends its turn.<br><b>Flee.</b> The target spends its turn moving away from you by the fastest available means.<br><b>Grovel.</b> The target has the Prone condition and then ends its turn.<br><b>Halt.</b> On its turn, the target doesn't move and takes no action or Bonus Action.</p>
+        <p class="hl"><b>Using a higher-level slot.</b> One additional creature per slot level above 1. <i>Cast from a pact slot: three targets.</i></p>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="cn">Binding Pledge</span><span class="chip">ritual</span><span class="chip">homebrew</span><span class="cm">1 minute &middot; touch &middot; V, S, M &middot; 10 days &middot; Grim Hollow PG 185</span></div>
+        <p class="muted">No description in the spell library. Header built from the Beyond export; add the text in Sideboard's custom spells to fill this card.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -149,12 +149,42 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-10-02 — Character sheet v3, phase 3a: page 1 (combat reference)
+
+Spec §5.1, laid out from `docs/sheet-mockup-v3.html` (now committed). Pages 2+ are still the old renderer.
+
+- **Page 1** (`src/lib/pdf/page-combat.ts`):
+  - A band with species, classes, subclasses, background and player, plus a seven-cell vitals strip. The Feature DC cell always carries `grapple/shove DC N`.
+  - A 46 mm left rail: ability blocks with their skills and feature dice (Smooth Talker `+1d4`), passives, defenses and senses, proficiencies.
+  - The right column holds attacks & cantrips with an "Adds to a hit" rider table, Your turn (Action / Bonus action / Reaction / Always on), resources (circles up to 8 uses, otherwise a write-in rule), and inventory inline when it has ≤ 8 rows.
+  - Overflow order: inventory moves off the page first, then resources (resources lead page 2). Attacks and Your turn never split.
+- **Layering:**
+  - `sheet-data.ts` is pure: what the page shows.
+  - `sheet-kit.ts` holds the drawing kit: tokens, mockup px → mm, spaced caps, chips, dots, rich text that wraps across styles.
+  - `spell-library.ts` does custom-then-SRD spell lookup, shared with the spells page.
+  - `character-export.ts` lost its old page 1 and its duplicated SRD and WinAnsi code. Its feature list survives as an interim page 2 until the v3 Features page lands.
+- **Your turn** comes from feature actions, activations, spell casting times and at-will spells:
+  - Clause-less activations share a line (`Conjure / Bond (Pact of the Blade)`).
+  - A required spend moves into the cost: `Flurry of Blows · make two Unarmed Strikes (1 Focus)`.
+  - Clauses are first sentences with lead-ins, run-in headings and the group's own wording removed. Over 140 characters they keep the effect after "…, you can", then cut at a clause boundary.
+- **Attack cantrips** the export doesn't list:
+  - Weapon cantrips come from the weapon notes (Booming Blade `+1d8 thunder`, weapon reach).
+  - Other damage comes from the SRD 5.2 library text, or from `src/data/cantrip-damage.ts` for common non-SRD cantrips (Toll the Dead), scaled at 5/11/17.
+- **jsPDF fixes:**
+  - Letter spacing (`Tc`) persisted in the PDF text state and leaked into every later string. It is now reset after each spaced label.
+  - `getTextWidth` applies kerning but `text()` draws unkerned, so kerned pairs measured short ("HP,you"). Measurement and wrapping now use unkerned widths.
+- **Visual checks:** Poppler substitutes the unembedded base-14 fonts badly on macOS (no bold, odd gaps). Use `qlmanage -t -s 1700` (CoreGraphics) for proofs.
+- **Since phase 2 (ef2a9f0):**
+  - Migration 009 is applied (additive, nullable; existing rows NULL).
+  - `free_uses` never clears `costs_slot`. Dash's Charm Person carries both; the multiclass Faerie Fire was already right. check-fixtures is at 73/73.
+  - The edit page and re-upload merge carry species, background, classes, spell_details, weapon masteries and both DCs.
+
 ### 2026-10-02 — Character sheet v3, phases 0–2: the parser
 
 Implements `docs/character-sheet-spec-v3.md` §2–§4 and §9 steps 0–2. The renderer (step 3) is still the pre-v3 one.
 
 - **Phase 0.** Parser and renderer moved out of the API routes: `src/lib/import/pdf-form-fields.ts` (form fields + annotation order), `src/lib/import/ddb-parser.ts` (pure), `src/lib/pdf/character-export.ts` (`renderCharacterPdf`). `scripts/parse-fixtures.ts` writes `PCsheets/fixtures/out/*.json` from the six fixture exports; the JSON is committed so parser changes diff.
-- **Phase 1.** v3 types in `src/types/index.ts`. They are optional on `PlayerCharacter`, so wizard-built and existing characters still typecheck. Migration `009_character_sheet_v3.sql` adds the columns (not yet applied to Supabase). `src/data/class-reference.ts` covers the 2024 twelve plus Artificer; `src/data/weapons.ts` holds the PHB mastery table.
+- **Phase 1.** v3 types in `src/types/index.ts`. They are optional on `PlayerCharacter`, so wizard-built and existing characters still typecheck. Migration `009_character_sheet_v3.sql` adds the columns. `src/data/class-reference.ts` covers the 2024 twelve plus Artificer; `src/data/weapons.ts` holds the PHB mastery table.
 - **Phase 2.** `ddb-parser.ts` is rewritten to §3:
   - Lossless feature grammar: `*` headings; `|` children, options, uses, activations; bullets and run-in paragraphs. Fields are joined so a structural line never fuses with prose.
   - Classification into container, excluded, ribbon and mechanical; Actions sections set the action economy.
