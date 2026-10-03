@@ -285,6 +285,8 @@ export interface SpellEntry {
   duration: string;
   notes: string;
   page_ref: string;
+  /** Full text from the Beyond character JSON, when one was uploaded with the PDF. */
+  description?: string;
 }
 
 export interface WeaponMastery {

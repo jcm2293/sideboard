@@ -289,7 +289,7 @@ export function shortRange(range: string): string {
 }
 
 /** "WIS 16" → "Wis 16"; "+8" stays. */
-const hitOrDc = (s: string) => (s ? s.replace(/^([A-Z]{3})\b/, (a) => a[0] + a.slice(1).toLowerCase()) : '—');
+export const hitOrDc = (s: string) => (s ? s.replace(/^([A-Z]{3})\b/, (a) => a[0] + a.slice(1).toLowerCase()) : '—');
 
 /** Cantrip dice scaled by character level: more dice at 5, 11, and 17. */
 function scaleCantrip(dice: string, level: number): string {

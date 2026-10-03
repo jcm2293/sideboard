@@ -149,6 +149,28 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-10-02 — Character sheet v3, phase 3c: spell index and slots
+
+Spec §5.3, scoped: the stats strip, slot bubbles, and index are new; the description cards are the existing renderer with fixes. No card redesign, inventory page, or fonts yet.
+
+- **Index pages** (`src/lib/pdf/page-spells.ts`):
+  - The band reads "Spell index · Pact Magic · Cha · DC 16 · atk +8".
+  - The strip shows Spell save DC, spell attack, and ability at display size. Pact slots are large bubbles with "all cast at 3rd level" and the Magical Cunning note; other casters get one column of bubbles per slot level (4 / 3 / 2).
+  - The legend covers only the chips in use.
+  - One table: Spell (chips), Time, Range, Hit / DC, Duration, From.
+    - Chips: circled C, `slot`, `free 1/LR` + `then slot`, `at will`, `ritual`.
+    - Level dividers with rules; "3rd level · pact slots cast here" for pact casters.
+    - From: the class; "Tome" or the naming invocation (Mask of Many Faces); "Fiend, always prepared"; the feat; "Drow lineage"; "Evocation Savant".
+  - The table continues on a second page with the header repeated.
+- **Cards** (`character-export.ts`):
+  - Every spell appears once (`spellsByLevel`: spell_details, else the stored names, with "[R]" markers stripped).
+  - The header facts come from spell_details, so homebrew spells get a full header plus the spec's "No description in the spell library" note.
+  - The prepared marker is a dot only, inside the padding (the "Prepared" label used to run past the card edge). Long facts shrink to fit.
+  - Card pages carry the v3 band.
+  - The old stats bar and slot boxes are gone.
+- `spell-library.ts` finds the SRD's renamed spells: "Tasha's Hideous Laughter" → Hideous Laughter, Bigby's Hand → Arcane Hand.
+- The kit gains a `conc` chip variant (the circled C).
+
 ### 2026-10-02 — Character sheet v3, phase 3b: summary clauses, page-1 fixes, Features page
 
 Spec §2, §4, §5.1 (as amended), §5.2.

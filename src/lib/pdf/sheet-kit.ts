@@ -272,16 +272,29 @@ export function capsOpts(sizePx: number, color: string, trackingEm: number, styl
 // Chips
 // ──────────────────────────────────────────────────────────────────────────
 
-export type ChipVariant = 'plain' | 'slot' | 'free';
+/** 'conc' is the circled C for concentration. */
+export type ChipVariant = 'plain' | 'slot' | 'free' | 'conc';
 const CHIP = () => capsOpts(7.5, C.maroonInk, 0.1);
+const CONC_D = px(13);
 
-export function chipWidth(doc: jsPDF, label: string): number {
+export function chipWidth(doc: jsPDF, label: string, variant: ChipVariant = 'plain'): number {
+  if (variant === 'conc') return CONC_D;
   return measure(doc, label.toUpperCase(), CHIP()) + px(8);
 }
 
 /** A chip whose text baseline sits at y. Returns its width. */
 export function chip(doc: jsPDF, label: string, x: number, y: number, variant: ChipVariant = 'plain'): number {
   const o = CHIP();
+  if (variant === 'conc') {
+    const r = CONC_D / 2;
+    const cy = y - ptMm(o.size) * 0.36;
+    fill(doc, C.cream);
+    stroke(doc, C.maroon);
+    doc.setLineWidth(px(1));
+    doc.circle(x + r, cy, r, 'FD');
+    text(doc, 'C', x + r, cy + ptMm(fs(8)) * 0.34, { size: fs(8), color: C.maroon, font: FONT.display, align: 'center' });
+    return CONC_D;
+  }
   const w = chipWidth(doc, label);
   const h = ptMm(o.size) + px(3);
   const top = y - ptMm(o.size) * 0.78 - px(1.5);
@@ -328,7 +341,7 @@ export function layoutRich(doc: jsPDF, runs: Run[], maxWidth: number, baseSize: 
   for (const run of runs) {
     if (run.kind === 'chip') {
       place({ kind: 'text', text: ' ' }, measure(doc, ' ', { size: baseSize }), true);
-      place(run, chipWidth(doc, run.text), false);
+      place(run, chipWidth(doc, run.text, run.variant), false);
       continue;
     }
     const o: TextOpts = { size: run.size ?? baseSize, style: run.style };

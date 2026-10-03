@@ -35,20 +35,31 @@ function customToSrdShape(c: CustomSpell): SrdSpell {
 
 export type SpellLookup = (name: string) => SrdSpell | null;
 
-/** Custom spells first, then the SRD; tolerant of "[R]"-style markers, apostrophes, and hyphens. */
+// The SRD drops the wizards' names: "Tasha's Hideous Laughter" is "Hideous Laughter".
+// Two renamed outright.
+const SRD_RENAMES: Record<string, string> = {
+  "bigby's hand": 'arcane hand',
+  "mordenkainen's sword": 'arcane sword',
+};
+const withoutOwner = (name: string) => name.replace(/^[a-z][\w-]*['’]s\s+/, '');
+
+/** Custom spells first, then the SRD; tolerant of "[R]"-style markers, apostrophes, hyphens, and the SRD's renames. */
 export function createSpellLookup(customSpells: CustomSpell[] = []): SpellLookup {
   const custom = new Map<string, SrdSpell>();
   for (const c of customSpells) custom.set(c.name.toLowerCase().trim(), customToSrdShape(c));
   const loose = (s: string) => s.replace(/['’-]/g, '').replace(/\s+/g, ' ');
 
-  return (name) => {
-    if (!name) return null;
-    const lower = name.replace(/\s*\[[^\]]*\]\s*$/, '').toLowerCase().trim();
+  const find = (lower: string): SrdSpell | null => {
     const direct = custom.get(lower) ?? SRD_BY_NAME.get(lower);
     if (direct) return direct;
     const norm = loose(lower);
     for (const [k, v] of custom) if (loose(k) === norm) return v;
     for (const [k, v] of SRD_BY_NAME) if (loose(k) === norm) return v;
     return null;
+  };
+  return (name) => {
+    if (!name) return null;
+    const lower = name.replace(/\s*\[[^\]]*\]\s*$/, '').toLowerCase().replace(/’/g, "'").trim();
+    return find(lower) ?? find(SRD_RENAMES[lower] ?? withoutOwner(lower));
   };
 }
