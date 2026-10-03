@@ -151,7 +151,7 @@ Append a dated entry per commit. Keep it tight: what changed, why, file referenc
 
 ### 2026-10-02 — Beyond character JSON as an overlay on the PDF import
 
-- **Upload.** The players page picker takes the D&D Beyond PDF (required) plus, optionally, the character-service JSON in the same selection. `/api/parse-character` parses the PDF as before, then applies the JSON (`src/lib/import/ddb-json.ts`). The JSON never adds features or spells the PDF doesn't have. A JSON for a different character, or one that isn't a Beyond export, is ignored with a notice.
+- **Upload.** Upload Character and Re-upload open a dialog with two fields: the D&D Beyond PDF (required) and the character-service JSON (optional). `/api/parse-character` parses the PDF as before, then applies the JSON (`src/lib/import/ddb-json.ts`). The JSON never adds features or spells the PDF doesn't have. A JSON for a different character, or one that isn't a Beyond export, is ignored with a notice.
 - **Overlay.**
   - `definition.description` HTML is stripped to the parser's text shape: paragraphs, "• " list lines, table cells joined with " · ". Leading "Prerequisite" and category-label ("Origin Feat") paragraphs are dropped, and simple template tokens are resolved.
   - That text lands on features' `full_text` by name: class features at or below the class level, species traits, feats, and invocations (which are options in the JSON).

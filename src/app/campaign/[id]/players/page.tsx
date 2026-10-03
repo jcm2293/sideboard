@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { playerCharacterStore, customSpellStore } from '@/lib/data';
 import { useShelfStore } from '@/stores/shelf-store';
@@ -24,12 +24,13 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
   // cards render with their full description instead of name-only.
   const [customSpells, setCustomSpells] = useState<CustomSpell[]>([]);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const reuploadInputRef = useRef<HTMLInputElement>(null);
-  const reuploadPcIdRef = useRef<string | null>(null);
+  // Upload dialog: a new character (pcId null) or a re-upload into an existing one.
+  const [uploadFor, setUploadFor] = useState<{ pcId: string | null; name?: string } | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [jsonFile, setJsonFile] = useState<File | null>(null);
 
   useEffect(() => {
-    playerCharacterStore.getAll({ campaign_id: id } as any).then(data => {
+    playerCharacterStore.getAll({ campaign_id: id } as Partial<PlayerCharacter>).then(data => {
       setCharacters(data);
       setLoading(false);
     });
@@ -38,53 +39,40 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       .then(setCustomSpells);
   }, [id]);
 
-  // The picker takes the Beyond PDF (required) and, optionally, the character
-  // JSON in the same selection; the JSON overlays full rules text.
-  async function parseUpload(files: FileList | null, onParsed: () => void): Promise<void> {
-    const picked = Array.from(files ?? []);
-    const pdf = picked.find((f) => f.name.toLowerCase().endsWith('.pdf'));
-    const json = picked.find((f) => f.name.toLowerCase().endsWith('.json'));
-    if (picked.length === 0) return;
-    if (!pdf) {
-      setError('Choose the character PDF. The Beyond JSON is optional and goes with it, not instead of it.');
-      return;
-    }
+  function openUpload(pcId: string | null, name?: string) {
+    setError(null);
+    setPdfFile(null);
+    setJsonFile(null);
+    setUploadFor({ pcId, name });
+  }
+
+  // The Beyond PDF is required; the character JSON is an optional overlay of full rules text.
+  async function handleParse() {
+    if (!uploadFor || !pdfFile) return;
     setUploading(true);
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('file', pdf);
-      if (json) formData.append('json', json);
+      formData.append('file', pdfFile);
+      if (jsonFile) formData.append('json', jsonFile);
       const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
       const data = await res.json();
       if (!res.ok || data.error) {
         setError(data.error || `Parse failed (${res.status})`);
         return;
       }
-      if (data.character) {
-        sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
-        sessionStorage.setItem('parsedNotices', JSON.stringify(data.notices ?? []));
-        onParsed();
-      } else {
+      if (!data.character) {
         setError('No character data returned from parser');
+        return;
       }
+      sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
+      sessionStorage.setItem('parsedNotices', JSON.stringify(data.notices ?? []));
+      router.push(`/campaign/${id}/players/${uploadFor.pcId ?? 'new'}?parsed=true`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload PDF');
     } finally {
       setUploading(false);
     }
-  }
-
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    await parseUpload(e.target.files, () => router.push(`/campaign/${id}/players/new?parsed=true`));
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  }
-
-  async function handleReupload(e: React.ChangeEvent<HTMLInputElement>) {
-    const pcId = reuploadPcIdRef.current;
-    if (pcId) await parseUpload(e.target.files, () => router.push(`/campaign/${id}/players/${pcId}?parsed=true`));
-    reuploadPcIdRef.current = null;
-    if (reuploadInputRef.current) reuploadInputRef.current.value = '';
   }
 
   async function handleExport(pc: PlayerCharacter) {
@@ -137,11 +125,6 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     setDeleteId(null);
   }
 
-  function triggerReupload(pcId: string) {
-    reuploadPcIdRef.current = pcId;
-    reuploadInputRef.current?.click();
-  }
-
   if (loading) {
     return (
       <div className="max-w-5xl">
@@ -154,20 +137,10 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     <div className="max-w-5xl">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-2xl text-accent">Player Characters</h1>
-          <p className="text-xs text-muted mt-1">
-            Upload the D&amp;D Beyond PDF; select its character JSON with it for full rules text.
-          </p>
-        </div>
+        <h1 className="font-display text-2xl text-accent">Player Characters</h1>
         <div className="flex gap-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="btn-primary px-4 py-2 rounded text-sm"
-            title="Select the D&D Beyond PDF. Add its character JSON in the same selection for full rules text."
-          >
-            {uploading ? 'Parsing character sheet...' : 'Upload Character PDF'}
+          <button onClick={() => openUpload(null)} className="btn-primary px-4 py-2 rounded text-sm">
+            Upload Character
           </button>
           <button
             onClick={() => setCreateOpen(true)}
@@ -178,8 +151,8 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
         </div>
       </div>
 
-      {/* Error message */}
-      {error && (
+      {/* Error message (the upload dialog shows its own) */}
+      {error && !uploadFor && (
         <div className="mb-4 p-3 bg-red-900/20 border border-red-900/40 rounded text-sm text-red-300">
           <div className="flex justify-between items-start">
             <span>{error}</span>
@@ -187,24 +160,6 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
           </div>
         </div>
       )}
-
-      {/* Hidden file inputs */}
-      <input
-        type="file"
-        accept=".pdf,.json,application/pdf,application/json"
-        multiple
-        ref={fileInputRef}
-        onChange={handleUpload}
-        className="hidden"
-      />
-      <input
-        type="file"
-        accept=".pdf,.json,application/pdf,application/json"
-        multiple
-        ref={reuploadInputRef}
-        onChange={handleReupload}
-        className="hidden"
-      />
 
       {/* Character grid */}
       {characters.length === 0 ? (
@@ -263,7 +218,7 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
                   Export PDF
                 </button>
                 <button
-                  onClick={() => triggerReupload(pc.id)}
+                  onClick={() => openUpload(pc.id, pc.name)}
                   className="btn-ghost px-3 py-1 rounded text-xs"
                 >
                   Re-upload
@@ -358,6 +313,57 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Upload dialog: the Beyond PDF, plus its character JSON if you have it */}
+      {uploadFor && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => !uploading && setUploadFor(null)}>
+          <div className="card-parchment rounded-lg p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-baseline justify-between mb-4">
+              <h3 className="font-display text-lg text-accent">
+                {uploadFor.pcId ? `Re-upload ${uploadFor.name ?? 'character'}` : 'Upload Character'}
+              </h3>
+              <button onClick={() => setUploadFor(null)} disabled={uploading} className="text-muted hover:text-foreground">
+                ✕
+              </button>
+            </div>
+
+            <label className="block text-sm font-medium mb-1">D&amp;D Beyond character sheet PDF</label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm mb-4 file:mr-3 file:px-3 file:py-1.5 file:rounded file:border-0 file:bg-accent/15 file:text-accent file:cursor-pointer"
+            />
+
+            <label className="block text-sm font-medium mb-1">
+              Beyond character JSON <span className="text-muted font-normal">(optional)</span>
+            </label>
+            <input
+              type="file"
+              accept=".json,application/json"
+              onChange={(e) => setJsonFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm file:mr-3 file:px-3 file:py-1.5 file:rounded file:border-0 file:bg-accent/15 file:text-accent file:cursor-pointer"
+            />
+            <p className="text-xs text-muted mt-1 mb-4">
+              Adds Beyond&apos;s full rules text for features, options, and spells. Save it from
+              character-service.dndbeyond.com/character/v5/character/&lt;character id&gt;.
+            </p>
+
+            {error && (
+              <div className="mb-4 p-2 bg-red-900/20 border border-red-900/40 rounded text-sm text-red-300">{error}</div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setUploadFor(null)} disabled={uploading} className="btn-ghost px-4 py-2 rounded text-sm">
+                Cancel
+              </button>
+              <button onClick={handleParse} disabled={!pdfFile || uploading} className="btn-primary px-4 py-2 rounded text-sm disabled:opacity-50">
+                {uploading ? 'Parsing…' : 'Parse'}
+              </button>
+            </div>
           </div>
         </div>
       )}
