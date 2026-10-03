@@ -260,7 +260,7 @@
       },
       {
         "name": "Radiant Sun Bolt",
-        "summary": "ranged spell attack, 30 ft, 1d8 radiant; twice as a Bonus Action for 1 Focus",
+        "summary": "radiant ranged spell attack out to 30 ft; twice as a Bonus Action for 1 Focus",
         "full_text": "You gain a special ranged spell attack with a range of 30 ft. that uses your DEX modifier and deals radiant damage equal to your Martial Arts die. When you take the Attack action, you can spend 1 Focus point to make the special attack twice as a bonus action and you can use this attack as any of the attacks using the Extra Attack feature.",
         "kind": "mechanical",
         "group": "Monk",
