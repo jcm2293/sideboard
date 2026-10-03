@@ -270,8 +270,17 @@ export interface AttackTable {
 const OFFICIAL_SOURCE =
   /^(PHB|DMG|MM|XGtE|TCoE|SCAG|EEPC|FToD|FTD|SCC|BMT|EGtW|AI|IDRotF|GGR|ERftLW|EFA|MOoT|VRGtR|WBtW|AAG|SAiS|BoMT|MPMM|VGtM|MToF|SRD|SatO|PaBTSO|TDCSR|DSotDQ|KftGV|QftIS)\b/i;
 
+/**
+ * The spells the character can cast. A prepared caster's export can list
+ * every spell it could prepare (a 2024 cleric: the whole list), so class
+ * spells outside its prepared list are left off; cantrips, always-prepared,
+ * and feat or species spells always stay.
+ */
 export function spellDetailsOf(c: Char): SpellEntry[] {
-  return Object.values(c.spell_details ?? {});
+  const all = Object.values(c.spell_details ?? {});
+  const prepared = new Set((c.prepared_spells ?? []).map(spellKey));
+  if (!c.is_prepared_caster || prepared.size === 0) return all;
+  return all.filter((s) => s.level === 0 || s.always_prepared || s.origin !== 'class' || prepared.has(spellKey(s.name)));
 }
 
 export function isHomebrew(detail: SpellEntry | undefined, lookup: SpellLookup): boolean {

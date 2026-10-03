@@ -116,6 +116,8 @@ export interface DdbJsonOverlay {
   spells: Map<string, { description: string; free?: { count: number; per: 'short' | 'long' } }>;
   /** featureKey(owning feature) → uses, from the actions Beyond computes. */
   uses: Map<string, FeatureUses & { from: string }>;
+  /** spellKey of class spells marked prepared or always prepared; empty when the JSON marks none. */
+  prepared: Set<string>;
 }
 
 /** Limited uses as Beyond counts them: a proficiency-based count is the bonus itself; a stat adds its modifier. */
@@ -165,6 +167,16 @@ export function readDdbJson(raw: unknown, pb: number, mods: AbilityMods): DdbJso
   }
 
   const spells = new Map<string, { description: string; free?: { count: number; per: 'short' | 'long' } }>();
+  const prepared = new Set<string>();
+  for (const s of arr(root.classSpells).flatMap((cs) => arr(cs.spells))) {
+    if (s.prepared === true || s.alwaysPrepared === true) prepared.add(spellKey(str(obj(s.definition).name)));
+  }
+  // Spells a feat, species, item, or background grants are always castable (Magic Initiate's).
+  if (prepared.size > 0) {
+    for (const section of SECTIONS.filter((x) => x !== 'class')) {
+      for (const s of arr(obj(root.spells)[section])) prepared.add(spellKey(str(obj(s.definition).name)));
+    }
+  }
   const spellEntries = [
     ...arr(root.classSpells).flatMap((cs) => arr(cs.spells)),
     ...SECTIONS.flatMap((section) => arr(obj(root.spells)[section])),
@@ -203,7 +215,7 @@ export function readDdbJson(raw: unknown, pb: number, mods: AbilityMods): DdbJso
       });
     }
   }
-  return { characterName: str(root.name), features, options, spells, uses };
+  return { characterName: str(root.name), features, options, spells, uses, prepared };
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -309,10 +321,23 @@ export function applyDdbJson(character: ParsedCharacter, raw: unknown): { charac
     );
   }
 
+  // Beyond's PDF can mark every spell a prepared caster could prepare; the JSON knows which are.
+  let preparedNote = '';
+  if (character.is_prepared_caster && overlay.prepared.size > 0 && character.spell_details) {
+    const names = Object.values(out.spell_details ?? character.spell_details)
+      .filter((s) => s.level > 0 && (s.always_prepared || overlay.prepared.has(spellKey(s.name))))
+      .map((s) => s.name);
+    if (names.length > 0) {
+      preparedNote = `Prepared spells from the JSON: ${names.length} (the PDF marked ${character.prepared_spells?.length ?? 0}).`;
+      out.prepared_spells = names;
+    }
+  }
+
   const notices = [
     `Beyond JSON: rules text for ${texts} feature${texts === 1 ? '' : 's'}${optionTexts ? ` and ${optionTexts} option${optionTexts === 1 ? '' : 's'}` : ''}, descriptions for ${spellTexts} spell${spellTexts === 1 ? '' : 's'}.`,
   ];
   if (usesChanged.length) notices.push(`Uses from the JSON: ${usesChanged.join('; ')}.`);
+  if (preparedNote) notices.push(preparedNote);
   if (missing.length) notices.push(`No JSON text for: ${missing.slice(0, 8).join(', ')}${missing.length > 8 ? `, and ${missing.length - 8} more` : ''}.`);
   return { character: out, notices };
 }
