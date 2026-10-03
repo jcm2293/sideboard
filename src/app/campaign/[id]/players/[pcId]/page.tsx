@@ -144,6 +144,8 @@ export default function PlayerCharacterEditPage({
   const [isMulticlass, setIsMulticlass] = useState(false);
   // What a re-uploaded PDF changed, kept, and offered when merged into this sheet.
   const [reuploadReport, setReuploadReport] = useState<ReuploadReport | null>(null);
+  // What the parser and the JSON overlay want the DM to know about this import.
+  const [importNotices, setImportNotices] = useState<string[]>([]);
   // Structured import data (sheet v3) with no form controls; carried through to save.
   // `classes` is re-derived from the class line on save, so it isn't held here.
   const [importData, setImportData] = useState<
@@ -363,10 +365,13 @@ export default function PlayerCharacterEditPage({
     let cancelled = false;
     async function load() {
       const raw = isParsed ? sessionStorage.getItem('parsedCharacter') : null;
+      const rawNotices = isParsed ? sessionStorage.getItem('parsedNotices') : null;
       let parsed: Partial<PlayerCharacter> | null = null;
+      let notices: string[] = [];
       if (raw) {
         try {
           parsed = JSON.parse(raw) as Partial<PlayerCharacter>;
+          notices = rawNotices ? (JSON.parse(rawNotices) as string[]) : [];
         } catch {
           // ignore malformed hand-off data
         }
@@ -390,7 +395,9 @@ export default function PlayerCharacterEditPage({
       } else if (existing) {
         populateForm(existing);
       }
+      if (parsed) setImportNotices(notices);
       if (raw) sessionStorage.removeItem('parsedCharacter');
+      if (rawNotices) sessionStorage.removeItem('parsedNotices');
       setCustomSpells(cs);
       setLoading(false);
     }
@@ -673,6 +680,22 @@ export default function PlayerCharacterEditPage({
       <h1 className="font-display text-2xl text-accent mb-6">
         {isNew ? 'Create Character' : `Edit ${name || 'Character'}`}
       </h1>
+
+      {importNotices.length > 0 && (
+        <section className="card-parchment rounded-lg p-4 mb-6 text-sm">
+          <div className="flex justify-between items-start mb-2">
+            <h2 className="font-display text-base text-accent">Import notes</h2>
+            <button type="button" onClick={() => setImportNotices([])} className="text-xs text-muted hover:underline">
+              Dismiss
+            </button>
+          </div>
+          <ul className="list-disc pl-5 space-y-1">
+            {importNotices.map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {reuploadReport && (
         <ReuploadReportPanel

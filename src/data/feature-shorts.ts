@@ -126,7 +126,7 @@ const CLASS_SHORTS: Record<string, Record<string, Short>> = {
     'Superior Defense': 'spend 3 Focus for resistance to all damage except Force for 1 minute',
     'Body and Mind': 'Dexterity and Wisdom +4, to a maximum of 25',
     // Way of the Sun Soul
-    'Radiant Sun Bolt': ({ level }) => `ranged spell attack, 30 ft, ${martialArtsDie(level)} radiant; twice as a Bonus Action for 1 Focus`,
+    'Radiant Sun Bolt': 'radiant ranged spell attack out to 30 ft; twice as a Bonus Action for 1 Focus',
     'Searing Arc Strike': 'after the Attack action, spend Focus to cast Burning Hands as a Bonus Action',
   },
 

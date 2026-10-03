@@ -322,7 +322,8 @@ function featureAttack(c: Char, f: FeatureEntry): AttackRow | null {
   const kind = text.match(/\b(ranged|melee) (spell|weapon) attack\b/i);
   if (!kind) return null;
   const rolled = text.match(new RegExp(`(\\d+d\\d+(?:\\s*[+-]\\s*\\d+)?)\\s+(${DAMAGE_TYPES})\\s+damage`, 'i'));
-  const martialArts = /\bMartial Arts die\b/i.test(text);
+  // "equal to your Martial Arts die" (Beyond's snippet) or "…as shown in the Martial Arts column" (the full text).
+  const martialArts = /\bMartial Arts (?:die|column)\b/i.test(text);
   if (!rolled && !martialArts) return null;
 
   let dice = rolled?.[1].replace(/\s+/g, '') ?? '';
@@ -331,11 +332,18 @@ function featureAttack(c: Char, f: FeatureEntry): AttackRow | null {
     const rider = classReferenceFor('monk')?.riders.find((r) => r.requires === 'Martial Arts');
     dice = rider?.damage(monk?.level ?? c.level ?? 1) ?? '1d6';
   }
-  const type = (rolled?.[2] ?? text.match(new RegExp(`\\b(${DAMAGE_TYPES})\\s+damage\\b`, 'i'))?.[1] ?? '').toLowerCase();
+  const type = (
+    rolled?.[2] ??
+    text.match(new RegExp(`\\b(${DAMAGE_TYPES})\\s+damage\\b`, 'i'))?.[1] ??
+    text.match(new RegExp(`\\bdamage is (${DAMAGE_TYPES})\\b`, 'i'))?.[1] ??
+    ''
+  ).toLowerCase();
 
   // To hit: the ability the text names; else the spell attack bonus for a spell attack; else Str or Dex.
+  // "You add your Dexterity modifier to its attack and damage rolls" also adds it to the damage.
   const pb = c.proficiency_bonus ?? 2;
-  const named = text.match(/\buses? your (Str|Dex|Con|Int|Wis|Cha)\w*\.? modifier/i)?.[1].toLowerCase();
+  const addsTo = text.match(/\badd your (Str|Dex|Con|Int|Wis|Cha)\w*\.? modifier to (?:its|the) attack and damage rolls/i)?.[1].toLowerCase();
+  const named = addsTo ?? text.match(/\buses? your (Str|Dex|Con|Int|Wis|Cha)\w*\.? modifier/i)?.[1].toLowerCase();
   const mod = (a: Ability) => abilityModifier(c[`${a}_score`] ?? 10);
   const hit = named
     ? mod(ABILITY_OF[named]) + pb
@@ -344,12 +352,13 @@ function featureAttack(c: Char, f: FeatureEntry): AttackRow | null {
       : Math.max(mod('str'), mod('dex')) + pb;
 
   const reach = text.match(/\brange of (\d+)\s*(?:ft|feet)/i)?.[1];
+  const bonus = addsTo && !rolled ? mod(ABILITY_OF[addsTo]) : 0;
   return {
     name: f.name,
     chips: [],
     note: '',
     hit: modString(hit),
-    damage: [dice, type].filter(Boolean).join(' '),
+    damage: [bonus ? `${dice}${modString(bonus)}` : dice, type].filter(Boolean).join(' '),
     range: reach ? `${reach} ft` : /melee/i.test(kind[1]) ? '5 ft' : '—',
     kind: 'feature',
   };

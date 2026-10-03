@@ -38,14 +38,23 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       .then(setCustomSpells);
   }, [id]);
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // The picker takes the Beyond PDF (required) and, optionally, the character
+  // JSON in the same selection; the JSON overlays full rules text.
+  async function parseUpload(files: FileList | null, onParsed: () => void): Promise<void> {
+    const picked = Array.from(files ?? []);
+    const pdf = picked.find((f) => f.name.toLowerCase().endsWith('.pdf'));
+    const json = picked.find((f) => f.name.toLowerCase().endsWith('.json'));
+    if (picked.length === 0) return;
+    if (!pdf) {
+      setError('Choose the character PDF. The Beyond JSON is optional and goes with it, not instead of it.');
+      return;
+    }
     setUploading(true);
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', pdf);
+      if (json) formData.append('json', json);
       const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -54,7 +63,8 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       }
       if (data.character) {
         sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
-        router.push(`/campaign/${id}/players/new?parsed=true`);
+        sessionStorage.setItem('parsedNotices', JSON.stringify(data.notices ?? []));
+        onParsed();
       } else {
         setError('No character data returned from parser');
       }
@@ -62,38 +72,19 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       setError(err instanceof Error ? err.message : 'Failed to upload PDF');
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
 
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    await parseUpload(e.target.files, () => router.push(`/campaign/${id}/players/new?parsed=true`));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
   async function handleReupload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
     const pcId = reuploadPcIdRef.current;
-    if (!file || !pcId) return;
-    setUploading(true);
-    setError(null);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/parse-character', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        setError(data.error || `Parse failed (${res.status})`);
-        return;
-      }
-      if (data.character) {
-        sessionStorage.setItem('parsedCharacter', JSON.stringify(data.character));
-        router.push(`/campaign/${id}/players/${pcId}?parsed=true`);
-      } else {
-        setError('No character data returned from parser');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload PDF');
-    } finally {
-      setUploading(false);
-      reuploadPcIdRef.current = null;
-      if (reuploadInputRef.current) reuploadInputRef.current.value = '';
-    }
+    if (pcId) await parseUpload(e.target.files, () => router.push(`/campaign/${id}/players/${pcId}?parsed=true`));
+    reuploadPcIdRef.current = null;
+    if (reuploadInputRef.current) reuploadInputRef.current.value = '';
   }
 
   async function handleExport(pc: PlayerCharacter) {
@@ -163,12 +154,18 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
     <div className="max-w-5xl">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl text-accent">Player Characters</h1>
+        <div>
+          <h1 className="font-display text-2xl text-accent">Player Characters</h1>
+          <p className="text-xs text-muted mt-1">
+            Upload the D&amp;D Beyond PDF; select its character JSON with it for full rules text.
+          </p>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             className="btn-primary px-4 py-2 rounded text-sm"
+            title="Select the D&D Beyond PDF. Add its character JSON in the same selection for full rules text."
           >
             {uploading ? 'Parsing character sheet...' : 'Upload Character PDF'}
           </button>
@@ -194,14 +191,16 @@ export default function PlayersPage({ params }: { params: Promise<{ id: string }
       {/* Hidden file inputs */}
       <input
         type="file"
-        accept=".pdf"
+        accept=".pdf,.json,application/pdf,application/json"
+        multiple
         ref={fileInputRef}
         onChange={handleUpload}
         className="hidden"
       />
       <input
         type="file"
-        accept=".pdf"
+        accept=".pdf,.json,application/pdf,application/json"
+        multiple
         ref={reuploadInputRef}
         onChange={handleReupload}
         className="hidden"

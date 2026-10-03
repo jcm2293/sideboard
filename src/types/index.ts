@@ -242,6 +242,8 @@ export interface FeatureEntry {
   summary: string;
   /** Complete description, paragraphs joined with \n\n. */
   full_text?: string;
+  /** 'json' when full_text came from the Beyond character JSON; a PDF-only re-upload keeps it. */
+  text_source?: 'json';
   kind?: 'mechanical' | 'passive' | 'ribbon' | 'container';
   /** "Warlock", "Rogue", "Dhampir", "Feats". */
   group?: string;

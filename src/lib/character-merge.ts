@@ -112,7 +112,7 @@ const keyOf = spellKey;
 // Structure the v3 import adds to features. The edit page doesn't expose
 // these, so on a matched feature the import's values replace the sheet's.
 const FEATURE_V3_KEYS = [
-  'full_text', 'kind', 'group', 'parent', 'action', 'uses', 'source_ref', 'options', 'option_details', 'activations',
+  'full_text', 'text_source', 'kind', 'group', 'parent', 'action', 'uses', 'source_ref', 'options', 'option_details', 'activations',
 ] as const;
 
 function enrich<T extends object>(sheetItem: T, pdfItem: T, keys: readonly (keyof T)[]): T {
@@ -412,7 +412,9 @@ export function mergeReupload(
       const fromPdf = Object.values(pdf.spell_details ?? {}).find((d) => keyOf(d.name) === keyOf(name));
       const fromSheet = Object.values(sheet.spell_details ?? {}).find((d) => keyOf(d.name) === keyOf(name));
       const detail = fromPdf ?? fromSheet;
-      if (detail) details[name] = { ...detail, name };
+      // A description from an earlier Beyond JSON survives a re-upload without one.
+      const description = fromPdf?.description ?? fromSheet?.description;
+      if (detail) details[name] = { ...detail, name, ...(description ? { description } : {}) };
     }
     merged.spell_details = details;
   }
@@ -456,7 +458,10 @@ export function mergeReupload(
   const untouched = (s: FeatureEntry) => !s.summary || s.summary === featureSummary(s, summaryContext(sheet, s.group));
   const withStructure = (s: FeatureEntry, p: FeatureEntry): FeatureEntry => {
     const next: FeatureEntry = { ...s };
+    // Text from an earlier Beyond JSON outlasts a re-upload without one (the PDF truncates).
+    const keepJsonText = s.text_source === 'json' && p.text_source !== 'json';
     for (const k of FEATURE_V3_KEYS) {
+      if (keepJsonText && (k === 'full_text' || k === 'text_source' || k === 'option_details')) continue;
       if (p[k] != null) (next as unknown as Record<string, unknown>)[k] = p[k];
     }
     if (p.summary && untouched(s)) next.summary = p.summary;

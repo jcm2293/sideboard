@@ -149,6 +149,20 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-10-02 — Beyond character JSON as an overlay on the PDF import
+
+- **Upload.** The players page picker takes the D&D Beyond PDF (required) plus, optionally, the character-service JSON in the same selection. `/api/parse-character` parses the PDF as before, then applies the JSON (`src/lib/import/ddb-json.ts`). The JSON never adds features or spells the PDF doesn't have. A JSON for a different character, or one that isn't a Beyond export, is ignored with a notice.
+- **Overlay.**
+  - `definition.description` HTML is stripped to the parser's text shape: paragraphs, "• " list lines, table cells joined with " · ". Leading "Prerequisite" and category-label ("Origin Feat") paragraphs are dropped, and simple template tokens are resolved.
+  - That text lands on features' `full_text` by name: class features at or below the class level, species traits, feats, and invocations (which are options in the JSON).
+  - It also lands on chosen options (`option_details`; `componentId` tells two "Charisma" options apart) and on `spell_details[].description`, which cards now prefer over the library. Homebrew spells get their real text.
+  - Limited uses come from Beyond's computed `actions[].limitedUse`: a proficiency-based count is the bonus itself, a stat adds its modifier, `resetType` 1/2 is a short/long rest. The owner comes via `componentId`. Feature-definition `limitedUse` is a static table and is ignored.
+  - Summaries are re-seeded from the new text; table shorts still win.
+- **Re-upload.** Text that came from a JSON (`text_source: 'json'`) and spell descriptions survive a later PDF-only re-upload.
+- **Notices.** Parse notices now travel with the upload, and the edit page lists them under "Import notes" (dismissible). The JSON reports what it replaced, any changed uses, and what had no match.
+- **Feature attacks** also read Beyond's full text ("…Martial Arts column", "its damage is radiant", "add your Dexterity modifier to its attack and damage rolls"). With Dan's JSON, Radiant Sun Bolt reads 1d8+5 radiant; the PDF's snippet reads 1d8.
+- `scripts/overlay-fixtures.ts [dir]` renders `out/<name>.overlay.pdf` for fixtures with a JSON of the same character name (default `docs/jsonfiles`, which is not committed).
+
 ### 2026-10-02 — Character sheet v3, phase 3c: spell index and slots
 
 Spec §5.3, scoped: the stats strip, slot bubbles, and index are new; the description cards are the existing renderer with fixes. No card redesign, inventory page, or fonts yet.
