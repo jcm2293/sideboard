@@ -3,16 +3,19 @@
 // older and homebrew-wizard characters fall back to the basic columns.
 
 import type { AttackEntry, EquipmentEntry, FeatureEntry, PlayerCharacter, ProficiencyLevel, SpellEntry } from '@/types';
+import { abilityModifier, deriveClasses, featureDc, grappleShoveDc, modString, spellAttackBonus, spellKey } from '@/lib/character';
 import {
-  abilityModifier,
-  deriveClasses,
-  featureDc,
-  grappleShoveDc,
-  modString,
-  spellAttackBonus,
-  spellKey,
-} from '@/lib/character';
+  activationSummary,
+  clauseOf,
+  expendCost,
+  optionText,
+  runInParagraph,
+  seedClause,
+  summaryContext,
+} from '@/lib/feature-summary';
 import { CANTRIP_DAMAGE } from '@/data/cantrip-damage';
+import { classReferenceFor, featureKey, type Ability } from '@/data/class-reference';
+import { MASTERY_EFFECTS, standardWeapon } from '@/data/weapons';
 import type { ChipVariant } from './sheet-kit';
 import type { SpellLookup } from './spell-library';
 
@@ -30,7 +33,7 @@ export function classesOf(c: Char) {
 export function bandParts(c: Char): { text: string; strong?: boolean; italic?: boolean }[] {
   const classes = classesOf(c);
   const classLine = classes.map((k) => `${k.class_name} ${k.level}`).join(' / ');
-  const subclasses = classes.map((k) => k.subclass).filter(Boolean).join(' / ');
+  const subclasses = classes.map((k) => k.subclass).filter(Boolean).join(' · ');
   const parts: { text: string; strong?: boolean; italic?: boolean }[] = [];
   const sep = () => parts.length > 0 && parts.push({ text: ' · ' });
   if (c.species) parts.push({ text: c.species, strong: true });
@@ -252,6 +255,15 @@ export interface AttackRow {
   hit: string;
   damage: string;
   range: string;
+  /** Table order: weapons, unarmed, attack cantrips, feature attacks; riders sit below. */
+  kind: 'weapon' | 'unarmed' | 'spell' | 'feature' | 'rider';
+}
+
+export interface AttackTable {
+  rows: AttackRow[];
+  riders: AttackRow[];
+  /** Chosen weapon masteries, for the line under the table. */
+  masteries: { weapon: string; mastery: string }[];
 }
 
 // Wizards of the Coast source codes in Beyond page refs; anything else is third-party or homebrew.
@@ -262,7 +274,7 @@ export function spellDetailsOf(c: Char): SpellEntry[] {
   return Object.values(c.spell_details ?? {});
 }
 
-function isHomebrew(detail: SpellEntry | undefined, lookup: SpellLookup): boolean {
+export function isHomebrew(detail: SpellEntry | undefined, lookup: SpellLookup): boolean {
   if (!detail || lookup(detail.name)) return false;
   return Boolean(detail.page_ref) && !OFFICIAL_SOURCE.test(detail.page_ref);
 }
@@ -297,10 +309,59 @@ function weaponRange(a: AttackEntry): string {
   return a.range ? `${a.range} ft` : /\breach\b/i.test(a.notes ?? '') ? '10 ft' : '5 ft';
 }
 
-export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; riders: AttackRow[] } {
+const ABILITY_OF: Record<string, Ability> = { str: 'str', dex: 'dex', con: 'con', int: 'int', wis: 'wis', cha: 'cha' };
+const DAMAGE_TYPES = 'acid|bludgeoning|cold|fire|force|lightning|necrotic|piercing|poison|psychic|radiant|slashing|thunder';
+
+/**
+ * A feature that is itself an attack (§5.1): its text names a "ranged spell
+ * attack" or "melee weapon attack" and either a damage expression or the
+ * Martial Arts die. Radiant Sun Bolt: +8, 1d8 radiant, 30 ft.
+ */
+function featureAttack(c: Char, f: FeatureEntry): AttackRow | null {
+  const text = textOf(f);
+  const kind = text.match(/\b(ranged|melee) (spell|weapon) attack\b/i);
+  if (!kind) return null;
+  const rolled = text.match(new RegExp(`(\\d+d\\d+(?:\\s*[+-]\\s*\\d+)?)\\s+(${DAMAGE_TYPES})\\s+damage`, 'i'));
+  const martialArts = /\bMartial Arts die\b/i.test(text);
+  if (!rolled && !martialArts) return null;
+
+  let dice = rolled?.[1].replace(/\s+/g, '') ?? '';
+  if (!rolled) {
+    const monk = classesOf(c).find((k) => /^monk$/i.test(k.class_name));
+    const rider = classReferenceFor('monk')?.riders.find((r) => r.requires === 'Martial Arts');
+    dice = rider?.damage(monk?.level ?? c.level ?? 1) ?? '1d6';
+  }
+  const type = (rolled?.[2] ?? text.match(new RegExp(`\\b(${DAMAGE_TYPES})\\s+damage\\b`, 'i'))?.[1] ?? '').toLowerCase();
+
+  // To hit: the ability the text names; else the spell attack bonus for a spell attack; else Str or Dex.
+  const pb = c.proficiency_bonus ?? 2;
+  const named = text.match(/\buses? your (Str|Dex|Con|Int|Wis|Cha)\w*\.? modifier/i)?.[1].toLowerCase();
+  const mod = (a: Ability) => abilityModifier(c[`${a}_score`] ?? 10);
+  const hit = named
+    ? mod(ABILITY_OF[named]) + pb
+    : /spell/i.test(kind[2]) && c.spellcasting_ability
+      ? spellAttackBonus(c)
+      : Math.max(mod('str'), mod('dex')) + pb;
+
+  const reach = text.match(/\brange of (\d+)\s*(?:ft|feet)/i)?.[1];
+  return {
+    name: f.name,
+    chips: [],
+    note: '',
+    hit: modString(hit),
+    damage: [dice, type].filter(Boolean).join(' '),
+    range: reach ? `${reach} ft` : /melee/i.test(kind[1]) ? '5 ft' : '—',
+    kind: 'feature',
+  };
+}
+
+const KIND_ORDER: Record<AttackRow['kind'], number> = { weapon: 0, unarmed: 1, spell: 2, feature: 3, rider: 4 };
+
+export function attackTable(c: Char, lookup: SpellLookup): AttackTable {
   const details = spellDetailsOf(c);
   const detailFor = (name: string) => details.find((d) => spellKey(d.name) === spellKey(name));
   const isCantrip = (name: string) => detailFor(name)?.level === 0;
+  const masteries = c.weapon_masteries ?? [];
 
   // Weapon notes carry the damage of weapon cantrips: "Booming Blade: 1d8 Thunder".
   const weaponCantrips = new Map<string, { damage: string; range: string }>();
@@ -316,6 +377,7 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
   for (const a of c.attacks ?? []) {
     const kind = a.kind ?? (/unarmed strike|flurry of blows/i.test(a.name) ? 'unarmed' : isCantrip(a.name) ? 'spell' : 'weapon');
     const tags = a.tags ?? [];
+    seen.add(spellKey(a.name));
     if (kind === 'rider') {
       riders.push({
         name: a.name,
@@ -324,10 +386,10 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
         hit: '',
         damage: [a.damage, a.damage_type.toLowerCase()].filter(Boolean).join(' '),
         range: '',
+        kind: 'rider',
       });
       continue;
     }
-    seen.add(spellKey(a.name));
     if (kind === 'spell') {
       const detail = detailFor(a.name);
       const count = (a.notes ?? '').match(/Count:\s*(\d+)/i)?.[1];
@@ -338,22 +400,29 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
         hit: a.atk_bonus || hitOrDc(detail?.save_or_atk ?? ''),
         damage: [a.damage, a.damage_type.toLowerCase(), count && count !== '1' ? `×${count}` : ''].filter(Boolean).join(' '),
         range: shortRange(detail?.range ?? a.range ?? ''),
+        kind: 'spell',
       });
       continue;
     }
-    // Weapon notes: keep properties, drop the cantrip damage riders listed after them.
-    const note = (a.notes ?? '')
+    // Weapon notes: keep properties, drop the cantrip damage riders listed
+    // after them, and add the effect of a chosen mastery (its chip goes, the
+    // note says it).
+    const weapon = standardWeapon(a.name);
+    const chosen = weapon ? masteries.find((m) => standardWeapon(m.weapon) === weapon) : undefined;
+    const properties = (a.notes ?? '')
       .split(',')
-      .map((s) => s.trim())
-      .filter((s) => s && !s.includes(':') && !/^\d+d\d+\s+\w+$/.test(s))
+      .map((p) => p.trim())
+      .filter((p) => p && !p.includes(':') && !/^\d+d\d+\s+\w+$/.test(p))
       .join(', ');
+    const effect = chosen && MASTERY_EFFECTS[chosen.mastery] ? `${chosen.mastery}: ${MASTERY_EFFECTS[chosen.mastery]}` : '';
     rows.push({
       name: a.name.replace(/,\s*(\+\d+)$/, ' $1'),
-      chips: tags.map((t) => ({ text: t, variant: 'plain' as ChipVariant })),
-      note,
+      chips: tags.filter((t) => t !== chosen?.mastery).map((t) => ({ text: t, variant: 'plain' as ChipVariant })),
+      note: [properties, effect].filter(Boolean).join(' · '),
       hit: a.atk_bonus,
       damage: [a.damage, a.damage_type.toLowerCase()].filter(Boolean).join(' '),
       range: weaponRange(a),
+      kind: kind === 'unarmed' ? 'unarmed' : 'weapon',
     });
   }
 
@@ -366,6 +435,7 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
     const fromText = spell ? cantripDamage(spell.desc.join(' '), c.level ?? 1) : null;
     const fromTable = known ? `${scaleCantrip(known.dice, c.level ?? 1)} ${known.type}` : null;
     if (!d.save_or_atk || !(viaWeapon || fromText || fromTable || d.save_or_atk.startsWith('+'))) continue;
+    seen.add(spellKey(d.name));
     rows.push({
       name: d.name,
       chips: isHomebrew(d, lookup) ? [{ text: 'homebrew', variant: 'plain' }] : [],
@@ -373,15 +443,28 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
       hit: viaWeapon ? 'weapon' : hitOrDc(d.save_or_atk),
       damage: viaWeapon?.damage ?? fromText ?? fromTable ?? '—',
       range: viaWeapon?.range ?? shortRange(d.range),
+      kind: 'spell',
     });
   }
 
-  const order = (r: AttackRow) => {
-    const a = (c.attacks ?? []).find((x) => x.name.replace(/,\s*(\+\d+)$/, ' $1') === r.name);
-    return a?.kind === 'unarmed' ? 1 : a && a.kind !== 'spell' ? 0 : 2;
+  // Features that are attacks in their own right.
+  for (const f of allFeatures(c)) {
+    if (f.kind === 'container' || seen.has(spellKey(f.name))) continue;
+    const row = featureAttack(c, f);
+    if (row) {
+      seen.add(spellKey(f.name));
+      rows.push(row);
+    }
+  }
+  rows.sort((x, y) => KIND_ORDER[x.kind] - KIND_ORDER[y.kind]);
+
+  // A die that replaces weapon damage is already in a row when that row rolls it
+  // (the Martial Arts die inside Unarmed Strike's 1d8+5).
+  const folded = (r: AttackRow) => {
+    const die = r.damage.match(/^(\d+d\d+)$/)?.[1];
+    return Boolean(die) && /\bin place of\b/i.test(r.note) && rows.some((row) => row.kind === 'unarmed' && row.damage.startsWith(die!));
   };
-  rows.sort((x, y) => order(x) - order(y));
-  return { rows, riders };
+  return { rows, riders: riders.filter((r) => !folded(r)), masteries };
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -391,7 +474,7 @@ export function attackTable(c: Char, lookup: SpellLookup): { rows: AttackRow[]; 
 export interface TurnItem {
   name: string;
   clause: string;
-  /** Muted parenthetical: "1 Focus", "slot, concentration", "Thirsting Blade". */
+  /** Muted italic parenthetical: the cost ("1 Focus", "slot, concentration"), else the source feature. */
   cost: string;
   /** The clause continues the name as one phrase ("Attack twice with the pact weapon") rather than after a "·". */
   inline?: boolean;
@@ -407,109 +490,6 @@ const GROUP_OF: Record<string, TurnGroup | undefined> = {
   special: 'always',
 };
 
-// A period after these doesn't end a sentence ("a Cha. (Deception…) check").
-const ABBREVIATION = /\b(?:Str|Dex|Con|Int|Wis|Cha|e\.g|i\.e|vs)\.$/i;
-// A run-in heading standing as the first "sentence": "Luck Points."
-const RUN_IN_HEADING = /^[A-Z][\w'’-]*(?:\s+(?:of|the|and|or|[A-Z][\w'’-]*)){0,4}\.$/;
-
-function firstSentence(s: string): string {
-  const text = s.replace(/\s+/g, ' ').trim();
-  let start = 0;
-  for (const m of text.matchAll(/[.!?](?=\s+[A-Z]|$)/g)) {
-    const end = (m.index ?? 0) + 1;
-    const sentence = text.slice(start, end).trim();
-    if (ABBREVIATION.test(sentence)) continue;
-    if (start === 0 && RUN_IN_HEADING.test(sentence) && end < text.length) {
-      start = end;
-      continue;
-    }
-    return sentence;
-  }
-  return text.slice(start).trim();
-}
-
-/** Cut at the latest clause boundary within max (after ")" or before "," / ";"), keeping brackets balanced; else at a word. */
-function cutAtBoundary(s: string, max: number): string {
-  let best = -1;
-  let depth = 0;
-  for (let i = 0; i < Math.min(s.length, max); i++) {
-    const ch = s[i];
-    if (ch === '(' || ch === '[') depth++;
-    else if (ch === ')' || ch === ']') {
-      depth--;
-      if (depth === 0 && i + 1 >= max * 0.4) best = i + 1;
-    } else if ((ch === ',' || ch === ';') && depth === 0 && i >= max * 0.4) best = i;
-  }
-  if (best > 0) return s.slice(0, best).trim();
-  return s.slice(0, max).replace(/\s+\S*$/, '').replace(/[,;:([]$/, '');
-}
-
-// The group heading already says it: "take the Disengage action as a Bonus Action".
-const GROUP_PHRASE: Partial<Record<TurnGroup, RegExp>> = {
-  action: /,? as (?:an|a Magic) Action\b/gi,
-  bonus: /,? as a Bonus Action\b/gi,
-  reaction: /,? as a Reaction\b/gi,
-};
-const HEADING_PARAGRAPH = /^([A-Z][\w'’-]*(?:\s+(?:of|the|and|or|[A-Z][\w'’-]*)){0,4})\.\s/;
-
-/**
- * A short clause for a "Your turn" line: the first sentence, minus "As a
- * Bonus Action, you can" lead-ins and anything the group heading already
- * says. A pointer sentence ("…the benefits below") gets the run-in headings
- * it points at. Too long, it keeps the effect after "…, you can" (the trigger
- * is usually the feature's name), then cuts at a clause boundary.
- */
-function clause(s: string, max = 140, group?: TurnGroup): string {
-  let first = firstSentence(s)
-    .replace(/^As (?:a|an) (?:Bonus Action|Reaction|Magic Action|Action),\s*/i, '')
-    .replace(/^On your turn,\s*/i, '')
-    .replace(/^you can\s+/i, '')
-    .replace(/\b(Str|Dex|Con|Int|Wis|Cha)\.(?=\s)/g, '$1')
-    .replace(/\bft\.(?=[\s,;)]|$)/g, 'ft')
-    .replace(/,(?=[A-Za-z])/g, ', ')
-    .replace(/[.!?]$/, '');
-  const phrase = group ? GROUP_PHRASE[group] : undefined;
-  if (phrase) first = first.replace(phrase, '');
-  if (/\b(?:below|the following)$/.test(first)) {
-    const headings = s.split('\n\n').slice(1).map((p) => p.match(HEADING_PARAGRAPH)?.[1]).filter(Boolean);
-    if (headings.length > 0) first = `${first.replace(/\s+below$/, '')}: ${headings.join(', ')}`;
-  }
-  if (first.length > max) {
-    const i = first.lastIndexOf(', you can ');
-    if (i > 0 && first.length - i > 30) first = first.slice(i + ', you can '.length);
-    first = first.replace(/^take (?:a|an) (?:Bonus Action|Reaction|Magic Action|Action) to\s+/i, '');
-  }
-  if (first.length > max) first = `${cutAtBoundary(first, max)}…`;
-  if (/^(?:[A-Z][a-z]|A\s)/.test(first)) first = first[0].toLowerCase() + first.slice(1);
-  // Keep a number with its unit on one line.
-  return first.replace(/(\d+) (?=(?:ft|feet|miles?|minutes?|hours?|rounds?|HP)\b)/g, '$1\u00a0');
-}
-
-/** The paragraph a run-in heading introduces: "Flurry of Blows. You can expend 1 Focus Point…". */
-function runInParagraph(f: FeatureEntry, label: string): string | null {
-  for (const p of textOf(f).split('\n\n')) {
-    if (p.toLowerCase().startsWith(`${label.toLowerCase()}.`)) return p.slice(label.length + 1).trim();
-  }
-  const option = f.option_details?.find((o) => o.name.toLowerCase() === label.toLowerCase());
-  return option ? option.text : null;
-}
-
-const EXPEND = /\b(or |alternatively, )?(?:you can )?expend (\d+) (\w+) Points?\b/i;
-
-/**
- * Clause and cost for a feature line. A required spend ("You can expend 1
- * Focus Point to make two Unarmed Strikes") moves into the cost: "make two
- * Unarmed Strikes (1 Focus)". An optional one ("…or expend 1 Focus Point to…")
- * stays in the clause, which already says it.
- */
-function costedClause(para: string, group: TurnGroup, fallbackCost: string): { clause: string; cost: string } {
-  const m = para.match(EXPEND);
-  if (m && !m[1]) {
-    return { clause: clause(para.replace(/\b(?:you can )?expend \d+ \w+ Points? to /i, ''), 140, group), cost: `${m[2]} ${m[3]}` };
-  }
-  return { clause: clause(para, 140, group), cost: m ? '' : fallbackCost };
-}
-
 function spellCost(s: SpellEntry, homebrew: boolean): string {
   const parts: string[] = homebrew ? ['homebrew'] : [];
   if (s.free_uses) parts.push(`free ${s.free_uses.count}/${s.free_uses.per === 'short' ? 'SR' : 'LR'}${s.costs_slot ? ', then a slot' : ''}`);
@@ -522,6 +502,19 @@ function spellCost(s: SpellEntry, homebrew: boolean): string {
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** The group a feature's text belongs to for single-class records that predate `group`. */
+function groupOf(c: Char, f: FeatureEntry): string | undefined {
+  if (f.group) return f.group;
+  const classes = classesOf(c);
+  return classes.length === 1 ? classes[0].class_name : undefined;
+}
+
+/**
+ * "Your turn" (§5.1). Features with an action get one line with their
+ * summary. Activations with text of their own get their own line, named
+ * `Parent: Option` when they are a chosen option; the ones without text that
+ * share an action type collapse into one line under the feature's name.
+ */
 export function yourTurn(c: Char, lookup: SpellLookup, attackNames: Set<string>): TurnGroups {
   const groups: TurnGroups = { action: [], bonus: [], reaction: [], always: [] };
   const features = allFeatures(c).filter((f) => f.kind !== 'container');
@@ -537,31 +530,42 @@ export function yourTurn(c: Char, lookup: SpellLookup, attackNames: Set<string>)
     }
     // Shown in the attacks table already (riders, Vampiric Bite).
     if (attackNames.has(f.name.toLowerCase())) continue;
+    const ctx = summaryContext(c, groupOf(c, f));
+    const scoped = { ...f, group: groupOf(c, f) };
 
     if (f.activations?.length) {
-      const bare: Partial<Record<TurnGroup, string[]>> = {};
+      const bare = new Map<TurnGroup, string[]>();
       for (const a of f.activations) {
         const group = GROUP_OF[a.action];
         // An attack-table row taken with the Attack action needs no line here;
         // a bonus-action attack (the monk's Unarmed Strike) still does.
         if (!group || (group === 'action' && attackNames.has(a.label.toLowerCase()))) continue;
-        const para = runInParagraph(f, a.label);
-        if (!para) {
-          (bare[group] ??= []).push(a.label);
+        const summary = activationSummary(scoped, a, ctx);
+        if (!summary) {
+          bare.set(group, [...(bare.get(group) ?? []), a.label]);
           continue;
         }
-        const credit = a.label.toLowerCase() !== f.name.toLowerCase() ? f.name : '';
-        groups[group].push({ name: a.label, ...costedClause(para, group, credit) });
+        const option = f.options?.find((o) => featureKey(o) === featureKey(a.label));
+        const own = runInParagraph(f, a.label) ?? optionText(f, a.label) ?? '';
+        groups[group].push({
+          name: option ? `${f.name}: ${option}` : a.label,
+          clause: summary,
+          cost: expendCost(own) || (option || featureKey(a.label) === featureKey(f.name) ? '' : f.name),
+        });
       }
-      // Activations with no text of their own share one line, credited to the feature.
-      for (const [group, labels] of Object.entries(bare) as [TurnGroup, string[]][]) {
-        const isFeature = labels.length === 1 && labels[0].toLowerCase() === f.name.toLowerCase();
-        groups[group].push({ name: labels.join(' / '), clause: '', cost: isFeature ? '' : f.name });
+      for (const [group, labels] of bare) {
+        if (labels.length === 1) {
+          // A lone activation keeps its own name ("Unarmed Strike") with the feature as its source.
+          const isFeature = featureKey(labels[0]) === featureKey(f.name);
+          groups[group].push({ name: labels[0], clause: isFeature ? clauseOf(scoped, ctx) : '', cost: isFeature ? '' : f.name });
+        } else {
+          groups[group].push({ name: f.name, clause: clauseOf(scoped, ctx), cost: expendCost(textOf(f)) });
+        }
       }
       continue;
     }
     const group = f.action ? GROUP_OF[f.action] : undefined;
-    if (group) groups[group].push({ name: f.name, ...costedClause(textOf(f), group, '') });
+    if (group) groups[group].push({ name: f.name, clause: clauseOf(scoped, ctx), cost: expendCost(textOf(f)) });
   }
 
   // Spells by casting time: bonus actions, reactions, and at-will spells get
@@ -590,7 +594,12 @@ export function yourTurn(c: Char, lookup: SpellLookup, attackNames: Set<string>)
     }
     if (group === 'action') continue;
     const lib = lookup(s.name);
-    groups[group].push({ name: s.name, clause: lib ? clause(lib.desc.join(' '), 120, group) : '', cost: spellCost(s, isHomebrew(s, lookup)) });
+    groups[group].push({ name: s.name, clause: lib ? seedClause(lib.desc.join(' '), { action: group }) : '', cost: spellCost(s, isHomebrew(s, lookup)) });
+  }
+
+  // Lines that say something first; bare names ("Unarmed Strike") last.
+  for (const g of Object.keys(groups) as TurnGroup[]) {
+    groups[g] = [...groups[g].filter((i) => i.clause), ...groups[g].filter((i) => !i.clause)];
   }
   return groups;
 }

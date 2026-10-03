@@ -231,7 +231,7 @@
     "class_features": [
       {
         "name": "Eldritch Invocations",
-        "summary": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation.",
+        "summary": "chosen magical augmentations; swap one when you gain a level",
         "full_text": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. If an invocation has a prerequisite, you must meet it to learn that invocation.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -239,7 +239,7 @@
       },
       {
         "name": "Agonizing Blast (Eldritch Blast)",
-        "summary": "You can add your Cha. modifier bonus to the damage rolls of Eldritch Blast.",
+        "summary": "add +5 (Cha) to the damage of your chosen cantrip",
         "full_text": "You can add your Cha. modifier bonus to the damage rolls of Eldritch Blast.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -248,7 +248,7 @@
       },
       {
         "name": "Mask of Many Faces",
-        "summary": "You can cast Disguise Self without expending a spell slot.",
+        "summary": "Disguise Self at will",
         "full_text": "You can cast Disguise Self without expending a spell slot.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -257,7 +257,7 @@
       },
       {
         "name": "Pact of the Blade",
-        "summary": "As a Bonus Action, you can conjure a pact weapon in your hand, or create a bond with a magic weapon you touch. You can’t bond with a magic weapon if someone else attuned to it or another Warlock is bonded with it. Until the bond ends, you’re proficient with it and can use it as a Spellcasting Focus.",
+        "summary": "conjure or bond a pact weapon; use Cha to hit; necrotic, psychic, or radiant damage",
         "full_text": "As a Bonus Action, you can conjure a pact weapon in your hand, or create a bond with a magic weapon you touch. You can’t bond with a magic weapon if someone else attuned to it or another Warlock is bonded with it. Until the bond ends, you’re proficient with it and can use it as a Spellcasting Focus.\n\nWhenever you attack with the bonded weapon, you can use your Cha. instead of Str. or Dex.; and you can cause it to deal Necrotic, Psychic, or Radiant damage or its normal damage type.\n\nYour bond with the weapons ends if you use this feature’s Bonus Action again, if the weapon is more than 5 ft. away from you for more than 1 minute, or if you die. A conjured weapon disappears when the bond ends.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -276,7 +276,7 @@
       },
       {
         "name": "Pact of the Tome",
-        "summary": "At the end of a Short or Long Rest you can conjure forth a book in your hand, a Book of Shadows, which contains eldritch magic that only you can access, granting the benefits below.",
+        "summary": "a Book of Shadows with three cantrips and two 1st-level rituals, always prepared",
         "full_text": "At the end of a Short or Long Rest you can conjure forth a book in your hand, a Book of Shadows, which contains eldritch magic that only you can access, granting the benefits below.\n\n• When the book appears, choose 3 cantrips and choose two level 1 spells that have the Ritual tag, which can be from any class’s spell list.\n• You can use the book as a Spellcasting Focus.\n\nThe book disappears if you conjure another one or if you die.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -285,7 +285,7 @@
       },
       {
         "name": "Thirsting Blade",
-        "summary": "You gain the Extra Attack feature for your pact weapon only and can attack twice with the weapon instead of once when you take the Attack action.",
+        "summary": "attack twice with your pact weapon when you take the Attack action",
         "full_text": "You gain the Extra Attack feature for your pact weapon only and can attack twice with the weapon instead of once when you take the Attack action.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -295,7 +295,7 @@
       },
       {
         "name": "Magical Cunning",
-        "summary": "Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots.",
+        "summary": "1-minute rite: regain half your pact slots, once per long rest",
         "full_text": "Once per Long Rest, you can perform an esoteric rite for 1 minute, regaining up to 1 expended Pact Magic spell slots.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -308,7 +308,7 @@
       },
       {
         "name": "Dark One’s Blessing",
-        "summary": "When you reduce an enemy to 0 HP, you gain 10 Temp HP. You also gain this benefit if someone else reduces an enemy within 10 ft. of you to 0 HP.",
+        "summary": "10 temp HP when you or someone within 10 ft drops an enemy to 0 HP",
         "full_text": "When you reduce an enemy to 0 HP, you gain 10 Temp HP. You also gain this benefit if someone else reduces an enemy within 10 ft. of you to 0 HP.",
         "kind": "mechanical",
         "group": "Warlock",
@@ -317,7 +317,7 @@
       },
       {
         "name": "Fiend Spells",
-        "summary": "When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.",
+        "summary": "thereafter always have the listed spells prepared",
         "full_text": "When you reach a Warlock level specified in the Fiend Spells table, you thereafter always have the listed spells prepared.",
         "kind": "container",
         "group": "Warlock",
@@ -327,7 +327,7 @@
     "racial_traits": [
       {
         "name": "Spider Climb",
-        "summary": "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free.",
+        "summary": "climb speed equal to your speed; from 3rd level, walls and ceilings hands-free",
         "full_text": "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free.",
         "kind": "mechanical",
         "group": "Dhampir",
@@ -335,7 +335,7 @@
       },
       {
         "name": "Trace of Undeath",
-        "summary": "You have Resistance to Necrotic damage.",
+        "summary": "resistance to necrotic damage",
         "full_text": "You have Resistance to Necrotic damage.",
         "kind": "mechanical",
         "group": "Dhampir",
@@ -343,7 +343,7 @@
       },
       {
         "name": "Vampiric Bite",
-        "summary": "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn’t a Construct or an Undead, you can empower yourself in one of the following ways:",
+        "summary": "replaces an Unarmed Strike: 1d4+2 piercing; heal that much or bank it for a check or attack",
         "full_text": "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 + 2 instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn’t a Construct or an Undead, you can empower yourself in one of the following ways:\n\nDrain. You regain Hit Points equal to the Piercing damage dealt. Strengthen. You gain a bonus to the next ability check or attack roll you make within the next minute; the bonus is equal to the Piercing damage dealt. You can empower yourself with this trait 3 times, and you regain all expended uses when you finish a Long Rest.",
         "kind": "mechanical",
         "group": "Dhampir",
@@ -358,7 +358,7 @@
     "feats": [
       {
         "name": "Fey Touched",
-        "summary": "Ability Score Increase. Increase your Int., Wis., or Cha. by 1.",
+        "summary": "Misty Step and a 1st-level Divination or Enchantment spell, each free once per long rest",
         "full_text": "Ability Score Increase. Increase your Int., Wis., or Cha. by 1.\n\nFey Magic. Choose one level 1 spell from the Divination or Enchantment school of magic. You always have that spell and the Misty Step spell prepared. Once per Long Rest, you can cast each of these spells without expending a spell slot. You can also cast these spells using spell slots you have of the appropriate level. The spells’ spellcasting ability is the ability increased by this feat.",
         "kind": "mechanical",
         "group": "Feats",
@@ -369,7 +369,7 @@
       },
       {
         "name": "Arcane Eloquence",
-        "summary": "You gain the following benefits.",
+        "summary": "Cantrip, Smooth Talker",
         "full_text": "You gain the following benefits.\n\nCantrip. You learn the Vicious Mockery cantrip. Int., Wis., or Cha. is your spellcasting ability for this spell (choose when you select this feat).\n\nSmooth Talker. When you make a Cha. (Deception, Intimidation, or Persuasion) check, you can roll 1d4 and add the number rolled to the ability check.",
         "kind": "mechanical",
         "group": "Feats",
@@ -380,13 +380,15 @@
         "option_details": [
           {
             "name": "Charisma",
-            "text": "Your spellcasting ability for this spell is Charisma."
+            "text": "Your spellcasting ability for this spell is Charisma.",
+            "summary": "your spellcasting ability for this spell is Charisma"
           }
         ],
         "activations": [
           {
             "label": "Smooth Talker",
-            "action": "special"
+            "action": "special",
+            "summary": "roll 1d4 and add the number rolled to the ability check"
           }
         ]
       }

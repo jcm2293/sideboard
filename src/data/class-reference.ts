@@ -4,7 +4,8 @@
 // (which tell class features from subclass ones when attributing spells).
 //
 // The export wins wherever it has a structured number; this table fills gaps.
-// Rule text is paraphrased, not quoted.
+// Rule text is paraphrased, not quoted. One-line `short` clauses live in
+// feature-shorts.ts.
 
 import type { ActionType } from '@/types';
 
@@ -59,11 +60,11 @@ export interface ClassReference {
 }
 
 /** Value of the highest step at or below `level`; 0 before the first step. */
-function steps(...table: [number, number][]): (level: number) => number {
+export function steps(...table: [number, number][]): (level: number) => number {
   return (level) => table.reduce((value, [from, v]) => (level >= from ? v : value), 0);
 }
 
-function dice(...table: [number, string][]): (level: number) => string {
+export function dice(...table: [number, string][]): (level: number) => string {
   return (level) => table.reduce((value, [from, v]) => (level >= from ? v : value), table[0][1]);
 }
 

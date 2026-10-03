@@ -43,6 +43,7 @@ import {
   vitalCells,
   yourTurn,
   type AttackRow,
+  type AttackTable,
   type TurnGroup,
   type TurnItem,
   type VitalCell,
@@ -142,7 +143,6 @@ function drawAbilities(doc: jsPDF, c: PlayerCharacter, y: number): number {
 
   const skillStep = lineH(11, 1.45);
   for (const block of abilityBlocks(c)) {
-    // Header: key spanning both rows; modifier, score, and save on the right.
     const modBase = y + px(3) + ascent(17);
     const saveBase = modBase + lineH(10, 1.25);
     const headH = saveBase - y + px(3);
@@ -154,11 +154,12 @@ function drawAbilities(doc: jsPDF, c: PlayerCharacter, y: number): number {
     if (block.skills.length > 0) hline(doc, x, x + w, y + headH, C.rule);
     rect(doc, x, y, w, boxH, { stroke: C.maroon });
 
-    text(doc, block.key, x + px(6), y + headH / 2 + ascent(9.5) / 2, capsOpts(9.5, C.maroon, 0.12));
-    text(doc, modString(block.mod), x + px(42), modBase, { size: fs(17), style: 'bold', color: C.maroon, font: FONT.display });
+    // Label and modifier on one baseline, the score right-aligned on it, the save beneath.
+    const keyW = text(doc, block.key, x + px(6), modBase, capsOpts(9.5, C.maroon, 0.12));
+    text(doc, modString(block.mod), x + px(6) + keyW + px(5), modBase, { size: fs(17), style: 'bold', color: C.maroon, font: FONT.display });
     text(doc, String(block.score), x + w - px(6), modBase, { size: fs(10), color: C.muted, align: 'right' });
     const saveW = text(doc, `save ${modString(block.save)}`, x + w - px(6), saveBase, { size: fs(10), align: 'right' });
-    if (block.saveProf) profDot(doc, x + w - px(6) - saveW - px(6), saveBase - ascent(10) / 2, 'proficient');
+    profDot(doc, x + w - px(6) - saveW - px(6), saveBase - ascent(10) / 2, block.saveProf ? 'proficient' : 'none');
 
     // Skills: dot, name, then modifier and any feature die on the right.
     let sy = y + headH + px(2) + ascent(11);
@@ -208,7 +209,8 @@ function chipRuns(r: AttackRow): Run[] {
   return [{ kind: 'text', text: r.name, style: 'bold' }, ...r.chips.map((ch) => ({ kind: 'chip' as const, text: ch.text, variant: ch.variant }))];
 }
 
-function attackBlock(doc: jsPDF, c: PlayerCharacter, rows: AttackRow[], riders: AttackRow[], x: number, w: number): Block | null {
+function attackBlock(doc: jsPDF, c: PlayerCharacter, table: AttackTable, x: number, w: number): Block | null {
+  const { rows, riders, masteries } = table;
   if (rows.length === 0 && riders.length === 0) return null;
   const spellNote = c.is_spellcaster && c.spellcasting_ability
     ? `spell attack ${modString(spellAttackBonus(c))} · save DC ${spellSaveDc(c)}`
@@ -235,8 +237,26 @@ function attackBlock(doc: jsPDF, c: PlayerCharacter, rows: AttackRow[], riders: 
   });
   const headerH = px(6) + ptMm(fs(8.5)) + px(3);
   const riderHeadH = riders.length > 0 ? px(9) + ptMm(fs(8.5)) + px(3) : 0;
+  // "Masteries · Greatsword Graze · Whip Slow · Handaxe Vex" under the table.
+  const masteryLabel = 'MASTERIES';
+  const masteryLabelOpts = capsOpts(8.5, C.maroon, 0.12, 'bold');
+  const masteryIndent = measure(doc, masteryLabel, masteryLabelOpts) + px(6);
+  const masteryRuns: Run[] = masteries.flatMap((m, i) => [
+    ...(i > 0 ? [{ kind: 'text' as const, text: ' · ', color: C.muted }] : []),
+    { kind: 'text' as const, text: `${m.weapon} ` },
+    { kind: 'text' as const, text: m.mastery, style: 'bold' as const, color: C.maroonInk },
+  ]);
+  const masteryLines = masteries.length > 0 ? layoutRich(doc, masteryRuns, w - masteryIndent, fs(10.5)) : [];
+  const masteryStep = lineH(10.5, 1.35);
+  const masteryH = masteryLines.length > 0 ? px(7) + masteryLines.length * masteryStep : 0;
   const height =
-    SECTION_HEAD_H + headerH + laidRows.reduce((s, r) => s + r.h, 0) + riderHeadH + laidRiders.reduce((s, r) => s + r.h, 0) + SECTION_GAP;
+    SECTION_HEAD_H +
+    headerH +
+    laidRows.reduce((s, r) => s + r.h, 0) +
+    riderHeadH +
+    laidRiders.reduce((s, r) => s + r.h, 0) +
+    masteryH +
+    SECTION_GAP;
 
   const drawNameCell = (name: ReturnType<typeof layoutRich>, note: string[], base: number) => {
     let nb = drawRich(doc, name, x + CELL_PAD, base, step, size) - step + noteStep;
@@ -269,17 +289,23 @@ function attackBlock(doc: jsPDF, c: PlayerCharacter, rows: AttackRow[], riders: 
         y += row.h;
         hline(doc, x, x + w, y, C.rowRule);
       });
-      if (laidRiders.length === 0) return;
-      y += px(9);
-      text(doc, 'ADDS TO A HIT', x, y + ascent(8.5), capsOpts(8.5, C.maroon, 0.12, 'bold'));
-      y += ptMm(fs(8.5)) + px(3);
-      hline(doc, x, x + w, y, C.maroon);
-      for (const row of laidRiders) {
-        const base = y + px(3) + ascent(11.5);
-        drawNameCell(row.name, row.note, base);
-        if (row.r.damage) text(doc, row.r.damage, x + widths[0] + widths[1] + CELL_PAD, base, { size, style: 'bold' });
-        y += row.h;
-        hline(doc, x, x + w, y, C.rowRule);
+      if (laidRiders.length > 0) {
+        y += px(9);
+        text(doc, 'ADDS TO A HIT', x, y + ascent(8.5), capsOpts(8.5, C.maroon, 0.12, 'bold'));
+        y += ptMm(fs(8.5)) + px(3);
+        hline(doc, x, x + w, y, C.maroon);
+        for (const row of laidRiders) {
+          const base = y + px(3) + ascent(11.5);
+          drawNameCell(row.name, row.note, base);
+          if (row.r.damage) text(doc, row.r.damage, x + widths[0] + widths[1] + CELL_PAD, base, { size, style: 'bold' });
+          y += row.h;
+          hline(doc, x, x + w, y, C.rowRule);
+        }
+      }
+      if (masteryLines.length > 0) {
+        const base = y + px(7) + ascent(10.5);
+        text(doc, masteryLabel, x, base, masteryLabelOpts);
+        drawRich(doc, masteryLines, x + masteryIndent, base, masteryStep, fs(10.5));
       }
     },
   };
@@ -448,18 +474,21 @@ export function drawCombatPage(doc: jsPDF, c: PlayerCharacter, lookup: SpellLook
 
   // Right column. Attacks and Your turn always stay; when space runs out the
   // inventory moves off the page first, then resources (spec §5.1).
-  const { rows, riders } = attackTable(c, lookup);
-  const attackNames = new Set([...rows, ...riders].map((r) => r.name.toLowerCase()));
-  const fixed = [attackBlock(doc, c, rows, riders, RIGHT_X, RIGHT_W), turnBlock(doc, c, lookup, attackNames, RIGHT_X, RIGHT_W)].filter(
+  const table = attackTable(c, lookup);
+  // Rows from the export and riders replace their Your-turn lines; a feature
+  // attack (Radiant Sun Bolt) keeps its line too, for its extra options.
+  const attackNames = new Set([...table.rows.filter((r) => r.kind !== 'feature'), ...table.riders].map((r) => r.name.toLowerCase()));
+  const fixed = [attackBlock(doc, c, table, RIGHT_X, RIGHT_W), turnBlock(doc, c, lookup, attackNames, RIGHT_X, RIGHT_W)].filter(
     (b): b is Block => b != null,
   );
   const room = BOTTOM - px(24) - top - fixed.reduce((s, b) => s + b.height, 0);
 
+  // Inventory goes inline whenever the table fits in what's left (measured, not counted).
   const inv = inventoryOf(c);
   const summary = `${inv.rows.length} items, ${inv.weightLb} lb · see the Inventory page`;
-  let inventory = inv.rows.length > 0 && inv.rows.length <= 8 ? inventoryBlock(doc, c, RIGHT_X, RIGHT_W) : null;
-  let inventoryOverflow = inv.rows.length > 8;
-  let resources = resourceBlock(doc, c, RIGHT_X, RIGHT_W, inventoryOverflow ? summary : undefined);
+  let inventory = inventoryBlock(doc, c, RIGHT_X, RIGHT_W);
+  let inventoryOverflow = false;
+  let resources = resourceBlock(doc, c, RIGHT_X, RIGHT_W);
   if (inventory && (resources?.height ?? 0) + inventory.height > room) {
     inventory = null;
     inventoryOverflow = true;

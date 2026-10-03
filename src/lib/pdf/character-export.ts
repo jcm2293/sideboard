@@ -2,9 +2,10 @@
 // scripts/export-fixtures.ts both call renderCharacterPdf.
 //
 // Pages:
-//   1. Combat reference  — the v3 page (page-combat.ts)
-//   2. Features          — interim: the old feature list until the v3 page lands
-//   3. Spells            — stats bar, slot boxes, full spell cards w/ SRD descriptions
+//   1. Combat reference  — page-combat.ts
+//   2. Features          — page-features.ts (two columns of full text)
+//   3. Spells            — stats bar, slot boxes, full spell cards w/ SRD descriptions;
+//                          not for species-only casters, whose spells sit on the Features page
 //   4. Inventory         — only when it doesn't fit inline on page 1
 //
 // jsPDF's built-in fonts (helvetica, times, courier) don't carry full Unicode,
@@ -12,9 +13,10 @@
 // "times" is the closest serif fallback to Cinzel/Crimson per the spec.
 
 import { jsPDF } from 'jspdf';
-import type { CustomSpell, FeatureEntry, PlayerCharacter, SrdSpell } from '@/types';
+import type { CustomSpell, PlayerCharacter, SrdSpell } from '@/types';
 import { spellSaveDc, spellAttackBonus } from '@/lib/character';
-import { drawCombatPage, drawResources } from './page-combat';
+import { drawCombatPage } from './page-combat';
+import { drawFeaturesPages, innateSpellsOnly } from './page-features';
 import { hardenPdfText } from './sheet-kit';
 import { createSpellLookup, type SpellLookup } from './spell-library';
 
@@ -201,147 +203,6 @@ function drawSectionHeader(doc: jsPDF, label: string, x: number, y: number, w: n
   doc.setLineWidth(0.4);
   doc.line(x, y + 1, x + w, y + 1);
   return y + 5;
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Feature list rendering — single column, name on its own line.
-//
-// Each feature renders as:
-//   <Feature Name>.        ← bold italic, own line
-//   <description text...>  ← wraps left-aligned with the name
-//   (4pt vertical gap before the next feature)
-//
-// The renderer is page-break aware: if a feature won't fit on the current page,
-// it calls onPageBreak() (caller decides whether to addPage and re-render a
-// "(continued)" header) and continues from the new top.
-
-interface FeatureListOpts {
-  /** Width to wrap descriptions at. */
-  width: number;
-  /** Top-of-feature-area y on the current page (used for overflow detection). */
-  pageTopY: number;
-  /** Bottom margin on the page (don't draw past PH - bottomMargin). */
-  bottomMargin?: number;
-  /** Called when a feature would overflow; returns the new (x, y) to continue at. */
-  onPageBreak: () => { x: number; y: number };
-  /** Font size for feature text (description). Default 8. */
-  fontSize?: number;
-}
-
-function drawFeatureBlock(
-  doc: jsPDF,
-  feature: { name: string; summary: string },
-  x: number,
-  y: number,
-  opts: FeatureListOpts,
-): { x: number; y: number } {
-  const fontSize = opts.fontSize ?? 8;
-  const lineH = fontSize * 0.45;
-  const descW = opts.width;
-  const bottomMargin = opts.bottomMargin ?? MARGIN;
-
-  // Establish a clean rendering context BEFORE measurement.
-  // splitTextToSize wraps based on the currently-active font/size, so we must
-  // pin both. Without this, prior section headers (bold 10pt) leak into the
-  // line-width math.
-  doc.setFont(SERIF, 'normal');
-  doc.setFontSize(fontSize);
-  let wrappedDesc = doc.splitTextToSize(feature.summary || '', descW) as string[];
-  const blockH =
-    lineH +                       // name line
-    wrappedDesc.length * lineH +  // description lines
-    1.5;                          // small bottom pad
-
-  // Page break if we'd overflow. The callback may render its own header
-  // (which mutates font state) — we'll re-establish the body context below.
-  if (y + blockH > PH - bottomMargin) {
-    const next = opts.onPageBreak();
-    x = next.x;
-    y = next.y;
-    // The callback may have released a column constraint (mutating
-    // opts.width) — re-wrap this feature at the current width.
-    doc.setFont(SERIF, 'normal');
-    doc.setFontSize(fontSize);
-    wrappedDesc = doc.splitTextToSize(feature.summary || '', opts.width) as string[];
-  }
-
-  // Re-establish font state explicitly for every draw operation. Both size
-  // and style are set so the callback's font choices can't leak through.
-  setText(doc, MAROON);
-  doc.setFont(SERIF, 'bolditalic');
-  doc.setFontSize(fontSize);
-  doc.text(`${feature.name}.`, x, y);
-  y += lineH;
-
-  setText(doc, BODY);
-  doc.setFont(SERIF, 'normal');
-  doc.setFontSize(fontSize);
-  for (const line of wrappedDesc) {
-    doc.text(line, x, y);
-    y += lineH;
-  }
-
-  // 4pt gap before next feature
-  return { x, y: y + 1.4 };
-}
-
-/** Render a list of features with a section header. Returns final y. */
-function drawFeatureSection(
-  doc: jsPDF,
-  title: string,
-  features: { name: string; summary: string }[] | null,
-  x: number,
-  y: number,
-  opts: FeatureListOpts,
-): number {
-  if (!features || features.length === 0) return y;
-
-  // Header at current position
-  y = drawSectionHeader(doc, title.toUpperCase(), x, y, opts.width);
-
-  for (const f of features) {
-    const result = drawFeatureBlock(doc, f, x, y, opts);
-    x = result.x;
-    y = result.y;
-  }
-
-  return y + 1.5;
-}
-
-// ──────────────────────────────────────────────────────────────────────────
-// Interim features page: the old feature list, until the v3 Features page
-// (spec §5.2) replaces it.
-// ──────────────────────────────────────────────────────────────────────────
-
-function drawFeaturesPage(doc: jsPDF, c: PlayerCharacter, withResources: boolean) {
-  const sections: [string, FeatureEntry[] | null][] = [
-    ['Class Features', c.class_features],
-    ['Species Traits', c.racial_traits],
-    ['Feats', c.feats],
-  ];
-  if (!withResources && !sections.some(([, f]) => f && f.length > 0)) return;
-
-  const newPage = (subtitle: string) => {
-    doc.addPage();
-    drawParchmentBg(doc);
-    drawPageHeader(doc, c, subtitle);
-  };
-  newPage('Features');
-  const opts: FeatureListOpts = {
-    width: PW - 2 * MARGIN,
-    pageTopY: 30,
-    bottomMargin: 12,
-    fontSize: 8,
-    onPageBreak: () => {
-      newPage('Features (cont.)');
-      return { x: MARGIN, y: 32 };
-    },
-  };
-  // Resources that didn't fit on page 1 lead page 2.
-  let y = withResources ? drawResources(doc, c, 32) : 32;
-  for (const [title, features] of sections) {
-    y = drawFeatureSection(doc, title, features, MARGIN, y, opts);
-  }
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -773,8 +634,8 @@ export function renderCharacterPdf(
   );
 
   const { inventoryOverflow, resourcesOverflow } = drawCombatPage(doc, character, lookup, exportedOn);
-  drawFeaturesPage(doc, character, resourcesOverflow);
-  if (character.is_spellcaster) {
+  drawFeaturesPages(doc, character, { withResources: resourcesOverflow });
+  if (character.is_spellcaster && innateSpellsOnly(character).length === 0) {
     drawSpellsPage(doc, character, lookup);
   }
   if (inventoryOverflow) {

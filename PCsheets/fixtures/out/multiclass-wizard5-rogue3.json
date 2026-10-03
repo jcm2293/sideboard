@@ -182,7 +182,7 @@
     "class_features": [
       {
         "name": "Ritual Adept",
-        "summary": "You can cast any spell in your spellbook that has the Ritual tag as a Ritual. You don't need it prepared, but you must read from the book to cast it this way.",
+        "summary": "cast any Ritual spell in your spellbook without preparing it",
         "full_text": "You can cast any spell in your spellbook that has the Ritual tag as a Ritual. You don't need it prepared, but you must read from the book to cast it this way.",
         "kind": "ribbon",
         "group": "Wizard",
@@ -190,7 +190,7 @@
       },
       {
         "name": "Arcane Recovery",
-        "summary": "When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher.",
+        "summary": "on a short rest, recover slots totaling 3 levels (none 6th+), once per day",
         "full_text": "When you finish a Short Rest, you can recover expended spell slots. The spell slots can have a combined level equal to no more than 3, and none of the slots can be level 6 or higher.\n\nYou can use this feature once per Long Rest.",
         "kind": "mechanical",
         "group": "Wizard",
@@ -203,7 +203,7 @@
       },
       {
         "name": "Scholar",
-        "summary": "You can choose one of the skills in which you’re proficient and gain Expertise in it.",
+        "summary": "Expertise in Arcana, History, Investigation, Medicine, Nature, or Religion",
         "full_text": "You can choose one of the skills in which you’re proficient and gain Expertise in it.",
         "kind": "ribbon",
         "group": "Wizard",
@@ -211,7 +211,7 @@
       },
       {
         "name": "Evocation Savant",
-        "summary": "Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free.",
+        "summary": "two free Evocation spells now, and one more with each new spell level",
         "full_text": "Choose two Evocation spells, each of which must not be higher than level 2, and add them to your spellbook for free.\n\nWhenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free.",
         "kind": "mechanical",
         "group": "Wizard",
@@ -219,7 +219,7 @@
       },
       {
         "name": "Potent Cantrip",
-        "summary": "When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect.",
+        "summary": "your damaging cantrips deal half damage on a miss or a successful save",
         "full_text": "When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on the saving throw, the target takes half the damage (if any) but suffers no additional effect.",
         "kind": "mechanical",
         "group": "Wizard",
@@ -227,7 +227,7 @@
       },
       {
         "name": "Memorize Spell",
-        "summary": "Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell.",
+        "summary": "on a short rest, swap one prepared spell for another in your spellbook",
         "full_text": "Whenever you finish a Short Rest, you can study your spellbook and replace one of the level 1+ Wizard spells with another level 1+ spell.",
         "kind": "ribbon",
         "group": "Wizard",
@@ -235,7 +235,7 @@
       },
       {
         "name": "Expertise",
-        "summary": "You gain Expertise in two of your skill proficiencies of your choice.",
+        "summary": "double your proficiency bonus with two chosen skills",
         "full_text": "You gain Expertise in two of your skill proficiencies of your choice.",
         "kind": "ribbon",
         "group": "Rogue",
@@ -243,7 +243,7 @@
       },
       {
         "name": "Sneak Attack",
-        "summary": "Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type.",
+        "summary": "once per turn, +2d6 with advantage or an ally next to the target",
         "full_text": "Once per turn you can deal an extra 2d6 damage to one creature you hit with an attack if you have Advantage on the roll and the attack uses a Finesse or Ranged weapon. The extra damage’s type is the same as the weapon’s type.\n\nYou don’t need Advantage on the attack if at least one of your allies is within 5 ft. of the target, the ally doesn’t have the Incapacitated condition, and you don’t have Disadvantage on the attack roll.",
         "kind": "mechanical",
         "group": "Rogue",
@@ -252,7 +252,7 @@
       },
       {
         "name": "Thieves’ Cant",
-        "summary": "You know Thieves’ Cant and one other language of your choice.",
+        "summary": "the secret rogue language, plus one more language",
         "full_text": "You know Thieves’ Cant and one other language of your choice.",
         "kind": "ribbon",
         "group": "Rogue",
@@ -260,7 +260,7 @@
       },
       {
         "name": "Weapon Mastery",
-        "summary": "",
+        "summary": "use the mastery property of 2 chosen kinds of weapon",
         "full_text": "",
         "kind": "mechanical",
         "group": "Rogue",
@@ -272,17 +272,19 @@
         "option_details": [
           {
             "name": "Blowgun (Vex)",
-            "text": "Vex. If you hit a creature with a Blowgun and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn."
+            "text": "Vex. If you hit a creature with a Blowgun and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn.",
+            "summary": "on a hit, Advantage on your next attack against that target"
           },
           {
             "name": "Dagger (Nick)",
-            "text": "Nick. When you make the extra attack of the Light property, you can make it as part of the Attack action instead of as a Bonus Action. This extra attack can only be made once per turn."
+            "text": "Nick. When you make the extra attack of the Light property, you can make it as part of the Attack action instead of as a Bonus Action. This extra attack can only be made once per turn.",
+            "summary": "make the Light weapon's extra attack as part of the Attack action, once per turn"
           }
         ]
       },
       {
         "name": "Cunning Action",
-        "summary": "On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide.",
+        "summary": "Dash, Disengage, or Hide",
         "full_text": "On your turn, you can take one of the following actions as a Bonus Action: Dash, Disengage, or Hide.",
         "kind": "mechanical",
         "group": "Rogue",
@@ -291,7 +293,7 @@
       },
       {
         "name": "Steady Aim",
-        "summary": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn.",
+        "summary": "advantage on your next attack this turn if you haven't moved; your speed drops to 0",
         "full_text": "As a Bonus Action, you give yourself Advantage on your next attack roll on the current turn, provided that you haven’t moved during this turn. After you use it, your Speed is 0 until the end of the current turn.",
         "kind": "mechanical",
         "group": "Rogue",
@@ -300,7 +302,7 @@
       },
       {
         "name": "Fast Hands",
-        "summary": "As a Bonus Action you can do one of the following:",
+        "summary": "a Sleight of Hand check, the Utilize action, or a magic item",
         "full_text": "As a Bonus Action you can do one of the following:\n\n• Make a Dex. (Sleight of Hand) check to pick a lock or disarm a trap with Thieves’ Tools or to pick a pocket.\n• Take the Utilize action or take the Magic action to use a magic item that requires that action.",
         "kind": "mechanical",
         "group": "Rogue",
@@ -322,7 +324,7 @@
       },
       {
         "name": "Second-Story Work",
-        "summary": "You gain the following benefits:",
+        "summary": "climb speed equal to your speed; jump using Dex",
         "full_text": "You gain the following benefits:\n\n• You gain a Climb Speed equal to your Speed.\n• You can determine your jump distance using your Dex. rather than your Str.",
         "kind": "ribbon",
         "group": "Rogue",
@@ -332,7 +334,7 @@
     "racial_traits": [
       {
         "name": "Elven Lineage",
-        "summary": "Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage.",
+        "summary": "lineage spells and traits from your elven heritage",
         "full_text": "Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of that lineage.",
         "kind": "mechanical",
         "group": "Elf",
@@ -343,13 +345,14 @@
         "option_details": [
           {
             "name": "Drow Lineage",
-            "text": "The range of your Darkvision increases to 120 ft. and you gain the spells outlined in the Elven Lineages table."
+            "text": "The range of your Darkvision increases to 120 ft. and you gain the spells outlined in the Elven Lineages table.",
+            "summary": "the range of your Darkvision increases to 120 ft"
           }
         ]
       },
       {
         "name": "Fey Ancestry",
-        "summary": "You have Advantage on saving throws you make to avoid or end the Charmed condition.",
+        "summary": "advantage on saves to avoid or end Charmed",
         "full_text": "You have Advantage on saving throws you make to avoid or end the Charmed condition.",
         "kind": "mechanical",
         "group": "Elf",
@@ -357,7 +360,7 @@
       },
       {
         "name": "Keen Senses",
-        "summary": "You have proficiency in the Insight, Perception, or Survival skill.",
+        "summary": "proficiency in Insight, Perception, or Survival",
         "full_text": "You have proficiency in the Insight, Perception, or Survival skill.",
         "kind": "ribbon",
         "group": "Elf",
@@ -365,7 +368,7 @@
       },
       {
         "name": "Trance",
-        "summary": "You don’t need to sleep, and magic can’t put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
+        "summary": "4 hours of trance count as a long rest; magic can't put you to sleep",
         "full_text": "You don’t need to sleep, and magic can’t put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.",
         "kind": "mechanical",
         "group": "Elf",
@@ -375,7 +378,7 @@
     "feats": [
       {
         "name": "Alert",
-        "summary": "Initiative Proficiency. When you roll Initiative, add +3 to the roll.",
+        "summary": "add your proficiency bonus to Initiative; swap Initiative with a willing ally",
         "full_text": "Initiative Proficiency. When you roll Initiative, add +3 to the roll.\n\nInitiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can’t make this swap if you or the ally has the Incapacitated condition.",
         "kind": "mechanical",
         "group": "Feats",

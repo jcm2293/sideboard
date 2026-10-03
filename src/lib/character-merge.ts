@@ -4,7 +4,7 @@
 // The PDF is authoritative for the numbers that move on a level-up: level, HP,
 // ability scores, saves/skills, attack bonuses, resource uses, spell slots,
 // currency. Everything the DM wrote or decided stays: player and reskinned
-// names, feature summaries, attack ranges/notes, spell markers, extra
+// names, edited feature summaries, attack ranges/notes, spell markers, extra
 // proficiencies. List items are matched by name. Sheet-only items are kept;
 // PDF-only items are offered, not added — on a curated sheet most of them are
 // boilerplate the DM already trimmed or pre-reskin originals. Every difference
@@ -28,6 +28,7 @@ import {
   normalizeSpeedKeys,
   spellKey,
 } from '@/lib/character';
+import { featureSummary, summaryContext } from '@/lib/feature-summary';
 
 export interface FieldChange {
   label: string;
@@ -108,8 +109,8 @@ type TextField =
 /** List-matching key: ignores case, punctuation, and bracket markers ("Ceremony [R]" matches "Ceremony"). */
 const keyOf = spellKey;
 
-// Structure the v3 import adds to list items. A matched sheet item keeps what
-// the DM wrote and picks up any of these it doesn't have yet.
+// Structure the v3 import adds to features. The edit page doesn't expose
+// these, so on a matched feature the import's values replace the sheet's.
 const FEATURE_V3_KEYS = [
   'full_text', 'kind', 'group', 'parent', 'action', 'uses', 'source_ref', 'options', 'option_details', 'activations',
 ] as const;
@@ -449,7 +450,18 @@ export function mergeReupload(
     report.updated.push({ label: `${s.name} uses`, from: String(s.uses), to: String(p.uses) });
     return { ...next, uses: p.uses };
   });
-  const withStructure = (s: FeatureEntry, p: FeatureEntry) => enrich(s, p, FEATURE_V3_KEYS);
+  // A summary still equal to what the seeder makes of the stored feature was
+  // never edited, so it follows the import (its numbers move with level).
+  // One the DM rewrote stays.
+  const untouched = (s: FeatureEntry) => !s.summary || s.summary === featureSummary(s, summaryContext(sheet, s.group));
+  const withStructure = (s: FeatureEntry, p: FeatureEntry): FeatureEntry => {
+    const next: FeatureEntry = { ...s };
+    for (const k of FEATURE_V3_KEYS) {
+      if (p[k] != null) (next as unknown as Record<string, unknown>)[k] = p[k];
+    }
+    if (p.summary && untouched(s)) next.summary = p.summary;
+    return next;
+  };
   const features = mergeByName('Class features', sheet.class_features, pdf.class_features, report, withStructure);
   const traits = mergeByName('Species traits', sheet.racial_traits, pdf.racial_traits, report, withStructure);
   const feats = mergeByName('Feats', sheet.feats, pdf.feats, report, withStructure);

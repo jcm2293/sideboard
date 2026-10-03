@@ -180,7 +180,7 @@
     "class_features": [
       {
         "name": "Bardic Inspiration",
-        "summary": "As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6). Once within the next hour, when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the total, potentially turning the failure into a success.",
+        "summary": "give a creature within 60 ft a d8 to add to a failed D20 Test",
         "full_text": "As a Bonus Action, you can inspire another creature within 60 ft. that can see or hear you. That creature gains one of your Bardic Inspiration dice (1d6). Once within the next hour, when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the total, potentially turning the failure into a success.\n\nYou can confer your Bardic Inspiration die 4 times per Long Rest.",
         "kind": "mechanical",
         "group": "Bard",
@@ -193,7 +193,7 @@
       },
       {
         "name": "Spellcasting",
-        "summary": "You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells.",
+        "summary": "cast spells through your bardic arts",
         "full_text": "You can cast spells through your bardic arts. Charisma is your spellcasting ability for your Bard spells (Spell DC 15, Spell Attack +7). You can use a Musical Instrument as a Spellcasting Focus for your Bard spells.",
         "kind": "container",
         "group": "Bard",
@@ -201,7 +201,7 @@
       },
       {
         "name": "Expertise",
-        "summary": "You gain Expertise in two skill proficiencies of your choice.",
+        "summary": "double your proficiency bonus with two chosen skills",
         "full_text": "You gain Expertise in two skill proficiencies of your choice.",
         "kind": "ribbon",
         "group": "Bard",
@@ -209,7 +209,7 @@
       },
       {
         "name": "Jack of All Trades",
-        "summary": "You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus.",
+        "summary": "add half your proficiency bonus to ability checks you lack proficiency in",
         "full_text": "You can add half your Proficiency Bonus (1) to ability checks you make that uses a skill proficiency you lack and that doesn’t otherwise use your Proficiency Bonus.",
         "kind": "mechanical",
         "group": "Bard",
@@ -217,7 +217,7 @@
       },
       {
         "name": "Beguiling Magic",
-        "summary": "You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis. saving throw. On a failed save, the target has the Charmed or Frightened condition (your choice) for 1 minute, and it repeats the save at the end of each of its turns, ending the effect on itself on a success.",
+        "summary": "after an Enchantment or Illusion slot spell, charm or frighten a creature within 60 ft (Wis save)",
         "full_text": "You always have Charm Person and Mirror Image prepared. In addition, immediately after you cast an Enchantment or Illusion spell using a spell slot, you can cause a creature you can see within 60 ft. of you to make a DC 15 Wis. saving throw. On a failed save, the target has the Charmed or Frightened condition (your choice) for 1 minute, and it repeats the save at the end of each of its turns, ending the effect on itself on a success.\n\nYou can only use this benefit once per Long Rest, but you can also restore your use of it by expending one use of your Bardic Inspiration (no action required).",
         "kind": "mechanical",
         "group": "Bard",
@@ -236,7 +236,7 @@
       },
       {
         "name": "Mantle of Inspiration",
-        "summary": "As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself. Each of those creatures gains Temporary HP equal to two times the number rolled on the Bardic Inspiration die, and then can use its reaction to move up to its Speed without provoking Opportunity Attacks.",
+        "summary": "spend Bardic Inspiration: allies within 60 ft gain temp HP and can move without provoking",
         "full_text": "As a Bonus Action, you can expend a use of Bardic Inspiration, rolling a Bardic Inspiration die (1d8). When you do, choose up to +4 creatures within 60 ft. of yourself. Each of those creatures gains Temporary HP equal to two times the number rolled on the Bardic Inspiration die, and then can use its reaction to move up to its Speed without provoking Opportunity Attacks.",
         "kind": "mechanical",
         "group": "Bard",
@@ -245,7 +245,7 @@
       },
       {
         "name": "Font of Inspiration",
-        "summary": "You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest.",
+        "summary": "Bardic Inspiration returns on a short rest; spend a slot to regain one use",
         "full_text": "You now regain all expended uses of Bardic Inspiration when you finish a Short or Long Rest.\n\nIn addition, you can expend a spell slot (no action required) to regain one expended use of Bardic Inspiration.",
         "kind": "mechanical",
         "group": "Bard",
@@ -261,7 +261,7 @@
     "racial_traits": [
       {
         "name": "Resourceful",
-        "summary": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+        "summary": "Heroic Inspiration after each long rest",
         "full_text": "You gain Heroic Inspiration whenever you finish a Long Rest.",
         "kind": "ribbon",
         "group": "Human",
@@ -269,7 +269,7 @@
       },
       {
         "name": "Skillful",
-        "summary": "You gain proficiency in one skill of your choice.",
+        "summary": "one more skill proficiency",
         "full_text": "You gain proficiency in one skill of your choice.",
         "kind": "ribbon",
         "group": "Human",
@@ -277,7 +277,7 @@
       },
       {
         "name": "Versatile",
-        "summary": "You gain an Origin feat of your choice.",
+        "summary": "an Origin feat",
         "full_text": "You gain an Origin feat of your choice.",
         "kind": "ribbon",
         "group": "Human",
@@ -287,7 +287,7 @@
     "feats": [
       {
         "name": "Lucky",
-        "summary": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.",
+        "summary": "spend a point for advantage on your d20, or disadvantage on an attack against you",
         "full_text": "Luck Points. You have 3 Luck Points that you can spend on the benefits below. You regain expended Luck Points after a Long Rest.\n\nAdvantage. When you roll a d20 for a D20 Test, you can spend 1 Luck Point to give yourself Advantage on the roll.\n\nDisadvantage. When a creature rolls a d20 for an attack roll against you, you can spend 1 Luck Point to impose Disadvantage on that roll.",
         "kind": "mechanical",
         "group": "Feats",
@@ -301,7 +301,7 @@
       },
       {
         "name": "Tough",
-        "summary": "When you take this feat, your HP maximum increases by 10. Whenever you gain a character level thereafter, your HP maximum increases an additional 2 HP.",
+        "summary": "+2 HP per level",
         "full_text": "When you take this feat, your HP maximum increases by 10. Whenever you gain a character level thereafter, your HP maximum increases an additional 2 HP.",
         "kind": "ribbon",
         "group": "Feats",

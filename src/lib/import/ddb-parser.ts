@@ -2,9 +2,10 @@
 // (docs/character-sheet-spec-v3.md §3). Pure — no I/O; the upload route and
 // scripts/parse-fixtures.ts both feed it extractFormFields' output.
 //
-// Lossless and structured: nothing is summarised here, the renderer decides
-// what to show. The export supplies the character's selections and computed
-// numbers; the class reference table fills what the export omits.
+// Lossless and structured: full text is kept whole, and the renderer decides
+// what to show. The one exception is each feature's one-line `summary`
+// (lib/feature-summary). The export supplies the character's selections and
+// computed numbers; the class reference table fills what the export omits.
 
 import { getProgressionForClasses } from '@/data/spell-progression';
 import {
@@ -16,6 +17,8 @@ import {
   type ClassReference,
 } from '@/data/class-reference';
 import { MASTERY_PROPERTIES, standardWeapon } from '@/data/weapons';
+import type { ShortContext } from '@/data/feature-shorts';
+import { activationSummary, featureSummary, optionSummary } from '@/lib/feature-summary';
 import type {
   ActionType,
   AttackEntry,
@@ -1128,12 +1131,18 @@ export function parseDdbCharacter(input: PdfFormFields): ParseResult {
       : 'no armor';
 
   // ── Assemble ──
+  // Shorts with numbers read the class level for class features, the total level otherwise.
+  const contextFor = (group: string): ShortContext => ({
+    level: classes.find((k) => k.class_name.toLowerCase() === group.toLowerCase())?.level ?? totalLevel,
+    mods,
+    pb,
+  });
   const toEntry = (f: RawFeature): FeatureEntry => {
-    const paragraphs = f.paras.map((p) => p.join('\n'));
+    const ctx = contextFor(f.group);
     const entry: FeatureEntry = {
       name: f.name,
-      summary: paragraphs[0] ?? '',
-      full_text: paragraphs.join('\n\n'),
+      summary: '',
+      full_text: f.paras.map((p) => p.join('\n')).join('\n\n'),
       kind: f.kind,
       group: f.group,
     };
@@ -1143,10 +1152,22 @@ export function parseDdbCharacter(input: PdfFormFields): ParseResult {
     if (f.ref) entry.source_ref = f.ref;
     if (f.options.length > 0) {
       entry.options = f.options.map((o) => o.name);
-      const details = f.options.filter((o) => o.paras.length > 0).map((o) => ({ name: o.name, text: textOf(o.paras) }));
+      const details = f.options
+        .filter((o) => o.paras.length > 0)
+        .map((o) => {
+          const text = textOf(o.paras);
+          return { name: o.name, text, summary: optionSummary(o.name, text, f.group, ctx) };
+        });
       if (details.length > 0) entry.option_details = details;
     }
-    if (f.activations.length > 0) entry.activations = f.activations;
+    entry.summary = featureSummary(entry, ctx);
+    if (f.activations.length > 0) {
+      entry.activations = f.activations;
+      entry.activations = f.activations.map((a) => {
+        const summary = activationSummary(entry, a, ctx);
+        return summary ? { ...a, summary } : a;
+      });
+    }
     return entry;
   };
   const classFeatures = kept.filter((f) => f.section === 'class' || f.section === 'other').map(toEntry);

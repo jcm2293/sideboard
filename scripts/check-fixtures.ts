@@ -119,5 +119,21 @@ check('inventory Handaxe ×4, Rations ×28, Bedroll ×3', eq('Handaxe') === 4 &&
 const lb = c.equipment.reduce((s, e) => s + (parseFloat(e.weight ?? '') || 0), 0); check('inventory totals 162 lb', lb === 162, `${lb}`);
 check('no Defenses (literal None suppressed)', !c.damage_resistances && !c.damage_immunities && !c.condition_immunities);
 check('no spells', !c.is_spellcaster);
+console.log('summaries (spec §2, §4, §5.1)');
+const FIXTURES = ['warlock-dash-fiend-5', 'bard-lucien-glamour-5', 'monk-grandpa-dan-sun-soul-5', 'paladin-amber-slam-castigation-5', 'multiclass-wizard5-rogue3', 'barbarian-zhela-storm-herald-5'];
+const clauses = FIXTURES.flatMap((f) =>
+  all(load(f)).flatMap((x) => [x.summary, ...(x.activations ?? []).map((a) => a.summary ?? ''), ...(x.option_details ?? []).map((o) => o.summary ?? '')]),
+).filter(Boolean);
+check('no clause ends in an ellipsis', !clauses.some((x) => /(…|\.\.\.)$/.test(x)), clauses.filter((x) => /(…|\.\.\.)$/.test(x)).join(' | '));
+check('every clause is one line (≤ 110 chars)', clauses.every((x) => x.length <= 110), clauses.filter((x) => x.length > 110).join(' | '));
+const monk = load('monk-grandpa-dan-sun-soul-5');
+const barb = load('barbarian-zhela-storm-herald-5');
+check('Rage summary is the table short, +2 at level 5', feat(barb, 'Rage')?.summary === 'resistance to bludgeoning, piercing, slashing · +2 to Str damage · advantage on Str checks and saves', feat(barb, 'Rage')?.summary);
+check('Lucky summary is the table short', feat(monk, 'Lucky')?.summary === 'spend a point for advantage on your d20, or disadvantage on an attack against you', feat(monk, 'Lucky')?.summary);
+check('Deflect Attacks: one clause with its numbers', feat(monk, 'Deflect Attacks')?.summary === 'reduce the damage by 1d10+10; if reduced to 0, redirect it', feat(monk, 'Deflect Attacks')?.summary);
+check('Storm Aura: Sea has its own clause with DC 13', /DC 13/.test(feat(barb, 'Storm Aura')?.activations?.find((a) => a.label === 'Sea')?.summary ?? ''));
+check('Martial Arts full_text keeps its three in-body bullets', (feat(monk, 'Martial Arts')?.full_text?.match(/^• /gm) ?? []).length === 3);
+check('Lucky full_text keeps its three run-in paragraphs', ['Luck Points.', 'Advantage.', 'Disadvantage.'].every((h) => feat(monk, 'Lucky')?.full_text?.includes(h)));
+
 console.log(`\n${pass} pass, ${fail} fail`);
 process.exitCode = fail > 0 ? 1 : 0;

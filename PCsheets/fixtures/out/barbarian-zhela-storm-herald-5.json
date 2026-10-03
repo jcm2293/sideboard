@@ -163,7 +163,7 @@
     "class_features": [
       {
         "name": "Rage",
-        "summary": "As a Bonus Action, enter a Rage if you aren't wearing Heavy armor. While raging you have Resistance to Bludgeoning, Piercing, and Slashing damage; add your Rage Damage bonus to damage from attacks that use Strength; and have Advantage on Strength checks and saving throws. You can't cast spells or maintain Concentration.",
+        "summary": "resistance to bludgeoning, piercing, slashing · +2 to Str damage · advantage on Str checks and saves",
         "full_text": "As a Bonus Action, enter a Rage if you aren't wearing Heavy armor. While raging you have Resistance to Bludgeoning, Piercing, and Slashing damage; add your Rage Damage bonus to damage from attacks that use Strength; and have Advantage on Strength checks and saving throws. You can't cast spells or maintain Concentration.\n\nThe Rage lasts until the end of your next turn and extends each turn you attack an enemy, force an enemy to make a saving throw, or take a Bonus Action to extend it, up to 10 minutes. It ends early if you put on Heavy armor or have the Incapacitated condition. You regain one expended use on a Short Rest and all of them on a Long Rest.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -176,7 +176,7 @@
       },
       {
         "name": "Unarmored Defense",
-        "summary": "While not wearing armor, your base AC equals 14 + any Shield bonus.",
+        "summary": "AC 10 + Dex + Con (14) without armor; a shield still counts",
         "full_text": "While not wearing armor, your base AC equals 14 + any Shield bonus.",
         "kind": "ribbon",
         "group": "Barbarian",
@@ -184,7 +184,7 @@
       },
       {
         "name": "Weapon Mastery",
-        "summary": "You are able to use the mastery properties of 3 kinds of Simple or Martial Melee weapons of your choice. Whenever you finish a Long Rest, you can change one of those weapon choices.",
+        "summary": "use the mastery property of 3 chosen kinds of weapon",
         "full_text": "You are able to use the mastery properties of 3 kinds of Simple or Martial Melee weapons of your choice. Whenever you finish a Long Rest, you can change one of those weapon choices.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -197,21 +197,24 @@
         "option_details": [
           {
             "name": "Greatsword (Graze)",
-            "text": "Graze. If your attack roll with a Greatsword misses a creature, you can deal damage to it equal to the ability modifier used to make the attack. This damage is the same type dealt by the Greatsword, and can only be increased by increasing the ability modifier."
+            "text": "Graze. If your attack roll with a Greatsword misses a creature, you can deal damage to it equal to the ability modifier used to make the attack. This damage is the same type dealt by the Greatsword, and can only be increased by increasing the ability modifier.",
+            "summary": "on a miss, deal damage equal to your ability modifier"
           },
           {
             "name": "Whip (Slow)",
-            "text": "Slow. If you hit a creature with a Whip and deal damage to the creature, you can reduce its Speed by 10 ft. until the start of your next turn. If the creature is hit more than once with this property, the Speed reduction doesn’t exceed 10 ft."
+            "text": "Slow. If you hit a creature with a Whip and deal damage to the creature, you can reduce its Speed by 10 ft. until the start of your next turn. If the creature is hit more than once with this property, the Speed reduction doesn’t exceed 10 ft.",
+            "summary": "on a hit, reduce the target's Speed by 10 ft until your next turn"
           },
           {
             "name": "Handaxe (Vex)",
-            "text": "Vex. If you hit a creature with a Handaxe and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn."
+            "text": "Vex. If you hit a creature with a Handaxe and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn.",
+            "summary": "on a hit, Advantage on your next attack against that target"
           }
         ]
       },
       {
         "name": "Danger Sense",
-        "summary": "You have Advantage on Dex. saving throws unless you have the Incapacitated condition.",
+        "summary": "advantage on Dex saves unless Incapacitated",
         "full_text": "You have Advantage on Dex. saving throws unless you have the Incapacitated condition.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -219,7 +222,7 @@
       },
       {
         "name": "Reckless Attack",
-        "summary": "When you make your first attack roll on your turn, you can decide to attack recklessly, giving you Advantage on attack rolls using Str. until the start of your next turn, but attacks against you have Advantage during that time.",
+        "summary": "advantage on Str attacks this turn; attacks against you have advantage until your next turn",
         "full_text": "When you make your first attack roll on your turn, you can decide to attack recklessly, giving you Advantage on attack rolls using Str. until the start of your next turn, but attacks against you have Advantage during that time.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -227,7 +230,7 @@
       },
       {
         "name": "Primal Knowledge",
-        "summary": "You gain proficiency in another Barbarian skill of your choice.",
+        "summary": "one more skill; while raging, some Dex, Wis, and Cha checks can use Str instead",
         "full_text": "You gain proficiency in another Barbarian skill of your choice.\n\nWhile Raging, whenever you make an ability check using one of the following skills, you can make it as a Str. check even if it normally uses a different ability: Acrobatics, Intimidation, Perception, Stealth, or Survival.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -235,7 +238,7 @@
       },
       {
         "name": "Storm Aura",
-        "summary": "You gain a 10 ft. aura effect when you start your rage and as a bonus action on each of your turns.",
+        "summary": "10 ft aura while raging; activate it as you rage and as a Bonus Action each turn",
         "full_text": "You gain a 10 ft. aura effect when you start your rage and as a bonus action on each of your turns.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -246,19 +249,21 @@
         "option_details": [
           {
             "name": "Sea",
-            "text": "When activated, one creature of your choice in your aura takes lightning damage (DEX DC 13, half damage on success) based on your level: [3rd] 1d6, [10th] 2d6, [15th] 3d6, and [20th] 4d6"
+            "text": "When activated, one creature of your choice in your aura takes lightning damage (DEX DC 13, half damage on success) based on your level: [3rd] 1d6, [10th] 2d6, [15th] 3d6, and [20th] 4d6",
+            "summary": "one creature in your aura takes 1d6 lightning; Dex save DC 13 for half"
           }
         ],
         "activations": [
           {
             "label": "Sea",
-            "action": "bonus"
+            "action": "bonus",
+            "summary": "one creature in your aura takes 1d6 lightning; Dex save DC 13 for half"
           }
         ]
       },
       {
         "name": "Extra Attack",
-        "summary": "You can attack twice instead of once whenever you take the Attack action on your turn.",
+        "summary": "attack twice when you take the Attack action",
         "full_text": "You can attack twice instead of once whenever you take the Attack action on your turn.",
         "kind": "mechanical",
         "group": "Barbarian",
@@ -267,7 +272,7 @@
       },
       {
         "name": "Fast Movement",
-        "summary": "Your speed increases by 10 ft. while you aren’t wearing Heavy armor.",
+        "summary": "+10 ft speed while not in Heavy armor",
         "full_text": "Your speed increases by 10 ft. while you aren’t wearing Heavy armor.",
         "kind": "ribbon",
         "group": "Barbarian",
@@ -277,7 +282,7 @@
     "racial_traits": [
       {
         "name": "Aggressive",
-        "summary": "As a bonus action, you can move up to your speed toward an enemy of your choice that you can see or hear. You must end this move closer to the enemy than you started.",
+        "summary": "move up to your speed toward an enemy you can see",
         "full_text": "As a bonus action, you can move up to your speed toward an enemy of your choice that you can see or hear. You must end this move closer to the enemy than you started.",
         "kind": "mechanical",
         "group": "Orc of Eberron",
@@ -286,7 +291,7 @@
       },
       {
         "name": "Powerful Build",
-        "summary": "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift.",
+        "summary": "advantage on checks to end Grappled; count as one size larger for carrying",
         "full_text": "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift.",
         "kind": "ribbon",
         "group": "Orc of Eberron",
@@ -296,7 +301,7 @@
     "feats": [
       {
         "name": "Tavern Brawler",
-        "summary": "Enhanced Unarmed Strike. When you hit with your Unarmed Strike and deal damage, you can deal 1d4+4 Bludgeoning damage instead of the normal damage of an Unarmed Strike.",
+        "summary": "Unarmed Strikes deal 1d4 + Str; reroll 1s; once per turn, push 5 ft on a hit",
         "full_text": "Enhanced Unarmed Strike. When you hit with your Unarmed Strike and deal damage, you can deal 1d4+4 Bludgeoning damage instead of the normal damage of an Unarmed Strike.\n\nDamage Rerolls. Whenever you roll a damage die for your Unarmed Strike, you can reroll the die if it rolls a 1, and you must use the new roll.\n\nImprovised Weaponry. You have proficiency with improvised weapons.\n\nPush. When you hit a creature with an Unarmed Strike, you can deal damage to the target and also push it 5 ft. away from you. You can use this benefit only once per turn.",
         "kind": "mechanical",
         "group": "Feats",
@@ -304,11 +309,13 @@
         "activations": [
           {
             "label": "Enhanced Unarmed Strike",
-            "action": "action"
+            "action": "action",
+            "summary": "deal 1d4+4 Bludgeoning damage instead of the normal damage of an Unarmed Strike"
           },
           {
             "label": "Push",
-            "action": "special"
+            "action": "special",
+            "summary": "deal damage to the target and also push it 5 ft away from you"
           }
         ]
       }

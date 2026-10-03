@@ -1247,7 +1247,7 @@ export default function PlayerCharacterEditPage({
       {/* ─── CLASS FEATURES ─── */}
       <section className="card-parchment rounded-lg p-5 mb-6">
         <h2 className="font-display text-lg text-accent mb-4">Class Features</h2>
-        <p className="text-xs text-muted mb-3">Keep summaries to one sentence</p>
+        <p className="text-xs text-muted mb-3">The summary is the one line the sheet shows in Your turn and on the feature heading; the full rules text comes from the import.</p>
         {classFeatures.map((f, i) => (
           <div key={i} className="flex gap-2 mb-2 items-end">
             <input
@@ -1262,7 +1262,7 @@ export default function PlayerCharacterEditPage({
               value={f.summary}
               onChange={(e) => updateFeatureList(setClassFeatures, i, 'summary', e.target.value)}
               className={`${inputClass} flex-[2]`}
-              placeholder="Summary"
+              placeholder="One-line summary"
             />
             <button
               type="button"
@@ -1299,7 +1299,7 @@ export default function PlayerCharacterEditPage({
               value={f.summary}
               onChange={(e) => updateFeatureList(setRacialTraits, i, 'summary', e.target.value)}
               className={`${inputClass} flex-[2]`}
-              placeholder="Summary"
+              placeholder="One-line summary"
             />
             <button
               type="button"
@@ -1336,7 +1336,7 @@ export default function PlayerCharacterEditPage({
               value={f.summary}
               onChange={(e) => updateFeatureList(setFeats, i, 'summary', e.target.value)}
               className={`${inputClass} flex-[2]`}
-              placeholder="Summary"
+              placeholder="One-line summary"
             />
             <button
               type="button"

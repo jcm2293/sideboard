@@ -149,6 +149,39 @@ Note: 001 originally created `player_characters` with only `armor_class`, `hit_p
 
 Append a dated entry per commit. Keep it tight: what changed, why, file references where useful.
 
+### 2026-10-02 — Character sheet v3, phase 3b: summary clauses, page-1 fixes, Features page
+
+Spec §2, §4, §5.1 (as amended), §5.2.
+
+- **`summary` is now the one-line clause**, shown in Your turn and on feature headings.
+  - `src/lib/feature-summary.ts` seeds it from the first sentence: run-in headings and lead-ins are skipped, it is cut at a clause boundary at about 90 chars, never mid-word and never with an ellipsis.
+  - `src/data/feature-shorts.ts` overrides it for core and common features: every 2024 base class feature, the fixture subclasses, origin and general feats, fighting styles, invocations, Metamagic, and species traits.
+  - Shorts take the class level and modifiers ("+2 to Str damage", "reduce the damage by 1d10+10").
+  - The parser stores clauses on features, on activations that have text of their own, and on chosen options.
+  - The DM edits the summary on the edit page. Pre-v3 paragraphs are re-seeded at render time.
+- **Re-upload.** The import now replaces structure the edit page doesn't expose (full text, uses, activations, options). A summary still equal to its seed for the stored sheet follows the import, so its numbers track level. A rewritten one stays.
+- **Your turn.**
+  - An option renders as `Storm Aura: Sea`.
+  - An activation with text of its own gets its own line, with the source feature in italics. Its text can be a run-in paragraph, option text, a table short, or the parent's "As a Bonus Action, …" sentence when it is the only activation of that type.
+  - Activations without text that share an action type collapse under the feature (`Deflect Attacks · … (1 Focus)`, `Lay On Hands`, `Pact of the Blade`, `Fast Hands`).
+  - A required spend moves into the cost.
+- **Attacks.**
+  - A feature whose text names a ranged/melee spell/weapon attack plus damage or the Martial Arts die becomes a row (Radiant Sun Bolt +8, 1d8 radiant, 30 ft).
+  - A rider already folded into a row is dropped (Martial Arts die).
+  - A `Masteries ·` line sits under the table, and each chosen mastery's effect goes in its weapon's notes (`src/data/weapons.ts` `MASTERY_EFFECTS`).
+- **Layout.**
+  - Ability label and modifier share a baseline; every save shows a circle.
+  - Inventory goes inline whenever it fits, by measurement.
+  - The band joins subclasses with " · " per §6.
+- **Features pages** (`src/lib/pdf/page-features.ts`):
+  - Two flowing columns: one group per class in `classes` order (subclass in the header), then species traits, then feats.
+  - Each heading carries name · parent · uses · action, plus the summary for long or empty texts.
+  - Bodies keep run-in headings bold and bullets hanging. Weapon Mastery lists `Greatsword: Graze · …` with one-line definitions; other options appear with their text. Ribbons share one "Also" paragraph.
+  - Species-only casters get an Innate spells block and no Spells pages.
+  - The interim feature page is gone.
+- `drawRich` emits consecutive same-style words as one string (fixture PDFs back to ~75–130 KB; text selects as text).
+- check-fixtures: 81/81, including no-ellipsis, one-line clauses, the Rage/Lucky/Deflect Attacks shorts, and the Martial Arts bullets and Lucky run-ins in `full_text`.
+
 ### 2026-10-02 — Character sheet v3, phase 3a: page 1 (combat reference)
 
 Spec §5.1, laid out from `docs/sheet-mockup-v3.html` (now committed). Pages 2+ are still the old renderer.

@@ -228,11 +228,17 @@ export interface FeatureUses {
 export interface FeatureActivation {
   label: string;
   action: ActionType;
+  /** Its own one-line clause, when it has text of its own (a run-in paragraph, an option, a table short). */
+  summary?: string;
 }
 
 export interface FeatureEntry {
   name: string;
-  /** The first paragraph of full_text (the whole description for older records). */
+  /**
+   * The one-line clause shown in "Your turn" and on the Features-page heading:
+   * the reference table's short, else seeded from the text (lib/feature-summary).
+   * DM-editable. Pre-v3 records hold a paragraph here; the renderer re-seeds those.
+   */
   summary: string;
   /** Complete description, paragraphs joined with \n\n. */
   full_text?: string;
@@ -248,7 +254,7 @@ export interface FeatureEntry {
   /** Chosen sub-options: ["Sea"], ["Greatsword (Graze)", "Whip (Slow)"]. */
   options?: string[];
   /** Body text of chosen options that have one. */
-  option_details?: { name: string; text: string }[];
+  option_details?: { name: string; text: string; summary?: string }[];
   activations?: FeatureActivation[];
 }
 

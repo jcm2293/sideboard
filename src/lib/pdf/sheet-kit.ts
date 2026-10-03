@@ -344,15 +344,35 @@ export function layoutRich(doc: jsPDF, runs: Run[], maxWidth: number, baseSize: 
   return lines.filter((l) => l.length > 0);
 }
 
-/** Draw laid-out rich lines from baseline y; returns the baseline after the last line. */
+/**
+ * Draw laid-out rich lines from baseline y; returns the baseline after the
+ * last line. Consecutive words in one style go out as a single string (fewer
+ * PDF text objects, and the text selects as text); the widths match because
+ * layout measured the same unkerned glyphs.
+ */
 export function drawRich(doc: jsPDF, lines: Placed[][], x: number, y: number, lineHeight: number, baseSize: number): number {
   for (const line of lines) {
+    let pending: { x: number; text: string; opts: TextOpts; key: string } | null = null;
+    const flush = () => {
+      if (pending && pending.text.trim()) text(doc, pending.text.replace(/\s+$/, ''), pending.x, y, pending.opts);
+      pending = null;
+    };
     for (const p of line) {
-      if (p.run.kind === 'chip') chip(doc, p.run.text, x + p.x, y, p.run.variant);
-      else if (p.run.text.trim()) {
-        text(doc, p.run.text, x + p.x, y, { size: p.run.size ?? baseSize, style: p.run.style, color: p.run.color });
+      if (p.run.kind === 'chip') {
+        flush();
+        chip(doc, p.run.text, x + p.x, y, p.run.variant);
+        continue;
+      }
+      const opts: TextOpts = { size: p.run.size ?? baseSize, style: p.run.style, color: p.run.color };
+      const key = `${opts.size}|${opts.style ?? ''}|${opts.color ?? ''}`;
+      if (pending && pending.key === key) pending.text += p.run.text;
+      else {
+        flush();
+        if (!p.run.text.trim()) continue; // a space that starts a new style adds nothing
+        pending = { x: x + p.x, text: p.run.text, opts, key };
       }
     }
+    flush();
     y += lineHeight;
   }
   return y;

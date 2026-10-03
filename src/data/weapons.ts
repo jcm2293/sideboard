@@ -32,3 +32,15 @@ export function weaponMastery(name: string): string | null {
   const key = standardWeapon(name);
   return key ? WEAPON_MASTERY[key] : null;
 }
+
+/** One-line effect of each mastery property, for the attacks table notes. */
+export const MASTERY_EFFECTS: Record<string, string> = {
+  Cleave: 'on a melee hit, attack a second creature within 5 ft of the first, once per turn',
+  Graze: 'on a miss, deal damage equal to your ability modifier',
+  Nick: "make the Light weapon's extra attack as part of the Attack action, once per turn",
+  Push: 'on a hit, push a Large or smaller target up to 10 ft away',
+  Sap: 'on a hit, the target has Disadvantage on its next attack roll',
+  Slow: "on a hit, reduce the target's Speed by 10 ft until your next turn",
+  Topple: 'on a hit, the target makes a Con save or falls Prone',
+  Vex: 'on a hit, Advantage on your next attack against that target',
+};
